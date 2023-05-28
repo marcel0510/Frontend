@@ -1,0 +1,12 @@
+.verticalLine {
+    border: 1px solid rgba(224, 224, 224, 1);
+}
+
+.width {
+    max-width: 17%;
+    width: 13%;
+}
+
+.widthHead {
+    width: 7%;
+}

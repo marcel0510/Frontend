@@ -22,7 +22,7 @@ export default function NavList() {
             <Divider />
                 <ListItemButton sx={{ padding: 0 }} onClick={() => navigate("/Aulas")}>
                     <SearchIcon fontSize="small" sx={{ marginRight: "5%" }} />
-                    <Typography variant="body2">Ver horarios</Typography>
+                    <Typography variant="body2">Ver Aulas</Typography>
                 </ListItemButton>
                 <Divider />
                 

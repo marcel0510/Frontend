@@ -6,11 +6,12 @@ import {
   InputLabel,
   FormControl,
   Box,
+  TextField,
 } from "@mui/material";
 
 import { distinct, findClassroom } from "../services/Building.Services";
 
-export default function ClassroomHeader({ isLoading,  buildings, build, setBuild, floor, setFloor }) {
+export default function ClassroomHeader({ isLoading,  buildings, build, floor, findClassrooms }) {
     var floors = [];
     var classrooms = [];
 
@@ -25,6 +26,8 @@ export default function ClassroomHeader({ isLoading,  buildings, build, setBuild
     classrooms = findClassroom(buildings[build - 1].classrooms, floor)
   }
 
+  
+
 
   return (
     <Paper sx={{ padding: "1.5%" }} elevation={3}>
@@ -32,16 +35,16 @@ export default function ClassroomHeader({ isLoading,  buildings, build, setBuild
         Aulas
       </Typography>
 
-      <Box sx={{ display: "flex", justifyContent: "space-evenly", marginTop: "3.5%"}}>
-        <FormControl sx={{ minWidth: "17%" }} size="small">
+      <Box sx={{ display: "flex", justifyContent: "space-evenly", marginTop: "3.5%", width: "100%"}}>
+        <Box sx={{ width: "47%", display: "flex", justifyContent: "space-evenly", alignItems: "center"}}>
+        <FormControl sx={{ minWidth: "32%" }} size="small">
           <InputLabel id="edificio-label">Edificio</InputLabel>
           <Select
             labelId="edificio-label"
             id="edificio-select"
             label="Edificio"
-            defaultValue={"Edificio"}
             value={build}
-            onChange={(e) => setBuild(e.target.value)}
+            onChange={(e) => findClassrooms(e.target.value)}
           >
             <MenuItem value={0}>{}</MenuItem>
             {buildings.map((building, index) => {
@@ -54,7 +57,7 @@ export default function ClassroomHeader({ isLoading,  buildings, build, setBuild
           </Select>
         </FormControl>
 
-        <FormControl sx={{ minWidth: "8%" }} size="small">
+        <FormControl sx={{ minWidth: "15%" }} size="small">
           <InputLabel id="piso-label">Piso</InputLabel>
           <Select
             labelId="piso-label"
@@ -74,6 +77,16 @@ export default function ClassroomHeader({ isLoading,  buildings, build, setBuild
             })}
           </Select>
         </FormControl>
+        </Box>
+        <Box sx={{ width: "47%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <FormControl>
+            <TextField 
+            id="aula-textField"
+            size="small"
+            label="Codigo del SAEw"
+            />
+          </FormControl>
+        </Box>
       </Box>
     </Paper>
   );

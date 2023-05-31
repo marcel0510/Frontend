@@ -9,12 +9,20 @@ export default function Classroom() {
   const [build, setBuild] = useState(0);
   const [floor, setFloor] = useState("");
 
+  var filterClassrooms = [];
+
+  const findClassrooms = (e) => {
+    setBuild(e.target.value)
+    if(build !== 0)
+      filterBuildings = buildings.find(b => b.id == build)
+    else  
+      filterBuildings = buildings
+  }
+
   if (dataBuilding)
     return (
       <Box
         sx={{
-          marginLeft: "19.5%",
-          width: "79.5%",
           display: "flex",
           justifyContent: "center",
           alignContent: "center",
@@ -30,9 +38,8 @@ export default function Classroom() {
         isLoading={dataBuilding}
         buildings={buildings}
         build={build}
-        setBuild={setBuild}
         floor={floor}
-        setFloor={setFloor}
+        findClassrooms={findClassrooms}
       />
       <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
         {buildings.map((building) => {

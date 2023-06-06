@@ -36,7 +36,7 @@ export default function ClassroomCard({ classroom, buildName, buildCode }) {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button variant="outlined" onClick={() => navigate(`/Horario/${classroom.id}`)}>Ver horario</Button>
+        <Button variant="outlined" onClick={() => navigate(`/Main/Horario/${classroom.id}`)}>Ver horario</Button>
         <Button variant="outlined" color="warning">
           Editar
         </Button>

@@ -8,7 +8,6 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
 
-import "../Styles/Schedule.css";
 
 export default function ScheduleBody({ classroom }) {
   const SevenToEight = [

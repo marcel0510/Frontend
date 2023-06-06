@@ -8,16 +8,8 @@ export default function Classroom() {
   const { isLoading: dataBuilding, data: buildings } = useBuildings();
   const [build, setBuild] = useState(0);
   const [floor, setFloor] = useState("");
-
-  var filterClassrooms = [];
-
-  const findClassrooms = (e) => {
-    setBuild(e.target.value)
-    if(build !== 0)
-      filterBuildings = buildings.find(b => b.id == build)
-    else  
-      filterBuildings = buildings
-  }
+  const [filterClassroom, setFilterClassroom] = useState({});
+  const [buildFiltered, setBuildFiltered] = useState({});
 
   if (dataBuilding)
     return (
@@ -32,6 +24,25 @@ export default function Classroom() {
       </Box>
     );
 
+  const findClassrooms = (e) => {
+    if (e !== 0) {
+      setFilterClassroom({ ...buildings.find((b) => b.id === e) });
+      setBuildFiltered({ ...buildings.find((b) => b.id === e) });
+    } else setFilterClassroom({});
+    setBuild(e);
+  };
+
+  const findClassroomsByFloor = (e) => {
+    if (e !== "")
+      setFilterClassroom({
+        ...filterClassroom,
+        classrooms: buildFiltered.classrooms.filter((c) => c.floor === e),
+      });
+    else setFilterClassroom({ ...filterClassroom });
+    console.log(filterClassroom);
+    setFloor(e);
+  };
+
   return (
     <>
       <ClassroomHeader
@@ -40,22 +51,39 @@ export default function Classroom() {
         build={build}
         floor={floor}
         findClassrooms={findClassrooms}
+        findClassroomsByFloor={findClassroomsByFloor}
       />
-      <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
-        {buildings.map((building) => {
-          return building.classrooms.map((classroom, index) => {
+      {Object.keys(filterClassroom).length === 0 ? (
+        <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
+          {buildings.map((building) => {
+            return building.classrooms.map((classroom, index) => {
+              return (
+                <Grid key={index} item md={3.9} marginBottom={"1.3%"}>
+                  <ClassroomCard
+                    classroom={classroom}
+                    buildName={building.name}
+                    buildCode={building.code}
+                  />
+                </Grid>
+              );
+            });
+          })}
+        </Grid>
+      ) : (
+        <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
+          {filterClassroom.classrooms.map((classroom, index) => {
             return (
               <Grid key={index} item md={3.9} marginBottom={"1.3%"}>
                 <ClassroomCard
                   classroom={classroom}
-                  buildName={building.name}
-                  buildCode={building.code}
+                  buildName={filterClassroom.name}
+                  buildCode={filterClassroom.code}
                 />
               </Grid>
             );
-          });
-        })}
-      </Grid>
+          })}
+        </Grid>
+      )}
     </>
   );
 }

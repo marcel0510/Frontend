@@ -11,9 +11,8 @@ import {
 
 import { distinct, findClassroom } from "../services/Building.Services";
 
-export default function ClassroomHeader({ isLoading,  buildings, build, floor, findClassrooms }) {
+export default function ClassroomHeader({ isLoading,  buildings, build, floor, findClassrooms, findClassroomsByFloor }) {
     var floors = [];
-    var classrooms = [];
 
   if (isLoading) return;
 
@@ -22,15 +21,9 @@ export default function ClassroomHeader({ isLoading,  buildings, build, floor, f
     floors.sort();
   }
 
-  if(build !== 0 && floors !== ""){
-    classrooms = findClassroom(buildings[build - 1].classrooms, floor)
-  }
-
-  
-
 
   return (
-    <Paper sx={{ padding: "1.5%" }} elevation={3}>
+    <Paper sx={{ padding: "1.5%", width: "100%" }} elevation={3}>
       <Typography variant="h3" align="center">
         Aulas
       </Typography>
@@ -40,8 +33,6 @@ export default function ClassroomHeader({ isLoading,  buildings, build, floor, f
         <FormControl sx={{ minWidth: "32%" }} size="small">
           <InputLabel id="edificio-label">Edificio</InputLabel>
           <Select
-            labelId="edificio-label"
-            id="edificio-select"
             label="Edificio"
             value={build}
             onChange={(e) => findClassrooms(e.target.value)}
@@ -60,12 +51,10 @@ export default function ClassroomHeader({ isLoading,  buildings, build, floor, f
         <FormControl sx={{ minWidth: "15%" }} size="small">
           <InputLabel id="piso-label">Piso</InputLabel>
           <Select
-            labelId="piso-label"
-            id="piso-select"
             label="Piso"
             defaultValue={"Piso"}
             value={floor}
-            onChange={(e) => setFloor(e.target.value)}
+            onChange={(e) => findClassroomsByFloor(e.target.value)}
           >
             <MenuItem value={""}>{}</MenuItem>
             {floors.map((floor, index) => {

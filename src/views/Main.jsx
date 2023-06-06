@@ -1,5 +1,18 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { Box, Button, Fab, Icon, IconButton, Paper, Toolbar } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Fab,
+  FormControl,
+  Icon,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Toolbar,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import MuiAppBar from "@mui/material/AppBar";
@@ -9,7 +22,8 @@ import NavList from "../components/NavList";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import logo from "../assets/logo.png";
-
+import { RoleMap } from "../helpers/user.helpers";
+import { useCalendars } from "../hooks/Calendar.Hooks";
 
 const drawerWidth = "18%";
 
@@ -58,12 +72,17 @@ const AppBar = styled(MuiAppBar, {
 const Img = styled("img")({
   width: 50,
   margin: 0,
-  marginTop: 8
+  marginTop: 8,
 });
+
+const userInfo = JSON.parse(localStorage.getItem("UserInfo"));
 
 export default function Main() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
+  const [calendar, setCalendar] = useState(0);
+  const { isLoading, data: calendars } = useCalendars();
+
   useEffect(() => {
     if (!localStorage.getItem("UserInfo")) {
       navigate("/");
@@ -82,6 +101,19 @@ export default function Main() {
     setOpen(false);
   };
 
+  if (isLoading)
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignContent: "center",
+        }}
+      >
+        <CircularProgress size={"8%"} sx={{ marginTop: "15%" }} />
+      </Box>
+    );
+
   return (
     <Box sx={{ display: "flex", width: "100%", height: "100%" }}>
       <AppBar
@@ -97,30 +129,74 @@ export default function Main() {
               width: "18%",
               height: "100%",
               display: "flex",
-              alignItems: "center"
+              alignItems: "center",
             }}
             elevation={10}
           >
-            <Box sx={{ display: "flex", justifyContent: "flex-start", flexGrow: 1, paddingTop: 0.5 }}>
-            <Box sx={{ backgroundColor: "#fff", ml: "3%", borderRadius: 4, height: 65 }}>
-            <Img src={logo}  />
-            </Box>
-            <Typography variant="h2" color={"#fff"} noWrap sx={{ ml: 1 }}>
-              FIEE
-            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-start",
+                flexGrow: 1,
+                paddingTop: 0.5,
+              }}
+            >
+              <Box
+                sx={{
+                  backgroundColor: "#fff",
+                  ml: "3%",
+                  borderRadius: 4,
+                  height: 65,
+                }}
+              >
+                <Img src={logo} />
+              </Box>
+              <Typography variant="h2" color={"#fff"} noWrap sx={{ ml: 1 }}>
+                FIEE
+              </Typography>
             </Box>
             <IconButton
-            disableRipple
-            onClick={open ? handleDrawerClose : handleDrawerOpen}
-            sx={{backgroundColor: "#e31d1a", borderRadius: 5, height: "55%" }}
-          >
-            {
-              open ? <KeyboardArrowLeftIcon />:<KeyboardArrowRightIcon />
-            }
-          </IconButton>
-           
+              disableRipple
+              onClick={open ? handleDrawerClose : handleDrawerOpen}
+              sx={{
+                backgroundColor: "#e31d1a",
+                borderRadius: 5,
+                height: "55%",
+              }}
+            >
+              {open ? <KeyboardArrowLeftIcon /> : <KeyboardArrowRightIcon />}
+            </IconButton>
           </Paper>
-          <Typography sx={{ flexGrow: 1 }} />
+          <Box
+            sx={{
+              ml: 5,
+              display: "flex",
+              flexDirection: "column",
+              flexGrow: 1,
+            }}
+          >
+            <Typography>Usuario: {userInfo["user"]["name"]}</Typography>
+            <Typography>Perfil: {RoleMap(userInfo["user"]["role"])}</Typography>
+          </Box>
+         
+            <Typography mr={3}>Calendario: </Typography>
+            <Select
+              value={calendar}
+              labelId="calendario-select"
+              onChange={(e) => setCalendar(e.target.value)}
+              sx={{  backgroundColor: "#fff", mr: 10, borderRadius: 5, minWidth: 100, height: 40}}
+            >
+              <MenuItem key={-1} value={0}></MenuItem>
+              {calendars.map((calendar, index) => {
+                return (
+                  <MenuItem key={index} value={calendar.id}>
+                    <Typography>{calendar.period}</Typography>
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          
+
           <Button
             color="secondary"
             variant="outlined"
@@ -147,7 +223,7 @@ export default function Main() {
         <NavList />
       </Drawer>
       <Body open={open}>
-        <Outlet />
+        <Outlet context={[calendar, setCalendar]} />
       </Body>
     </Box>
   );

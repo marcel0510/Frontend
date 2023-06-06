@@ -120,7 +120,7 @@ export default function Main() {
         position="fixed"
         open={open}
         sx={{ height: "10%", padding: 0, margin: 0 }}
-        disableGutters
+        
       >
         <Toolbar disableGutters>
           <Paper
@@ -139,14 +139,16 @@ export default function Main() {
                 justifyContent: "flex-start",
                 flexGrow: 1,
                 paddingTop: 0.5,
+                mt: 0.45
               }}
             >
               <Box
                 sx={{
                   backgroundColor: "#fff",
-                  ml: "3%",
+                  ml: 2,
                   borderRadius: 4,
                   height: 65,
+                 
                 }}
               >
                 <Img src={logo} />

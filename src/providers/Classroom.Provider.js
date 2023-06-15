@@ -9,6 +9,12 @@ export const GetClassrooms = async () => {
     return response.data;
 }
 
+export const GetClassroomsByCalendar = async (id) => {
+    const response = await classroomProviderHandler.get(`/byCalendar/${id}`);
+    return response.data;
+}
+
+
 export const GetClassroom = async (id) => {
     const response = await classroomProviderHandler.get(`/${id}`);
     return response.data;

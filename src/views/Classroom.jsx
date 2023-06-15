@@ -1,17 +1,28 @@
 import { useBuildings } from "../hooks/Building.Hooks";
-import { useState } from "react";
+import { useClassroomsByCalendar } from "../hooks/Classroom.Hooks";
+import { useEffect, useState } from "react";
 import { Box, CircularProgress, Grid } from "@mui/material";
 import ClassroomCard from "../components/ClassroomCard";
 import ClassroomHeader from "../components/ClassroomHeader";
+import { useOutletContext } from "react-router-dom";
 
 export default function Classroom() {
-  const { isLoading: dataBuilding, data: buildings } = useBuildings();
+  const [calendar, setCalendar] = useOutletContext();
+  const { isLoading: loadBuild, data: buildings } = useBuildings();
+  const { isLoading: loadClass, data: classrooms } =
+    useClassroomsByCalendar(calendar);
   const [build, setBuild] = useState(0);
   const [floor, setFloor] = useState("");
-  const [filterClassroom, setFilterClassroom] = useState({});
+  const [filterClassroom, setFilterClassroom] = useState([]);
   const [buildFiltered, setBuildFiltered] = useState({});
 
-  if (dataBuilding)
+  useEffect(() => {
+    if (calendar !== 0) {
+      setCalendar(calendar);
+    }
+  }, []);
+
+  if (loadBuild || loadClass || calendar === 0)
     return (
       <Box
         sx={{
@@ -26,10 +37,11 @@ export default function Classroom() {
 
   const findClassrooms = (e) => {
     if (e !== 0) {
-      setFilterClassroom({ ...buildings.find((b) => b.id === e) });
-      setBuildFiltered({ ...buildings.find((b) => b.id === e) });
-    } else setFilterClassroom({});
+      setFilterClassroom([ ...classrooms.filter(c => c.building.id === e) ]);
+      //setBuildFiltered({ ...classrooms.find((c) => c.building.id === e) });
+    } else setFilterClassroom([]);
     setBuild(e);
+    console.log(filterClassroom.length);
   };
 
   const findClassroomsByFloor = (e) => {
@@ -46,39 +58,30 @@ export default function Classroom() {
   return (
     <>
       <ClassroomHeader
-        isLoading={dataBuilding}
+        isLoading={loadBuild}
         buildings={buildings}
         build={build}
         floor={floor}
         findClassrooms={findClassrooms}
         findClassroomsByFloor={findClassroomsByFloor}
       />
-      {Object.keys(filterClassroom).length === 0 ? (
+
+      {filterClassroom.length <= 0 ? (
         <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
-          {buildings.map((building) => {
-            return building.classrooms.map((classroom, index) => {
-              return (
-                <Grid key={index} item md={3.9} marginBottom={"1.3%"}>
-                  <ClassroomCard
-                    classroom={classroom}
-                    buildName={building.name}
-                    buildCode={building.code}
-                  />
-                </Grid>
-              );
-            });
+          {classrooms.map((classroom, index) => {
+            return (
+              <Grid key={index} item md={3.9} marginBottom={"1.3%"}>
+                <ClassroomCard classroom={classroom} />
+              </Grid>
+            );
           })}
         </Grid>
       ) : (
         <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
-          {filterClassroom.classrooms.map((classroom, index) => {
+          {filterClassroom.map((classroom, index) => {
             return (
               <Grid key={index} item md={3.9} marginBottom={"1.3%"}>
-                <ClassroomCard
-                  classroom={classroom}
-                  buildName={filterClassroom.name}
-                  buildCode={filterClassroom.code}
-                />
+                <ClassroomCard classroom={classroom} />
               </Grid>
             );
           })}

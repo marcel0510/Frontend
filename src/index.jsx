@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryCache, QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { BrowserRouter } from "react-router-dom";
 import  CssBaseline  from "@mui/material/CssBaseline";
@@ -12,8 +12,9 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme } from "@mui/material";
 import { ThemeProvider } from "@emotion/react";
-
-
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { esES } from "@mui/x-date-pickers/locales";
 
 const theme = createTheme({
   palette: {
@@ -32,9 +33,13 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      refetchInterval: 3000,
       staleTime: false,
       retry: false,
     },
+    mutations: {
+      refetchInterval: 3000,
+    }
   },
 });
 
@@ -43,8 +48,10 @@ root.render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
       <ThemeProvider theme={theme}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} locate={esES.components.MuiLocalizationProvider.defaultProps.localeText}>
         <CssBaseline />
         <App />
+        </LocalizationProvider>
         <ReactQueryDevtools />
         </ThemeProvider>
       </BrowserRouter>

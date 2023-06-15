@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 
 
-export default function ClassroomCard({ classroom, buildName, buildCode }) {
+export default function ClassroomCard({ classroom }) {
   const navigate = useNavigate();
 
   return (
@@ -28,11 +28,11 @@ export default function ClassroomCard({ classroom, buildName, buildCode }) {
           {classroom.isLab ? classroom.name : "No es laboratorio"}
         </Typography>
         <Typography variant="body1">Capacidad: {classroom.capacity}</Typography>
-        <Typography variant="body1">{buildName}</Typography>
+        <Typography variant="body1">{classroom.building.name}</Typography>
         <Typography variant="body1">Piso: {classroom.floor}</Typography>
         <Typography variant="body1">
           Codigo SAEw:{" "}
-          {buildCode + "/" + classroom.floor + "/" + classroom.code}
+          {classroom.building.code + "/" + classroom.floor + "/" + classroom.code}
         </Typography>
       </CardContent>
       <CardActions>

@@ -6,7 +6,9 @@ export const useBuildings = () => {
 }
 
 export const useBuilding = (id) => {
-    return useQuery(['GetBuilding', id], () => GetBuilding(id), { staleTime: 0 });
+    if(id !== undefined)
+      return useQuery(['GetBuilding', id], () => GetBuilding(id), { staleTime: 0 });
+    return { data: '', isLoadion: '' };
 } 
 
 export const useAddBuilding = () => {
@@ -14,7 +16,8 @@ export const useAddBuilding = () => {
     return useMutation(AddBuilding, {
         onSuccess: () => {
             queryClient.invalidateQueries(['GetBuildings']);
-        }
+        },
+        onError: (error) => console.log(error)
     })
 }
 

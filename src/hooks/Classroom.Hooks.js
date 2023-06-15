@@ -1,9 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { GetClassrooms, GetClassroom, AddClassroom, UpdateClassroom, DeleteClassroom, NewCalendar } from '../providers/Classroom.Provider'
+import { GetClassrooms, GetClassroomsByCalendar, GetClassroom, AddClassroom, UpdateClassroom, DeleteClassroom, NewCalendar } from '../providers/Classroom.Provider'
 
 export const useClassrooms = () => {
     return useQuery(['GetClassrooms'], GetClassrooms)
 }
+
+export const useClassroomsByCalendar = (id) => {
+    return useQuery(['GetClassroomsByCalendar', id], () => GetClassroomsByCalendar(id))
+}
+
 
 export const useClassroom = (id) => {
     return useQuery(['GetClassroom', id], () => GetClassroom(id), { staleTime: 0 });

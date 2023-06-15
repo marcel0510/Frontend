@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
+
 const calendarProviderHandler = axios.create({
     baseURL: 'https://localhost:7130/api/calendar'
 })
@@ -15,7 +17,7 @@ export const GetCalendar = async (id) => {
 }
 
 export const AddCalendar = async (calendar) => {
-    return await calendarProviderHandler.post(`/new`, calendar);
+    return await calendarProviderHandler.post(`/new`, calendar,  { headers: { Authorization: `Bearer ${UserInfo.token}` } });
 }
 
 export const UpdateCalendar = async (calendar) => {

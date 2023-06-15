@@ -1,19 +1,21 @@
 import {
   Alert,
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   FormControl,
+  Modal,
   Paper,
   Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
-import styled from "@emotion/styled";
+import logo from "../assets/logo.png";
 
+import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
 import { useValidateUser } from "../hooks/User.Hooks";
-
-import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 
 const Img = styled("img")({
@@ -22,7 +24,7 @@ const Img = styled("img")({
 
 export default function Login() {
   const navigate = useNavigate();
-  const { mutate: validate } = useValidateUser();
+  const { mutate: validate, isLoading, isError } = useValidateUser();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -42,19 +44,18 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState(false);
 
   useEffect(() => {
-    if(localStorage.getItem("UserInfo")){
-     navigate("/Main");
+    if (localStorage.getItem("UserInfo")) {
+      navigate("/Main");
     }
-   }, []);
+  }, []);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log(form);
     const bool1 = validateEmail(form.email);
     const bool2 = validatePassword(form.password);
     if (bool1 && bool2) {
       validate(form, {
-        onSuccess: res => {
+        onSuccess: (res) => {
           const data = res.data;
           setErrorEmail({
             error: false,
@@ -63,8 +64,8 @@ export default function Login() {
             error: false,
           });
           if (data.isSuccess) {
-            setSuccessMessage(true);
             localStorage.setItem("UserInfo", JSON.stringify(data));
+            setSuccessMessage(true);
           } else {
             setErrorMessage(true);
           }
@@ -116,7 +117,8 @@ export default function Login() {
 
   const handleErrorMessage = () => {
     setErrorMessage(false);
-  }
+  };
+
 
   return (
     <Box
@@ -128,7 +130,7 @@ export default function Login() {
         gap: 5,
       }}
     >
-        <Snackbar
+      <Snackbar
         open={successMessage}
         autoHideDuration={1500}
         onClose={handleSuccessMessage}
@@ -198,7 +200,30 @@ export default function Login() {
           Ingresar
         </Button>
       </Paper>
-      
+
+      {isLoading || isError ? (
+        <Backdrop
+          open={true}
+          sx={{
+            color: "#fff",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          {isError ? (
+            <Typography mb={"1.5%"} variant="h5" color="secondary">
+              Error de conexión con el servidor!
+            </Typography>
+          ) : (
+            <p></p>
+          )}
+          <CircularProgress size={100} />
+        </Backdrop>
+      ) : (
+        <p />
+      )}
     </Box>
   );
 }

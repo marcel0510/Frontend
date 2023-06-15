@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+
+const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
 const BuildingProviderHandler = axios.create({
-    baseURL: 'https://localhost:7130/api/building'
+    baseURL: 'https://localhost:7130/api/building',
 })
 
 export const GetBuildings = async () => {
@@ -15,13 +17,13 @@ export const GetBuilding = async (id) => {
 }
 
 export const AddBuilding = async (building) => {
-    return await BuildingProviderHandler.post(`/new`, building);
+    return await BuildingProviderHandler.post(`/new`, building, { headers: { Authorization: `Bearer ${UserInfo.token}` } });
 }
 
 export const UpdateBuilding = async (building) => {
-    return await BuildingProviderHandler.put(`/update/${building.Id}`, building);
+    return await BuildingProviderHandler.put(`/update`, building, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
 }
 
-export const DeleteBuilding = async (id) => {
-    return await BuildingProviderHandler.delete(`/delete/${id}`);
+export const DeleteBuilding = async (building) => {
+    return await BuildingProviderHandler.put(`/delete`, building, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
 }

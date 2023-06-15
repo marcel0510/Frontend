@@ -1,13 +1,10 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import {
+  Backdrop,
   Box,
   Button,
   CircularProgress,
-  Fab,
-  FormControl,
-  Icon,
   IconButton,
-  InputLabel,
   MenuItem,
   Paper,
   Select,
@@ -25,7 +22,7 @@ import logo from "../assets/logo.png";
 import { RoleMap } from "../helpers/user.helpers";
 import { useCalendars } from "../hooks/Calendar.Hooks";
 
-const drawerWidth = "18%";
+const drawerWidth = 270;
 
 const Body = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
@@ -35,9 +32,9 @@ const Body = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: `-${drawerWidth}`,
-    marginTop: "4%",
-    width: `82%`,
+    marginLeft: -270,
+    marginTop: "5%",
+    width: "82%",
     ...(open && {
       transition: theme.transitions.create("margin", {
         easing: theme.transitions.easing.easeOut,
@@ -75,23 +72,28 @@ const Img = styled("img")({
   marginTop: 8,
 });
 
-const userInfo = JSON.parse(localStorage.getItem("UserInfo"));
 
 export default function Main() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
   const [calendar, setCalendar] = useState(0);
-  const { isLoading, data: calendars } = useCalendars();
+  const { isLoading, data: calendars, isError } = useCalendars();
+  const userInfo = JSON.parse(localStorage.getItem("UserInfo"));
+
 
   useEffect(() => {
     if (!localStorage.getItem("UserInfo")) {
       navigate("/");
     }
-  }, []);
+    if(!isLoading) {
+      calendars.reverse();
+      setCalendar(calendars[0]["id"]);
+    }
+  }, [isLoading]);
 
   const handleCloseSession = () => {
     localStorage.removeItem("UserInfo");
-    window.location.href = "./";
+    navigate("/");
   };
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -101,18 +103,29 @@ export default function Main() {
     setOpen(false);
   };
 
-  if (isLoading)
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignContent: "center",
-        }}
-      >
-        <CircularProgress size={"8%"} sx={{ marginTop: "15%" }} />
-      </Box>
-    );
+  if (isLoading || isError)
+  return (
+    <Backdrop
+      open={true}
+      sx={{
+        color: "#fff",
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
+      {isError ? (
+        <Typography mb={"1.5%"} variant="h5" color="secondary">
+          Error de conexión con el servidor!
+        </Typography>
+      ) : (
+        <p></p>
+      )}
+      <CircularProgress size={100} />
+    </Backdrop>
+  );
+  
 
   return (
     <Box sx={{ display: "flex", width: "100%", height: "100%" }}>
@@ -126,7 +139,7 @@ export default function Main() {
           <Paper
             sx={{
               backgroundColor: "#001f3e",
-              width: "18%",
+              width: drawerWidth,
               height: "100%",
               display: "flex",
               alignItems: "center",
@@ -184,8 +197,8 @@ export default function Main() {
             <Typography mr={3}>Calendario: </Typography>
             <Select
               value={calendar}
-              labelId="calendario-select"
               onChange={(e) => setCalendar(e.target.value)}
+              
               sx={{  backgroundColor: "#fff", mr: 10, borderRadius: 5, minWidth: 100, height: 40}}
             >
               <MenuItem key={-1} value={0}></MenuItem>
@@ -211,6 +224,7 @@ export default function Main() {
       </AppBar>
       <Drawer
         sx={{
+          elevation: 16,
           width: drawerWidth,
           flexShrink: 0,
           "& .MuiDrawer-paper": {

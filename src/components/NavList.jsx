@@ -9,6 +9,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import MenuIcon from '@mui/icons-material/Menu';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import { useNavigate } from "react-router-dom";
+import BuildingList from "./Buildings/BuildingList";
+import CalendarList from "./Calendars/CalendarLis";
 
 export default function NavList() {
   const navigate = useNavigate();
@@ -57,12 +59,18 @@ export default function NavList() {
           <CalendarMonthIcon sx={{ marginRight: "5%" }} />
           <Typography>Calendarios</Typography>
         </AccordionSummary>
+        <AccordionDetails>
+          <CalendarList />
+        </AccordionDetails>
       </Accordion>
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <ApartmentIcon sx={{ marginRight: "5%" }} />
           <Typography>Edificios</Typography>
         </AccordionSummary>
+        <AccordionDetails >
+          <BuildingList />
+        </AccordionDetails>
       </Accordion>
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMore />}>

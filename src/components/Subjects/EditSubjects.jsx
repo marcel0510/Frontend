@@ -1,19 +1,36 @@
-import { Backdrop, CircularProgress } from "@mui/material";
-import { RenderComponent, validateForm, ErrorMap } from "../../helpers/building.helper";
+import { Backdrop, CircularProgress, Typography } from "@mui/material";
+import { RenderComponent, validateForm } from "../../helpers/subject.helper";
+import { useSubject, useUpdateSubject } from "../../hooks/Subject.Hooks";
 import { useEffect, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
-import { useAddBuilding } from "../../hooks/Building.Hooks";
-
-export default function AddBuildings() {
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+export default function () {
   const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
-  const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre
+  const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre8
   const navigate = useNavigate(); //Navegador de la aplicacion
-  const { mutate: add, isLoading, isError } = useAddBuilding(); //Funcion que agrega el edicio
-  //Estado para controlar el formulario
+  const { id } = useParams(); //Informacion del URL
+  const [alias, setAlias] = useState(false);
+  const {
+    data: subject,
+    isLoading: isLoadingSubject,
+    isError: isErrorSubject,
+  } = useSubject(id);
+  const {
+    mutate: edit,
+    isLoading: isLoadingUpdate,
+    isError: isErrorUpdate,
+  } = useUpdateSubject();
+
   const [form, setForm] = useState({
+    id: id,
     code: "",
     name: "",
-    createdBy: UserInfo.user.id,
+    alias: null,
+    numHours: 1,
+    numCredits: 1,
+    numSemester: 1,
+    isLab: false,
+    aliasBool: false,
+    updatedBy: UserInfo.user.id,
   });
   //Estado que controla los errores del formulario
   const [formError, setFormError] = useState({
@@ -22,6 +39,10 @@ export default function AddBuildings() {
       message: "",
     },
     name: {
+      error: false,
+      message: "",
+    },
+    alias: {
       error: false,
       message: "",
     },
@@ -35,11 +56,25 @@ export default function AddBuildings() {
   });
 
   useEffect(() => {
+    if (!isLoadingSubject) {
+      setForm({
+        ...form,
+        code: subject.code,
+        name: subject.name,
+        alias: subject.alias,
+        numHours: subject.numHours,
+        numCredits: subject.numCredits,
+        numSemester: subject.numSemester,
+        isLab: subject.isLab,
+      });
+      if(subject.alias !== null){
+        setAlias(true);
+      }
+    }
+    setIsEdit(true);
     setIsSee(false);
-    setIsEdit(false)
-  }, [])
+  }, [isLoadingSubject, subject]);
 
-  //Funcion que maneja el agregado del edificio
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm(form, formError, setFormError)) {
@@ -48,7 +83,7 @@ export default function AddBuildings() {
         name: { error: false },
         code: { error: false },
       });
-      add(
+      edit(
         { ...form },
         {
           onSuccess: (res) => {
@@ -81,13 +116,17 @@ export default function AddBuildings() {
           setSuccessMessage,
           errorMessage,
           setErrorMessage,
+          alias,
+          setAlias,
           isEdit,
           setIsSee
         )
       }
-
       {/* Pantalla de carga */}
-      {isLoading || isError ? (
+      {isLoadingSubject ||
+      isLoadingUpdate ||
+      isErrorSubject ||
+      isErrorUpdate ? (
         <Backdrop
           open={true}
           sx={{
@@ -98,7 +137,7 @@ export default function AddBuildings() {
             justifyContent: "center",
           }}
         >
-          {isError ? (
+          {isErrorSubject || isErrorUpdate ? (
             <Typography mb={"1.5%"} variant="h5" color="secondary">
               Error de conexión con el servidor!
             </Typography>

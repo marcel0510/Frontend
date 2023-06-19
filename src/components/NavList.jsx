@@ -11,6 +11,8 @@ import ApartmentIcon from '@mui/icons-material/Apartment';
 import { useNavigate } from "react-router-dom";
 import BuildingList from "./Buildings/BuildingList";
 import CalendarList from "./Calendars/CalendarLis";
+import SubjectList from "./Subjects/SubjectList";
+import GroupList from "./Groups/GroupList";
 
 export default function NavList() {
   const navigate = useNavigate();
@@ -45,6 +47,9 @@ export default function NavList() {
           <AutoStoriesIcon sx={{ marginRight: "5%" }} />
           <Typography>Materias</Typography>
         </AccordionSummary>
+        <AccordionDetails>
+          <SubjectList />
+        </AccordionDetails>
       </Accordion>
 
       <Accordion>
@@ -52,6 +57,9 @@ export default function NavList() {
           <TableViewIcon sx={{ marginRight: "5%" }} />
           <Typography>Grupos</Typography>
         </AccordionSummary>
+        <AccordionDetails>
+          <GroupList/>
+        </AccordionDetails>
       </Accordion>
 
       <Accordion>

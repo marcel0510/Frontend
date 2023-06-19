@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
 const classroomProviderHandler = axios.create({
     baseURL: 'https://localhost:7130/api/classroom'
 })
@@ -32,6 +33,6 @@ export const DeleteClassroom = async (id) => {
     return await classroomProviderHandler.delete(`/delete/${id}`);
 }
 
-export const NewCalendar = async (oldCalendarId, newCalendarId) => {
-    return await classroomProviderHandler.put(`/newCalendar/${oldCalendarId}/${newCalendarId}`);
+export const DeleteByBuilding = async ({buildingId, userId}) => {
+    return await classroomProviderHandler.delete(`/deleteByBuilding/${buildingId}/${userId}`, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
 }

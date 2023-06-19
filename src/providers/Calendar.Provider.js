@@ -21,9 +21,9 @@ export const AddCalendar = async (calendar) => {
 }
 
 export const UpdateCalendar = async (calendar) => {
-    return await calendarProviderHandler.put(`/update/${calendar.Id}`, calendar);
+    return await calendarProviderHandler.put(`/update/${calendar.Id}`, calendar, { headers: { Authorization: `Bearer ${UserInfo.token}` } });
 }
 
-export const DeleteCalendar = async (id) => {
-    return await calendarProviderHandler.delete(`/delete/${id}`);
+export const DeleteCalendar = async (calendar) => {
+    return await calendarProviderHandler.delete(`/delete/${calendar.id}/${calendar.deletedBy}`, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
 }

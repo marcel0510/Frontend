@@ -1,4 +1,4 @@
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Box,
@@ -9,34 +9,37 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
-export default function Calendar() {
+export default function Subject() {
   const navigate = useNavigate();
-  const [_, setCalendar, calendars] = useOutletContext();
   const [isEdit, setIsEdit] = useState(false);
   const [isSee, setIsSee] = useState(true);
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState({
+    code: "",
+    name: ""
+  });
   const editButtonHandle = () => {
     setIsEdit(false);
     setIsSee(true);
-    navigate("/Main/Calendarios/Ver");
+    navigate("/Main/Materias/Ver");
   };
+
   return (
     <>
       <Paper
         sx={{
           width: "100%",
-          padding: "17px 1.5%",
+          padding: 2,
           display: "flex",
           alignItems: "flex-start",
           flexDirection: "column",
         }}
       >
         <Box sx={{ display: "flex", width: "100%" }}>
-          <CalendarMonthIcon sx={{ fontSize: 50, mr: "1.5%" }} />
+          <AutoStoriesIcon sx={{ fontSize: 50, mr: "1.5%" }} />
           <Typography variant="h3" sx={{ flexGrow: 1 }}>
-            Módulo de Calendarios
+            Módulo de Materias
           </Typography>
           {isEdit ? (
             <IconButton onClick={() => editButtonHandle()}>
@@ -57,12 +60,24 @@ export default function Calendar() {
                 <Typography variant="body2">Filtrar por :</Typography>
               </legend>
               <TextField
-                label="Periodo"
+                label="Codigo"
+                size="small"
+                sx={{ mt: 1.7, mr: 2 }}
+                value={filter.code}
+                inputProps={{ maxLength: 7 }}
+                onChange={(e) =>
+                  setFilter({ ...filter, code: e.target.value.toUpperCase() })
+                }
+              />
+              <TextField
+                label="Nombre/Alias"
                 size="small"
                 sx={{ mt: 1.7 }}
-                value={filter}
-                inputProps={{ maxLength: 5 }}
-                onChange={(e) => setFilter(e.target.value.toUpperCase())}
+                value={filter.name}
+                inputProps={{ maxLength: 40 }}
+                onChange={(e) =>
+                  setFilter({ ...filter, name: e.target.value.toUpperCase() })
+                }
               />
             </Box>
           </>
@@ -70,9 +85,7 @@ export default function Calendar() {
           <p />
         )}
       </Paper>
-      <Outlet
-        context={[isEdit, setIsEdit, setCalendar, calendars, setIsSee, filter]}
-      />
+      <Outlet context={[isEdit, setIsEdit, setIsSee, filter, setFilter]} />
     </>
   );
 }

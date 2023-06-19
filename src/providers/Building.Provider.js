@@ -25,5 +25,5 @@ export const UpdateBuilding = async (building) => {
 }
 
 export const DeleteBuilding = async (building) => {
-    return await BuildingProviderHandler.put(`/delete`, building, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
+    return await BuildingProviderHandler.delete(`/delete/${building.id}/${building.deletedBy}`, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
 }

@@ -69,7 +69,7 @@ export default function Login() {
           } else {
             setErrorMessage(true);
           }
-        },
+        }
       });
     }
   };

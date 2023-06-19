@@ -72,24 +72,22 @@ const Img = styled("img")({
   marginTop: 8,
 });
 
-
 export default function Main() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
   const [calendar, setCalendar] = useState(0);
-  const { isLoading, data: calendars, isError } = useCalendars();
+  const { data: calendars, isLoading, isError } = useCalendars();
   const userInfo = JSON.parse(localStorage.getItem("UserInfo"));
-
 
   useEffect(() => {
     if (!localStorage.getItem("UserInfo")) {
       navigate("/");
     }
-    if(!isLoading) {
+    if (!isLoading && !isError) {
       calendars.reverse();
-      setCalendar(calendars[0]["id"]);
+      setCalendar(calendars[0].id);
     }
-  }, [isLoading]);
+  }, [isLoading, calendars, isError]);
 
   const handleCloseSession = () => {
     localStorage.removeItem("UserInfo");
@@ -104,143 +102,149 @@ export default function Main() {
   };
 
   if (isLoading || isError)
-  return (
-    <Backdrop
-      open={true}
-      sx={{
-        color: "#fff",
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-      }}
-    >
-      {isError ? (
-        <Typography mb={"1.5%"} variant="h5" color="secondary">
-          Error de conexión con el servidor!
-        </Typography>
-      ) : (
-        <p></p>
-      )}
-      <CircularProgress size={100} />
-    </Backdrop>
-  );
-  
+    return (
+      <Backdrop
+        open={true}
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        {isError ? (
+          <Typography mb={"1.5%"} variant="h5" color="secondary">
+            Error de conexión con el servidor!
+          </Typography>
+        ) : (
+          <p></p>
+        )}
+        <CircularProgress size={100} />
+      </Backdrop>
+    );
 
   return (
-    <Box sx={{ display: "flex", width: "100%", height: "100%" }}>
-      <AppBar
-        position="fixed"
-        open={open}
-        sx={{ height: "10%", padding: 0, margin: 0 }}
-        
-      >
-        <Toolbar disableGutters>
-          <Paper
-            sx={{
-              backgroundColor: "#001f3e",
-              width: drawerWidth,
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-            }}
-            elevation={10}
-          >
-            <Box
+    <>
+      <Box sx={{ display: "flex", width: "100%", height: "100%" }}>
+        <AppBar
+          position="fixed"
+          open={open}
+          sx={{ height: "10%", padding: 0, margin: 0 }}
+        >
+          <Toolbar disableGutters>
+            <Paper
               sx={{
+                backgroundColor: "#001f3e",
+                width: drawerWidth,
+                height: "100%",
                 display: "flex",
-                justifyContent: "flex-start",
-                flexGrow: 1,
-                paddingTop: 0.5,
-                mt: 0.45
+                alignItems: "center",
               }}
+              elevation={10}
             >
               <Box
                 sx={{
-                  backgroundColor: "#fff",
-                  ml: 2,
-                  borderRadius: 4,
-                  height: 65,
-                 
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  flexGrow: 1,
+                  paddingTop: 0.5,
+                  mt: 0.45,
                 }}
               >
-                <Img src={logo} />
+                <Box
+                  sx={{
+                    backgroundColor: "#fff",
+                    ml: 2,
+                    borderRadius: 4,
+                    height: 65,
+                  }}
+                >
+                  <Img src={logo} />
+                </Box>
+                <Typography variant="h2" color={"#fff"} noWrap sx={{ ml: 1 }}>
+                  FIEE
+                </Typography>
               </Box>
-              <Typography variant="h2" color={"#fff"} noWrap sx={{ ml: 1 }}>
-                FIEE
-              </Typography>
-            </Box>
-            <IconButton
-              disableRipple
-              onClick={open ? handleDrawerClose : handleDrawerOpen}
+              <IconButton
+                disableRipple
+                onClick={open ? handleDrawerClose : handleDrawerOpen}
+                sx={{
+                  backgroundColor: "#e31d1a",
+                  borderRadius: 5,
+                  height: "55%",
+                }}
+              >
+                {open ? <KeyboardArrowLeftIcon /> : <KeyboardArrowRightIcon />}
+              </IconButton>
+            </Paper>
+            <Box
               sx={{
-                backgroundColor: "#e31d1a",
-                borderRadius: 5,
-                height: "55%",
+                ml: 5,
+                display: "flex",
+                flexDirection: "column",
+                flexGrow: 1,
               }}
             >
-              {open ? <KeyboardArrowLeftIcon /> : <KeyboardArrowRightIcon />}
-            </IconButton>
-          </Paper>
-          <Box
-            sx={{
-              ml: 5,
-              display: "flex",
-              flexDirection: "column",
-              flexGrow: 1,
-            }}
-          >
-            <Typography>Usuario: {userInfo["user"]["name"]}</Typography>
-            <Typography>Perfil: {RoleMap(userInfo["user"]["role"])}</Typography>
-          </Box>
-         
+              <Typography>Usuario: {userInfo["user"]["name"]}</Typography>
+              <Typography>
+                Perfil: {RoleMap(userInfo["user"]["role"])}
+              </Typography>
+            </Box>
+
             <Typography mr={3}>Calendario: </Typography>
             <Select
               value={calendar}
               onChange={(e) => setCalendar(e.target.value)}
-              
-              sx={{  backgroundColor: "#fff", mr: 10, borderRadius: 5, minWidth: 100, height: 40}}
+              sx={{
+                backgroundColor: "#fff",
+                mr: 10,
+                borderRadius: 5,
+                minWidth: 100,
+                height: 40,
+              }}
             >
               <MenuItem key={-1} value={0}></MenuItem>
               {calendars.map((calendar, index) => {
                 return (
-                  <MenuItem key={index} value={calendar.id}>
+                  <MenuItem key={index} value={calendar.id} sx={{ display:  index < 3 ? "block":"none"  }}>
                     <Typography>{calendar.period}</Typography>
                   </MenuItem>
                 );
               })}
             </Select>
-          
 
-          <Button
-            color="secondary"
-            variant="outlined"
-            onClick={handleCloseSession}
-            sx={{ mr: 4 }}
-          >
-            Cerrar Sesion
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        sx={{
-          elevation: 16,
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
+            <Button
+              color="secondary"
+              variant="outlined"
+              onClick={handleCloseSession}
+              sx={{ mr: 4 }}
+            >
+              Cerrar Sesion
+            </Button>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          sx={{
+            elevation: 16,
             width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-        <NavList />
-      </Drawer>
-      <Body open={open}>
-        <Outlet context={[calendar, setCalendar]} />
-      </Body>
-    </Box>
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+              boxSizing: "border-box",
+            },
+          }}
+          variant="persistent"
+          anchor="left"
+          open={open}
+        >
+          <NavList />
+        </Drawer>
+        <Body open={open}>
+          <Outlet context={[calendar, setCalendar, calendars]} />
+        </Body>
+      </Box>
+      {}
+    </>
   );
 }

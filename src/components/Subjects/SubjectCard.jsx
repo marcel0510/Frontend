@@ -10,42 +10,37 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import ApartmentIcon from "@mui/icons-material/Apartment";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import { useNavigate } from "react-router-dom";
-import { useDeleteBuilding } from "../../hooks/Building.Hooks";
+import { useDeleteSubject } from "../../hooks/Subject.Hooks";
 import { useState } from "react";
-import { ErrorMap } from "../../helpers/building.helper"
-
-export default function BuildingCard({
-  building,
+import { ErrorMap } from "../../helpers/calendars.helper";
+export default function SubjectCard({
+  subject,
   setSuccessMessage,
   setErrorMessage,
 }) {
   const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
   const navigate = useNavigate();
-  const {
-    mutate: deleteBuilding,
-    isLoading,
-    isError
-  } = useDeleteBuilding();
-
+  const { mutate: drop, isLoading, isError } = useDeleteSubject();
   const [modal, setModal] = useState({
     isOpen: false,
     id: 0,
-    deletedBy: UserInfo.user.id
+    deletedBy: UserInfo.user.id,
   });
 
-  const handleDelete = () => {
-    setModal({ ...modal, isOpen: false });
-    deleteBuilding(
+  const handleDelete = (id) => {
+    drop(
       { ...modal },
       {
         onSuccess: (res) => {
+          console.log(res);
           if (res.data.isSuccess) setSuccessMessage(true);
-          else setErrorMessage({
-            error: true,
-            message: ErrorMap(res.data.errorType),
-          })
+          else
+            setErrorMessage({
+              error: true,
+              message: ErrorMap(res.data.errorType),
+            });
         },
         onError: (error) => {
           setErrorMessage({
@@ -61,32 +56,47 @@ export default function BuildingCard({
     <>
       <Card>
         <CardContent>
-          <Typography variant="h4" marginBottom={"3%"}>
-            {building.code}
-            <ApartmentIcon sx={{ marginLeft: "5%" }} />
+          <Typography variant="h5" marginBottom={"3%"}>
+            {subject.alias !== null ? subject.alias : subject.name}
+            <AutoStoriesIcon sx={{ marginLeft: "5%" }} />
           </Typography>
           <Divider />
-          <Typography marginTop={"2%"} variant="h6">
-            {building.name}
+          <Typography marginTop={"2%"} variant="h5">
+            {"Codigo:  " + subject.code}
           </Typography>
+          
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
+          <Typography marginTop={"2%"} mr={2.5} >
+              {"Número de Créditos:  " + subject.numCredits}
+            </Typography>
+            <Typography marginTop={"2%"} >
+              {"Número de Horas:  " + subject.numHours}
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography marginTop={"2%"} mr={3}>
+              {"Semestre:  " + subject.numSemester}
+            </Typography>
+            <Typography marginTop={"2%"}>
+              Es laboratorio: {subject.isLab ? "Si" : "No"}
+            </Typography>
+          </Box>
         </CardContent>
         <CardActions>
-        <Button
-            variant="outlined"
-          >
-            Ver Aulas
-          </Button>
+          <Button variant="outlined">Ver Grupos</Button>
           <Button
             variant="outlined"
             color="warning"
-            onClick={() => navigate(`/Main/Edificios/Editar/${building.id}`)}
+            onClick={() => navigate(`/Main/Materias/Editar/${subject.id}`)}
           >
             Editar
           </Button>
           <Button
             variant="outlined"
             color="secondary"
-            onClick={() => setModal({ ...modal, isOpen: true, id: building.id })}
+            onClick={() =>
+              setModal({ ...modal, isOpen: true, id: subject.id })
+            }
           >
             Eliminar
           </Button>
@@ -106,15 +116,14 @@ export default function BuildingCard({
           }}
         >
           <Typography variant="h6" mb={1}>
-            Eliminar edificio
+            Eliminar materia
           </Typography>
           <Divider />
           <Typography mt={1} mb={2}>
-            ¿Esta seguro de que desea eliminar este edificio?
+            ¿Esta seguro de que desea eliminar esta materia?
             <Typography color={"secondary"}>
               {" "}
-              Todas las aulas relaciondas con este edificio también se
-              eliminarán
+              Todos los relaciondas con este edificio también se eliminarán
             </Typography>
           </Typography>
           <Button

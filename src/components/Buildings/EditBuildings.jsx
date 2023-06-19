@@ -1,45 +1,38 @@
 import {
-  Alert,
   Backdrop,
-  Box,
-  Button,
   CircularProgress,
-  FormControl,
-  Paper,
-  Snackbar,
-  TextField,
   Typography,
 } from "@mui/material";
-import { ErrorMap } from "../../helpers/building.helper";
+import { RenderComponent, validateForm } from "../../helpers/building.helper";
 import { useBuilding, useUpdateBuilding } from "../../hooks/Building.Hooks";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 export default function EditBuilding() {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
-  const navigate = useNavigate();
-  const { id } = useParams();
+  const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
+  const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre8
+  const navigate = useNavigate(); //Navegador de la aplicacion
+  const { id } = useParams(); //Informacion del URL
+  //Funcion para obtener el edificio
   const {
     data: building,
     isLoading: isLoadingBuilding,
     isError: isErrorBuilding,
   } = useBuilding(id);
+  //Funcion para actualizar el edificio
   const {
     mutate: edit,
     isLoading: isLoadingUpdate,
     isError: isErrorUpdate,
   } = useUpdateBuilding();
+  //Estado para controlar el formulario
   const [form, setForm] = useState({
-    id: "",
+    id: 0,
     code: "",
     name: "",
-    updatedBy: 0,
+    updatedBy: UserInfo.user.id,
   });
-  const [successMessage, setSuccessMessage] = useState(false);
-  const [errorMessage, setErrorMessage] = useState({
-    error: false,
-    message: "",
-  });
+  //Estado que controla los errores del formulario
   const [formError, setFormError] = useState({
     code: {
       error: false,
@@ -50,6 +43,14 @@ export default function EditBuilding() {
       message: "",
     },
   });
+  //Estado para controlar el mensaje exito
+  const [successMessage, setSuccessMessage] = useState(false);
+  //Estado para controlar los errores generales
+  const [errorMessage, setErrorMessage] = useState({
+    error: false,
+    message: "",
+  });
+  //Llenado automatico del formulario
   useEffect(() => {
     if (!isLoadingBuilding) {
       setForm({
@@ -58,26 +59,27 @@ export default function EditBuilding() {
         code: building.code,
         name: building.name,
       });
+      setIsEdit(true);
+      setIsSee(false);
     }
   }, [isLoadingBuilding, building]);
-
+  //Funcion que maneja la edicion del edificio
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) {
+    if (validateForm(form, formError, setFormError)) {
       setFormError({
         ...formError,
         name: { error: false },
         code: { error: false },
       });
-      setForm({
-        ...form,
-        updatedBy: UserInfo.user.id,
-      });
       edit(
         { ...form },
         {
           onSuccess: (res) => {
-            if (res.data.isSuccess) setSuccessMessage(true);
+            if (res.data.isSuccess) {
+              setSuccessMessage(true);
+              setIsEdit(false);
+            }
             else
               setErrorMessage({
                 error: true,
@@ -92,138 +94,26 @@ export default function EditBuilding() {
       );
     }
   };
-
-  const handleForm = (e) => {
-    if (e.target.name === "code")
-      setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
-    else setForm({ ...form, [e.target.name]: e.target.value });
-    setFormError({
-      ...formError,
-      name: { error: false },
-      code: { error: false },
-    });
-  };
-
-  const handleSuccessMessage = () => {
-    setSuccessMessage(false);
-    navigate("/Main/Edificios/Ver");
-  };
-
-  const validateForm = () => {
-    if (form.code === "" && form.name === "") {
-      setFormError({
-        name: { error: true, message: "No puede dejar este campo vacío" },
-        code: { error: true, message: "No puede dejar este campo vacío" },
-      });
-      return false;
-    }
-
-    if (form.code === "") {
-      setFormError({
-        ...formError,
-        code: { error: true, message: "No puede dejar este campo vacío" },
-      });
-      return false;
-    }
-
-    if (form.name === "") {
-      setFormError({
-        ...formError,
-        name: { error: true, message: "No puede dejar este campo vacío" },
-      });
-      return false;
-    }
-    return true;
-  };
-
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        mt: "5%",
-      }}
-    >
-      <Paper sx={{ width: "47%", padding: "1% 0" }}>
-        <Typography variant="h4" align="center">
-          {"Editar un edificio"}
-        </Typography>
-      </Paper>
-
-      <Snackbar
-        open={successMessage}
-        autoHideDuration={1500}
-        onClose={handleSuccessMessage}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        sx={{ mt: "5%", mr: "3%" }}
-      >
-        <Alert severity="success" sx={{ width: "100%" }}>
-          <Typography>{"El edificio de actualizó correctamente!"}</Typography>
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={errorMessage.error}
-        autoHideDuration={2000}
-        onClose={() => setErrorMessage({ ...errorMessage, error: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        sx={{ mt: "5%", mr: "3%" }}
-      >
-        <Alert severity="error" sx={{ width: "100%" }}>
-          <Typography>{errorMessage.message}</Typography>
-        </Alert>
-      </Snackbar>
-
-      <Paper
-        onSubmit={handleSubmit}
-        component={"form"}
-        sx={{
-          width: "47%",
-          padding: "1% 2%",
-          mt: 2,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <FormControl sx={{ width: "50%" }}>
-          <TextField
-            size="small"
-            label="Codigo"
-            name="code"
-            variant="outlined"
-            inputProps={{ maxLength: 3, style: { textTransform: "uppercase" } }}
-            onChange={(e) => handleForm(e)}
-            error={formError.code.error}
-            helperText={formError.code.message}
-            value={form.code}
-          />
-        </FormControl>
-        <FormControl sx={{ width: "50%", mt: 3 }}>
-          <TextField
-            name="name"
-            size="small"
-            label="Nombre del Edificio"
-            variant="outlined"
-            onChange={(e) => handleForm(e)}
-            onKeyDown={(e) => {if(/^[0-9]+$/.test(e.key)) e.preventDefault()}}
-
-            error={formError.name.error}
-            helperText={formError.name.message}
-            value={form.name}
-          />
-        </FormControl>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ width: "35%", mt: 2 }}
-        >
-          {"Editar"}
-        </Button>
-      </Paper>
-
+    <>
+      {
+        //Renderizar formulario
+        RenderComponent(
+          navigate,
+          handleSubmit,
+          form,
+          setForm,
+          formError,
+          setFormError,
+          successMessage,
+          setSuccessMessage,
+          errorMessage,
+          setErrorMessage,
+          isEdit,
+          setIsSee
+        )
+      }
+      {/* Pantalla de carga */}
       {isLoadingBuilding ||
       isLoadingUpdate ||
       isErrorBuilding ||
@@ -250,6 +140,6 @@ export default function EditBuilding() {
       ) : (
         <p />
       )}
-    </Box>
+    </>
   );
 }

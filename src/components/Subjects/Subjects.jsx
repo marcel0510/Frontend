@@ -6,21 +6,19 @@ import {
   Snackbar,
   Typography,
 } from "@mui/material";
-import { useBuildings } from "../../hooks/Building.Hooks";
-import BuildingCard from "../Buildings/BuildingCard";
+import { useSubjects } from "../../hooks/Subject.Hooks";
+import SubjectCard from "../Subjects/SubjectCard";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-
-export default function Buildings() {
+export default function Subjects() {
   const [_, setIsEdit, setIsSee, filter] = useOutletContext();
-  const { data, isLoading, isError } = useBuildings();
-  const [buildings, setBuildings] = useState([]);
+  const { data, isLoading, isError } = useSubjects();
+  const [subjects, setSubjects] = useState([]);
   const [successMessage, setSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState({
     error: false,
     message: "",
   });
-
   useEffect(() => {
     setIsSee(true);
     setIsEdit(false);
@@ -28,12 +26,20 @@ export default function Buildings() {
   }, [filter, isLoading]);
 
   const filterData = () => {
-    if (filter !== "") {
-      setBuildings(data.filter((b) => b.code.includes(filter)));
-    } else {
-      if (!isLoading) setBuildings(data);
-    }
+    if (filter.code !== "" && filter.name == "")
+      setSubjects(data.filter((s) => s.code.includes(filter.code)));
+    else if (filter.name !== "" && filter.code == "")
+      setSubjects(
+        data.filter((s) => {
+          if (s.alias !== null)
+           return s.name.includes(filter.name) || s.alias.includes(filter.name);
+          else 
+          return s.name.includes(filter.name);
+        })
+      );
+    else if (!isLoading) setSubjects(data);
   };
+
   if (isLoading || isError)
     return (
       <Backdrop
@@ -60,11 +66,11 @@ export default function Buildings() {
   return (
     <>
       <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
-        {buildings.reverse().map((building, index) => {
+        {subjects.map((subject, index) => {
           return (
-            <Grid item key={index} md={3.15} marginBottom={"1.3%"}>
-              <BuildingCard
-                building={building}
+            <Grid item key={index} md={3.9} marginBottom={"1.3%"}>
+              <SubjectCard
+                subject={subject}
                 setSuccessMessage={setSuccessMessage}
                 setErrorMessage={setErrorMessage}
               />
@@ -80,7 +86,7 @@ export default function Buildings() {
         sx={{ mt: "5%", mr: "3%" }}
       >
         <Alert severity="success" sx={{ width: "100%" }}>
-          <Typography>{"El edificio se eliminó correctamente!"}</Typography>
+          <Typography>{"La materia se eliminó correctamente!"}</Typography>
         </Alert>
       </Snackbar>
       <Snackbar

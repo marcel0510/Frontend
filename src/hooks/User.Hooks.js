@@ -37,6 +37,5 @@ export const useDeleteUser = () => {
 }
 
 export const useValidateUser = () => {
-    const queryClient = useQueryClient();
     return useMutation(ValidateUser)
 }

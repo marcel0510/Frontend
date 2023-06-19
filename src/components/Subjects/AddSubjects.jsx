@@ -1,18 +1,27 @@
-import { Backdrop, CircularProgress } from "@mui/material";
-import { RenderComponent, validateForm, ErrorMap } from "../../helpers/building.helper";
+import { Backdrop, CircularProgress, Typography } from "@mui/material";
+import {
+  RenderComponent,
+  validateForm,
+  ErrorMap,
+} from "../../helpers/subject.helper";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { useAddBuilding } from "../../hooks/Building.Hooks";
-
-export default function AddBuildings() {
+import { useAddSubject } from "../../hooks/Subject.Hooks";
+export default function AddSubject() {
   const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
   const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre
   const navigate = useNavigate(); //Navegador de la aplicacion
-  const { mutate: add, isLoading, isError } = useAddBuilding(); //Funcion que agrega el edicio
+  const { mutate: add, isLoading, isError } = useAddSubject(); //Funcion que agrega el edicio
+  const [ alias, setAlias ] = useState(false);
   //Estado para controlar el formulario
   const [form, setForm] = useState({
     code: "",
     name: "",
+    alias: null,
+    numHours: 1,
+    numCredits: 1,
+    numSemester: 1,
+    isLab: false,
     createdBy: UserInfo.user.id,
   });
   //Estado que controla los errores del formulario
@@ -25,6 +34,10 @@ export default function AddBuildings() {
       error: false,
       message: "",
     },
+    alias: {
+        error: false,
+        message: "",
+      },
   });
   //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
@@ -37,9 +50,8 @@ export default function AddBuildings() {
   useEffect(() => {
     setIsSee(false);
     setIsEdit(false)
-  }, [])
 
-  //Funcion que maneja el agregado del edificio
+  }, []);
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm(form, formError, setFormError)) {
@@ -81,6 +93,8 @@ export default function AddBuildings() {
           setSuccessMessage,
           errorMessage,
           setErrorMessage,
+          alias,
+          setAlias,
           isEdit,
           setIsSee
         )

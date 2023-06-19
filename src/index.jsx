@@ -33,12 +33,12 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      refetchInterval: 3000,
+      refetchInterval: 0,
       staleTime: false,
-      retry: false,
+      retry: false
     },
     mutations: {
-      refetchInterval: 3000,
+      retry: false
     }
   },
 });

@@ -6,47 +6,52 @@ import {
   Snackbar,
   Typography,
 } from "@mui/material";
-import { useSubjects } from "../../hooks/Subject.Hooks";
-import SubjectCard from "../Subjects/SubjectCard";
-import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
-export default function Subjects() {
+import { useClassrooms } from "../../hooks/Classroom.Hooks";
+import ClassroomCard from "./ClassroomCard";
+import { useEffect, useRef, useState } from "react";
+import { useOutletContext, useParams } from "react-router-dom";
+export default function Classrooms() {
   const [_, setIsEdit, setIsSee, filter, setFilter] = useOutletContext();
-  const { data, isLoading, isError } = useSubjects();
-  const [subjects, setSubjects] = useState([]);
+  const { fil } = useParams();
+  const isInitialMount = useRef(true);
+  const { data, isLoading, isError } = useClassrooms();
+  const [classrooms, setClassrooms] = useState([]);
   const [successMessage, setSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState({
     error: false,
     message: "",
   });
+
   useEffect(() => {
     setIsSee(true);
     setIsEdit(false);
+    if(isInitialMount.current && !isLoading && fil){
+      isInitialMount.current = false;
+      setFilter({ ...filter, code: fil });
+    }
     filterData();
   }, [filter, isLoading, data]);
 
   const filterData = () => {
-    if (filter.code !== "" && filter.name == "" && filter.semester == "")
-      setSubjects(data.filter((s) => s.code.includes(filter.code)).reverse());
-    else if (filter.name !== "" && filter.code == "" && filter.semester == "")
-      setSubjects(
+    if (filter.code !== "" && filter.name == "")
+      setClassrooms(
         data
-          .filter((s) => {
-            if (s.alias !== null)
-              return (
-                s.name.includes(filter.name) || s.alias.includes(filter.name)
-              );
-            else return s.name.includes(filter.name);
+          .filter((c) => {
+            const code = c.building.code + "/" + c.floor + "/" + c.code;
+            return code.includes(filter.code);
           })
           .reverse()
       );
-    else if (filter.name === "" && filter.code === "" && filter.semester !== "")
-      setSubjects(
-        data.filter((s) => s.numSemester == parseInt(filter.semester))
+    else if (filter.name !== "" && filter.code == "")
+      setClassrooms(
+        data
+          .filter((c) => {
+            if (c.isLab) return c.name.includes(filter.name);
+          })
+          .reverse()
       );
-    else if (!isLoading) setSubjects(data.reverse());
+    else if (!isLoading) setClassrooms(data.reverse());
   };
-
   if (isLoading || isError)
     return (
       <Backdrop
@@ -69,15 +74,14 @@ export default function Subjects() {
         <CircularProgress size={100} />
       </Backdrop>
     );
-
   return (
     <>
       <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
-        {subjects.map((subject, index) => {
+        {classrooms.map((classroom, index) => {
           return (
             <Grid item key={index} md={3.9} marginBottom={"1.3%"}>
-              <SubjectCard
-                subject={subject}
+              <ClassroomCard
+                classroom={classroom}
                 setSuccessMessage={setSuccessMessage}
                 setErrorMessage={setErrorMessage}
               />
@@ -93,7 +97,7 @@ export default function Subjects() {
         sx={{ mt: "5%", mr: "3%" }}
       >
         <Alert severity="success" sx={{ width: "100%" }}>
-          <Typography>{"La materia se eliminó correctamente!"}</Typography>
+          <Typography>{"El aula se eliminó correctamente!"}</Typography>
         </Alert>
       </Snackbar>
       <Snackbar

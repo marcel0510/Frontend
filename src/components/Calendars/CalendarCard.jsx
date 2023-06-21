@@ -14,13 +14,13 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useNavigate } from "react-router-dom";
 import { useDeleteCalendar } from "../../hooks/Calendar.Hooks";
 import { useState } from "react";
-import { ErrorMap } from "../../helpers/calendars.helper"
+import { ErrorMap } from "../../helpers/calendars.helper";
 
 export default function CalendarCard({
   calendar,
   setSuccessMessage,
   setErrorMessage,
-  setCalendar
+  setCalendar,
 }) {
   const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
   const navigate = useNavigate();
@@ -29,20 +29,22 @@ export default function CalendarCard({
   const [modal, setModal] = useState({
     isOpen: false,
     id: 0,
-    deletedBy: UserInfo.user.id
+    deletedBy: UserInfo.user.id,
   });
 
-  const handleDelete = (id) => {
+  const handleDelete = () => {
+    setModal({ ...modal, isOpen: false });
     drop(
       { ...modal },
       {
         onSuccess: (res) => {
           console.log(res);
           if (res.data.isSuccess) setSuccessMessage(true);
-          else setErrorMessage({
-            error: true,
-            message: ErrorMap(res.data.errorType),
-          })
+          else
+            setErrorMessage({
+              error: true,
+              message: ErrorMap(res.data.errorType),
+            });
         },
         onError: (error) => {
           setErrorMessage({
@@ -70,10 +72,7 @@ export default function CalendarCard({
           </Typography>
         </CardContent>
         <CardActions>
-        <Button
-            variant="outlined"
-            onClick={() => setCalendar(calendar.id)}
-          >
+          <Button variant="outlined" onClick={() => setCalendar(calendar.id)}>
             Usar calendario
           </Button>
           <Button
@@ -86,13 +85,15 @@ export default function CalendarCard({
           <Button
             variant="outlined"
             color="secondary"
-            onClick={() => setModal({ ...modal, isOpen: true, id: calendar.id })}
+            onClick={() =>
+              setModal({ ...modal, isOpen: true, id: calendar.id })
+            }
           >
             Eliminar
           </Button>
         </CardActions>
       </Card>
-      <Modal open={modal.isOpen} >
+      <Modal open={modal.isOpen}>
         <Box
           sx={{
             position: "absolute",
@@ -105,14 +106,34 @@ export default function CalendarCard({
             p: 4,
           }}
         >
-          <Typography variant="h6" mb={1}>Eliminar calendario</Typography>
-          <Divider />
-          <Typography mt={1} mb={2}>¿Esta seguro de que desea eliminar este calendario? 
-          <Typography color={"secondary"}> Todas los grupos relacionados con este calendario también se eliminarán</Typography>
-
+          <Typography variant="h6" mb={1}>
+            Eliminar calendario
           </Typography>
-          <Button color="secondary" variant="outlined" sx={{ mr: 1.5 }} onClick={() => {handleDelete(modal.id)}}>Si, eliminar</Button>
-          <Button  variant="outlined" onClick={() => setModal({ ...modal, isOpen: false })}>Cancelar</Button>
+          <Divider />
+          <Typography mt={1} mb={2}>
+            ¿Esta seguro de que desea eliminar este calendario?
+            <Typography color={"secondary"}>
+              {" "}
+              Todas los grupos relacionados con este calendario también se
+              eliminarán
+            </Typography>
+          </Typography>
+          <Button
+            color="secondary"
+            variant="outlined"
+            sx={{ mr: 1.5 }}
+            onClick={() => {
+              handleDelete(modal.id);
+            }}
+          >
+            Si, eliminar
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => setModal({ ...modal, isOpen: false })}
+          >
+            Cancelar
+          </Button>
         </Box>
       </Modal>
       {isLoading || isError ? (

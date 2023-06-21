@@ -21,13 +21,13 @@ export default function Calendars() {
     setIsSee(true);
     setIsEdit(false);
     filterData();
-  }, [filter])
+  }, [filter, calendars])
 
   const filterData = () => {
     if(filter !== ""){
-      setCalendars(calendars.filter(b => b.period.includes(filter)))
+      setCalendars(calendars.filter(b => b.period.includes(filter)).reverse())
     }else{
-      setCalendars(calendars)
+      setCalendars(calendars.reverse())
     }
   }
 

@@ -1,5 +1,5 @@
 import DomainAddIcon from '@mui/icons-material/DomainAdd';
-import HolidayVillageIcon from '@mui/icons-material/HolidayVillage';
+import BusinessIcon from '@mui/icons-material/Business';
 
 import { Divider, Grid, ListItemButton, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +13,7 @@ export default function BuildingList() {
         sx={{ padding: 0, ml: 4 }}
         onClick={() => navigate("/Main/Edificios/Ver")}
       >
-        <HolidayVillageIcon fontSize="small" sx={{ marginRight: "5%" }} />
+        <BusinessIcon fontSize="small" sx={{ marginRight: "5%" }} />
         <Typography variant="body2">Ver edificios</Typography>
       </ListItemButton>
       

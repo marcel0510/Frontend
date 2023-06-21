@@ -6,10 +6,13 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+import { Backdrop, CircularProgress } from "@mui/material";
+import { useClassroom } from "../../hooks/Classroom.Hooks";
+import { useOutletContext, useParams } from "react-router-dom";
+import { useEffect } from "react";
 
-
-
-export default function ScheduleBody({ classroom }) {
+export default function ClassroomSchedule() {
+  const Header = ["Hora", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
   const SevenToEight = [
     "07:00 - 08:00",
     {
@@ -374,8 +377,6 @@ export default function ScheduleBody({ classroom }) {
       EndTime: "20:00",
     },
   ];
-
-  const Header = ["Hora", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
   const ScheduleModel = [
     SevenToEight,
     EightToNine,
@@ -391,6 +392,14 @@ export default function ScheduleBody({ classroom }) {
     SixToSeven,
     SevenToEightPM,
   ];
+  const { id } = useParams();
+  const { data: classroom, isLoading, isError } = useClassroom(id);
+  const [_, setIsEdit, setIsSee] = useOutletContext();
+
+  useEffect(() => {
+    setIsSee(false);
+    setIsEdit(true);
+  }, []);
 
   const FindInMatrix = () => {
     classroom.groups.forEach((group) => {
@@ -415,13 +424,12 @@ export default function ScheduleBody({ classroom }) {
             if ((bool1 || bool2 || bool3) && bool4) {
               hour[i]["GR"] = group.name;
               hour[i]["Code"] = group.subject.code;
-              if(group.subject.alias != null)
+              if (group.subject.alias != null)
                 hour[i]["Alias"] = group.subject.alias;
-              else{
+              else {
                 hour[i]["Subject"] = group.subject.name;
                 hour[i]["Alias"] = null;
               }
-
             }
           }
         });
@@ -429,106 +437,191 @@ export default function ScheduleBody({ classroom }) {
     });
   };
 
-  FindInMatrix();
+  if (!isLoading) FindInMatrix();
+
+  if (isLoading || isError)
+    return (
+      <Backdrop
+        open={true}
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        {isError ? (
+          <Typography mb={"1.5%"} variant="h5" color="secondary">
+            Error de conexión con el servidor!
+          </Typography>
+        ) : (
+          <p></p>
+        )}
+        <CircularProgress size={100} />
+      </Backdrop>
+    );
 
   return (
-    <TableContainer component={Paper}>
-      <Table size="small" sx={{ width: "100%" }}>
-        <TableHead>
-          <TableRow>
-            {Header.map((label, index) => {
+    <>
+      <Paper
+        sx={{
+          mt: 1,
+          mb: 1,
+          padding: "10px 2%",
+          display: "flex",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: 300 }} >
+          {"Aula:  " +
+            classroom.building.code +
+            "/" +
+            classroom.floor +
+            "/" +
+            classroom.code}
+        </Typography>
+        {classroom.isLab ? (
+          <Typography variant="h6" sx={{ fontWeight: 300 }}>{classroom.name}</Typography>
+        ) : (
+          <p />
+        )}
+
+        <Typography variant="h6" sx={{ fontWeight: 300 }}>
+          {" "}
+          Capacidad: {classroom.capacity} estudiantes{" "}
+        </Typography>
+      </Paper>
+      <TableContainer component={Paper} sx={{ mb: 1.5, pb: 2 }}>
+        <Table size="small" sx={{ width: "100%" }}>
+          <TableHead>
+            <TableRow>
+              {Header.map((label, index) => {
+                return (
+                  <TableCell key={index}>
+                    <Typography align="center">{label}</Typography>
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {ScheduleModel.map((hour, index) => {
               return (
-                <TableCell key={index} >
-                  <Typography align="center">{label}</Typography>
-                </TableCell>
+                <TableRow key={index}>
+                  <TableCell
+                    sx={{
+                      border: "1px solid rgba(224, 224, 224, 1)",
+                      width: "8.5%",
+                    }}
+                  >
+                    <Typography align="center" variant="body2">
+                      {hour[0]}
+                    </Typography>
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      border: "1px solid rgba(224, 224, 224, 1)",
+                      width: "14.4%",
+                    }}
+                  >
+                    {hour[1].hasOwnProperty("GR") ? (
+                      <>
+                        <Typography variant="body2" align="center" margin={0}>
+                          {hour[1]["GR"] + " - " + hour[1]["Code"]}
+                        </Typography>
+                        <Typography variant="body2" align="center" margin={0}>
+                          {"\n" + hour[1]["Subject"]}
+                        </Typography>
+                      </>
+                    ) : (
+                      <p />
+                    )}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      border: "1px solid rgba(224, 224, 224, 1)",
+                      width: "14.4%",
+                    }}
+                  >
+                    {hour[2].hasOwnProperty("GR") ? (
+                      <>
+                        <Typography variant="body2" align="center" margin={0}>
+                          {hour[2]["GR"] + " - " + hour[2]["Code"]}
+                        </Typography>
+                        <Typography variant="body2" align="center" margin={0}>
+                          {hour[2]["Subject"]}
+                        </Typography>
+                      </>
+                    ) : (
+                      <p />
+                    )}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      border: "1px solid rgba(224, 224, 224, 1)",
+                      width: "14.4%",
+                    }}
+                  >
+                    {hour[3].hasOwnProperty("GR") ? (
+                      <>
+                        <Typography variant="body2" align="center" margin={0}>
+                          {hour[3]["GR"] + " - " + hour[3]["Code"]}
+                        </Typography>
+                        <Typography variant="body2" align="center" margin={0}>
+                          {hour[3]["Subject"]}
+                        </Typography>
+                      </>
+                    ) : (
+                      <p />
+                    )}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      border: "1px solid rgba(224, 224, 224, 1)",
+                      width: "14.4%",
+                    }}
+                  >
+                    {hour[4].hasOwnProperty("GR") ? (
+                      <>
+                        <Typography variant="body2" align="center" margin={0}>
+                          {hour[4]["GR"] + " - " + hour[4]["Code"]}
+                        </Typography>
+                        <Typography variant="body2" align="center" margin={0}>
+                          {hour[4]["Subject"]}
+                        </Typography>
+                      </>
+                    ) : (
+                      <p />
+                    )}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      border: "1px solid rgba(224, 224, 224, 1)",
+                      width: "14.4%",
+                    }}
+                  >
+                    {hour[5].hasOwnProperty("GR") ? (
+                      <>
+                        <Typography variant="body2" align="center" margin={0}>
+                          {hour[5]["GR"] + " - " + hour[5]["Code"]}
+                        </Typography>
+                        <Typography variant="body2" align="center" margin={0}>
+                          {hour[5]["Alias"] == null
+                            ? hour[5]["Subject"]
+                            : hour[5]["Alias"]}
+                        </Typography>
+                      </>
+                    ) : (
+                      <p />
+                    )}
+                  </TableCell>
+                </TableRow>
               );
             })}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {ScheduleModel.map((hour, index) => {
-            return (
-              <TableRow key={index}>
-                <TableCell sx={{ border: "1px solid rgba(224, 224, 224, 1)", width: "8.5%"}}>
-                  <Typography align="center" variant="body2">
-                    {hour[0]}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ border: "1px solid rgba(224, 224, 224, 1)", width: "14.4%"}}>
-                  {hour[1].hasOwnProperty("GR") ? (
-                    <>
-                      <Typography variant="body2" align="center" margin={0}>
-                        {hour[1]["GR"] + " - " + hour[1]["Code"]}
-                      </Typography>
-                      <Typography variant="body2" align="center" margin={0}>
-                        {"\n" + hour[1]["Subject"]}
-                      </Typography>
-                    </>
-                  ) : (
-                    <p />
-                  )}
-                </TableCell>
-                <TableCell sx={{ border: "1px solid rgba(224, 224, 224, 1)", width: "14.4%" }}>
-                  {hour[2].hasOwnProperty("GR") ? (
-                    <>
-                      <Typography variant="body2" align="center" margin={0}>
-                        {hour[2]["GR"] + " - " + hour[2]["Code"]}
-                      </Typography>
-                      <Typography variant="body2" align="center" margin={0}>
-                        {hour[2]["Subject"]}
-                      </Typography>
-                    </>
-                  ) : (
-                    <p />
-                  )}
-                </TableCell>
-                <TableCell sx={{ border: "1px solid rgba(224, 224, 224, 1)", width: "14.4%" }}>
-                  {hour[3].hasOwnProperty("GR") ? (
-                    <>
-                      <Typography variant="body2" align="center" margin={0}>
-                        {hour[3]["GR"] + " - " + hour[3]["Code"]}
-                      </Typography>
-                      <Typography variant="body2" align="center" margin={0}>
-                        {hour[3]["Subject"]}
-                      </Typography>
-                    </>
-                  ) : (
-                    <p />
-                  )}
-                </TableCell>
-                <TableCell sx={{ border: "1px solid rgba(224, 224, 224, 1)", width: "14.4%" }}>
-                  {hour[4].hasOwnProperty("GR") ? (
-                    <>
-                      <Typography variant="body2" align="center" margin={0} >
-                        {hour[4]["GR"] + " - " + hour[4]["Code"]}
-                      </Typography>
-                      <Typography variant="body2" align="center" margin={0}>
-                        {hour[4]["Subject"]}
-                      </Typography>
-                    </>
-                  ) : (
-                    <p />
-                  )}
-                </TableCell>
-                <TableCell sx={{ border: "1px solid rgba(224, 224, 224, 1)", width: "14.4%" }}>
-                  {hour[5].hasOwnProperty("GR") ? (
-                    <>
-                      <Typography variant="body2" align="center" margin={0}>
-                        {hour[5]["GR"] + " - " + hour[5]["Code"]}
-                      </Typography>
-                      <Typography variant="body2" align="center" margin={0}>
-                        {hour[5]["Alias"] == null ? hour[5]["Subject"]:hour[5]["Alias"]}
-                      </Typography>
-                    </>
-                  ) : (
-                    <p />
-                  )}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 }

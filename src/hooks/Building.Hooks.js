@@ -34,7 +34,7 @@ export const useDeleteBuilding = () => {
     const queryClient = useQueryClient();
     return useMutation(DeleteBuilding, { 
         onSuccess: () => {
-        queryClient.invalidateQueries(['GetBuildings']) 
+        queryClient.invalidateQueries(['GetBuildings'])
         }
     });
 }

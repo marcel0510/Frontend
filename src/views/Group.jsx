@@ -1,4 +1,4 @@
-import SchoolIcon from "@mui/icons-material/School";
+import TableViewIcon from "@mui/icons-material/TableView";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Box,
@@ -9,22 +9,18 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-
-export default function Classroom() {
+import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
+export default function Group() {
   const navigate = useNavigate();
+  const [calendar] = useOutletContext();
   const [isEdit, setIsEdit] = useState(false);
   const [isSee, setIsSee] = useState(true);
-  const [filter, setFilter] = useState({
-    code: "",
-    name: ""
-  });
+  const [filter, setFilter] = useState("");
   const editButtonHandle = () => {
     setIsEdit(false);
     setIsSee(true);
-    navigate("/Main/Aulas/Ver");
+    navigate("/Main/Grupos/Ver");
   };
-
   return (
     <>
       <Paper
@@ -37,9 +33,9 @@ export default function Classroom() {
         }}
       >
         <Box sx={{ display: "flex", width: "100%" }}>
-          <SchoolIcon sx={{ fontSize: 50, mr: "1.5%" }} />
+          <TableViewIcon sx={{ fontSize: 50, mr: "1.5%" }} />
           <Typography variant="h3" sx={{ flexGrow: 1 }}>
-            Módulo de Aulas
+            Módulo de Grupos
           </Typography>
           {isEdit ? (
             <IconButton onClick={() => editButtonHandle()}>
@@ -54,30 +50,18 @@ export default function Classroom() {
             <Divider />
             <Box
               component={"fieldset"}
-              sx={{ mt: 1, ml: 9, border: "1px solid #fff" }}
+              sx={{ mt: 1, ml: 9, border: "1px solid #fff", width: "35%" }}
             >
               <legend>
                 <Typography variant="body2">Filtrar por :</Typography>
               </legend>
               <TextField
-                label="Codigo de Aula"
+                label="Nombre de materia"
                 size="small"
-                sx={{ mt: 1.7, mr: 2 }}
-                value={filter.code}
-                inputProps={{ maxLength: 12 }}
-                onChange={(e) =>
-                  setFilter({ ...filter, code: e.target.value.toUpperCase() })
-                }
-              />
-              <TextField
-                label="Nombre de Laboratorio"
-                size="small"
-                sx={{ mt: 1.7 }}
-                value={filter.name}
+                sx={{ mt: 1.7, mr: 2, width:"100%"  }}
+                value={filter}
                 inputProps={{ maxLength: 40 }}
-                onChange={(e) =>
-                  setFilter({ ...filter, name: e.target.value.toUpperCase() })
-                }
+                onChange={(e) => setFilter(e.target.value.toUpperCase())}
               />
             </Box>
           </>
@@ -85,7 +69,7 @@ export default function Classroom() {
           <p />
         )}
       </Paper>
-      <Outlet context={[isEdit, setIsEdit, setIsSee, filter, setFilter]} />
+      <Outlet context={[calendar, isEdit, setIsEdit, setIsSee, filter, setFilter]} />
     </>
   );
 }

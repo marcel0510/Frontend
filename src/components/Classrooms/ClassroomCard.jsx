@@ -10,13 +10,14 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import SchoolIcon from "@mui/icons-material/School";
 import { useNavigate } from "react-router-dom";
 import { useDeleteSubject } from "../../hooks/Subject.Hooks";
 import { useState } from "react";
 import { ErrorMap } from "../../helpers/subject.helper";
-export default function SubjectCard({
-  subject,
+
+export default function ClassroomCard({
+  classroom,
   setSuccessMessage,
   setErrorMessage,
 }) {
@@ -28,7 +29,6 @@ export default function SubjectCard({
     id: 0,
     deletedBy: UserInfo.user.id,
   });
-
   const handleDelete = () => {
     setModal({ ...modal, isOpen: false });
     drop(
@@ -52,59 +52,43 @@ export default function SubjectCard({
       }
     );
   };
-
   return (
     <>
       <Card>
         <CardContent>
           <Typography variant="h5" marginBottom={"3%"}>
-            {subject.alias !== null ? subject.alias : subject.name}
-            <AutoStoriesIcon sx={{ marginLeft: "5%" }} />
+            Aula: {classroom.code}
+            <SchoolIcon sx={{ marginLeft: "5%" }} />
           </Typography>
           <Divider />
-          <Typography marginTop={"2%"} variant="h5">
-            {"Codigo:  " + subject.code}
+          <Typography variant="h6" marginTop={"2%"}>
+            {classroom.isLab ? classroom.name : "No es laboratorio"}
           </Typography>
-
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-start",
-            }}
-          >
-            <Typography marginTop={"2%"} mr={2.5}>
-              {"Número de Créditos:  " + subject.numCredits}
-            </Typography>
-            <Typography marginTop={"2%"}>
-              {"Número de Horas:  " + subject.numHours}
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography marginTop={"2%"} mr={3}>
-              {"Semestre:  " + subject.numSemester}
-            </Typography>
-            <Typography marginTop={"2%"}>
-              Es laboratorio: {subject.isLab ? "Si" : "No"}
-            </Typography>
-          </Box>
+          <Typography variant="body1">
+            Capacidad: {classroom.capacity}
+          </Typography>
+          <Typography variant="body1">{classroom.building.name}</Typography>
+          <Typography variant="body1">Piso: {classroom.floor}</Typography>
+          <Typography variant="body1">
+            Codigo SAEw:{" "}
+            {classroom.building.code +
+              "/" +
+              classroom.floor +
+              "/" +
+              classroom.code}
+          </Typography>
         </CardContent>
         <CardActions>
-          <Button variant="outlined"
-          onClick={() => navigate(`/Main/Grupos/Ver/Filtro/${subject.name}`)}
-          >Ver Grupos</Button>
           <Button
             variant="outlined"
-            color="warning"
-            onClick={() => navigate(`/Main/Materias/Editar/${subject.id}`)}
+            onClick={() => navigate(`/Main/Aulas/Horario/${classroom.id}`)}
           >
+            Ver horario
+          </Button>
+          <Button variant="outlined" color="warning">
             Editar
           </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => setModal({ ...modal, isOpen: true, id: subject.id })}
-          >
+          <Button variant="outlined" color="secondary">
             Eliminar
           </Button>
         </CardActions>

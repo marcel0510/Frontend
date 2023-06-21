@@ -73,6 +73,8 @@ export default function BuildingCard({
         <CardActions>
         <Button
             variant="outlined"
+            onClick={() => navigate(`/Main/Aulas/Ver/Filtro/${building.code}`)}
+
           >
             Ver Aulas
           </Button>

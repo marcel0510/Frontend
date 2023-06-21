@@ -72,7 +72,7 @@ export default function Buildings() {
           <p />
         )}
       </Paper>
-      <Outlet context={[isEdit, setIsEdit, setIsSee, filter]} />
+      <Outlet context={[isEdit, setIsEdit, setIsSee, filter, setFilter]} />
     </>
   );
 }

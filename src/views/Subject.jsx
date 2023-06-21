@@ -17,7 +17,8 @@ export default function Subject() {
   const [isSee, setIsSee] = useState(true);
   const [filter, setFilter] = useState({
     code: "",
-    name: ""
+    name: "",
+    semester: "",
   });
   const editButtonHandle = () => {
     setIsEdit(false);
@@ -72,11 +73,22 @@ export default function Subject() {
               <TextField
                 label="Nombre/Alias"
                 size="small"
-                sx={{ mt: 1.7 }}
+                sx={{ mt: 1.7, mr: 2 }}
                 value={filter.name}
                 inputProps={{ maxLength: 40 }}
                 onChange={(e) =>
                   setFilter({ ...filter, name: e.target.value.toUpperCase() })
+                }
+              />
+
+          <TextField
+                label="Semestre"
+                size="small"
+                sx={{ mt: 1.7 }}
+                value={filter.semester}
+                inputProps={{ maxLength: 40 }}
+                onChange={(e) =>
+                  setFilter({ ...filter, semester: e.target.value})
                 }
               />
             </Box>

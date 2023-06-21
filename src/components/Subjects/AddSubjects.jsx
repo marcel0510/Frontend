@@ -17,7 +17,7 @@ export default function AddSubject() {
   const [form, setForm] = useState({
     code: "",
     name: "",
-    alias: null,
+    alias: "",
     numHours: 1,
     numCredits: 1,
     numSemester: 1,
@@ -54,7 +54,7 @@ export default function AddSubject() {
   }, []);
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm(form, formError, setFormError)) {
+    if (validateForm(form, setForm, formError, setFormError)) {
       setFormError({
         ...formError,
         name: { error: false },

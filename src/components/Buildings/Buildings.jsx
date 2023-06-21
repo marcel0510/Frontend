@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 export default function Buildings() {
-  const [_, setIsEdit, setIsSee, filter] = useOutletContext();
+  const [_, setIsEdit, setIsSee, filter, setFilter] = useOutletContext();
   const { data, isLoading, isError } = useBuildings();
   const [buildings, setBuildings] = useState([]);
   const [successMessage, setSuccessMessage] = useState(false);
@@ -25,13 +25,13 @@ export default function Buildings() {
     setIsSee(true);
     setIsEdit(false);
     filterData();
-  }, [filter, isLoading]);
+  }, [filter, isLoading, data]);
 
   const filterData = () => {
     if (filter !== "") {
-      setBuildings(data.filter((b) => b.code.includes(filter)));
+      setBuildings(data.filter((b) => b.code.includes(filter)).reverse());
     } else {
-      if (!isLoading) setBuildings(data);
+      if (!isLoading) setBuildings(data.reverse());
     }
   };
   if (isLoading || isError)

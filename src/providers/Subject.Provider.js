@@ -16,7 +16,7 @@ export const GetSubject = async (id) => {
 }
 
 export const AddSubject = async (subject) => {
-    return await SubjectProviderHandler.post(`/new`, subject, { headers: { Authorization: `Bearer ${UserInfo.token}` } });
+    return await SubjectProviderHandler.post(`/new`, subject, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
 }
 
 export const UpdateSubject = async (subject) => {

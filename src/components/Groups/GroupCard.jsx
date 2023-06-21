@@ -10,38 +10,37 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import TableViewIcon from "@mui/icons-material/TableView";
 import { useNavigate } from "react-router-dom";
-import { useDeleteSubject } from "../../hooks/Subject.Hooks";
+import { useDeleteGroup } from "../../hooks/Group.Hooks";
 import { useState } from "react";
-import { ErrorMap } from "../../helpers/subject.helper";
-export default function SubjectCard({
-  subject,
+import { ErrorMap } from "../../helpers/group.helper";
+
+export default function GroupCard({
+  group,
   setSuccessMessage,
   setErrorMessage,
 }) {
   const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
   const navigate = useNavigate();
-  const { mutate: drop, isLoading, isError } = useDeleteSubject();
+  const { mutate: deleteGroup, isLoading, isError } = useDeleteGroup();
   const [modal, setModal] = useState({
     isOpen: false,
     id: 0,
-    deletedBy: UserInfo.user.id,
+    deletedBy: UserInfo.user.id
   });
 
   const handleDelete = () => {
     setModal({ ...modal, isOpen: false });
-    drop(
+    deleteGroup(
       { ...modal },
       {
         onSuccess: (res) => {
-          console.log(res);
           if (res.data.isSuccess) setSuccessMessage(true);
-          else
-            setErrorMessage({
-              error: true,
-              message: ErrorMap(res.data.errorType),
-            });
+          else setErrorMessage({
+            error: true,
+            message: ErrorMap(res.data.errorType),
+          })
         },
         onError: (error) => {
           setErrorMessage({
@@ -52,58 +51,43 @@ export default function SubjectCard({
       }
     );
   };
-
-  return (
+ return (
     <>
       <Card>
         <CardContent>
-          <Typography variant="h5" marginBottom={"3%"}>
-            {subject.alias !== null ? subject.alias : subject.name}
-            <AutoStoriesIcon sx={{ marginLeft: "5%" }} />
+          <Typography variant="h4" marginBottom={"3%"}>
+            {group.name + " - " + group.subject.code}
+            <TableViewIcon sx={{ marginLeft: "5%" }} />
           </Typography>
           <Divider />
-          <Typography marginTop={"2%"} variant="h5">
-            {"Codigo:  " + subject.code}
+          <Typography marginTop={"2%"} sx={{ fontWeight: 600 }}>
+            {group.subject.name}
           </Typography>
-
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-start",
-            }}
-          >
-            <Typography marginTop={"2%"} mr={2.5}>
-              {"Número de Créditos:  " + subject.numCredits}
-            </Typography>
-            <Typography marginTop={"2%"}>
-              {"Número de Horas:  " + subject.numHours}
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography marginTop={"2%"} mr={3}>
-              {"Semestre:  " + subject.numSemester}
-            </Typography>
-            <Typography marginTop={"2%"}>
-              Es laboratorio: {subject.isLab ? "Si" : "No"}
-            </Typography>
-          </Box>
+          <Typography marginTop={"2%"} >
+            Aula: {group.classroom.building + "/" + group.classroom.floor + "/" + group.classroom.code}
+          </Typography>
+          <Typography marginTop={"2%"} >
+            Calendario: {group.calendar.period}
+          </Typography>
         </CardContent>
         <CardActions>
-          <Button variant="outlined"
-          onClick={() => navigate(`/Main/Grupos/Ver/Filtro/${subject.name}`)}
-          >Ver Grupos</Button>
+        <Button
+            variant="outlined"
+            onClick={() => navigate(`/Main/Grupos/Horario/${group.id}`)}
+          >
+            Ver horario
+          </Button>
           <Button
             variant="outlined"
             color="warning"
-            onClick={() => navigate(`/Main/Materias/Editar/${subject.id}`)}
+            onClick={() => navigate(`/Main/Grupos/Editar/${group.id}`)}
           >
             Editar
           </Button>
           <Button
             variant="outlined"
             color="secondary"
-            onClick={() => setModal({ ...modal, isOpen: true, id: subject.id })}
+            onClick={() => setModal({ ...modal, isOpen: true, id: group.id })}
           >
             Eliminar
           </Button>
@@ -123,14 +107,14 @@ export default function SubjectCard({
           }}
         >
           <Typography variant="h6" mb={1}>
-            Eliminar materia
+            Eliminar edificio
           </Typography>
           <Divider />
           <Typography mt={1} mb={2}>
-            ¿Esta seguro de que desea eliminar esta materia?
+            ¿Esta seguro de que desea eliminar este edificio?
             <Typography color={"secondary"}>
               {" "}
-              Todos los grupos relaciondas con esta materia también se
+              Todas las aulas relaciondas con este edificio también se
               eliminarán
             </Typography>
           </Typography>
@@ -176,3 +160,4 @@ export default function SubjectCard({
     </>
   );
 }
+

@@ -10,16 +10,21 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-export const handleForm = (e, form, setForm, formError, setFormError) => {
+export const handleForm = (
+  e,
+  form,
+  setForm,
+  formError,
+  setFormError,
+  alias
+) => {
   if (
     e.target.name === "code" ||
     e.target.name === "name" ||
     e.target.name === "alias"
-  ){
+  ) {
     setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
-    if(!alias)
-      setForm({ ...form, alias: null });
-  }else {
+  } else {
     if (e.target.name === "numCredits") {
       if (parseInt(e.target.value) >= 1 && parseInt(e.target.value) <= 3)
         setForm({ ...form, [e.target.name]: parseInt(e.target.value) });
@@ -40,7 +45,12 @@ export const handleForm = (e, form, setForm, formError, setFormError) => {
   });
 };
 
-export const validateForm = (form, formError, setFormError) => {
+const handleAlias = (e, form, setForm, alias) => {
+  if (alias) setForm({ ...form, alias: e.target.value.toUpperCase() });
+  else setForm({ ...form, alias: null });
+};
+
+export const validateForm = (form, setForm, formError, setFormError) => {
   if (form.code === "" && form.name === "") {
     setFormError({
       name: { error: true, message: "No puede dejar este campo vacío" },
@@ -61,7 +71,7 @@ export const validateForm = (form, formError, setFormError) => {
       name: { error: true, message: "No puede dejar este campo vacío" },
     });
     return false;
-  } else if (form.name.length < 3) {
+  }else if (form.name.length < 3) {
     setFormError({
       ...formError,
       name: {
@@ -250,7 +260,7 @@ export const RenderComponent = (
             control={
               <Checkbox checked={alias} onChange={() => setAlias(!alias)} />
             }
-            label=  {isEdit ? "Alias":  "¿Agregar alias?"}
+            label={isEdit ? "Alias" : "¿Agregar alias?"}
           />
           {alias ? (
             <TextField
@@ -260,7 +270,7 @@ export const RenderComponent = (
               variant="outlined"
               inputProps={{ maxLength: 90 }}
               onChange={(e) =>
-                handleForm(e, form, setForm, formError, setFormError)
+                handleForm(e, form, setForm, formError, setFormError, alias)
               }
               onKeyDown={(e) => {
                 if (/^[0-9]+$/.test(e.key)) e.preventDefault();

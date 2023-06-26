@@ -10,7 +10,7 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import TableViewIcon from "@mui/icons-material/TableView";
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import { useNavigate } from "react-router-dom";
 import { useDeleteGroup } from "../../hooks/Group.Hooks";
 import { useState } from "react";
@@ -57,7 +57,7 @@ export default function GroupCard({
         <CardContent>
           <Typography variant="h4" marginBottom={"3%"}>
             {group.name + " - " + group.subject.code}
-            <TableViewIcon sx={{ marginLeft: "5%" }} />
+            <LibraryBooksIcon sx={{ marginLeft: "5%" }} />
           </Typography>
           <Divider />
           <Typography marginTop={"2%"} sx={{ fontWeight: 600 }}>

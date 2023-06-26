@@ -22,17 +22,13 @@ export const GetClassroom = async (id) => {
 }
 
 export const AddClassroom = async (classroom) => {
-    return await classroomProviderHandler.post('/new', classroom);
+    return await classroomProviderHandler.post('/new', classroom, { headers: { Authorization: `Bearer ${UserInfo.token}` } });
 }
 
 export const UpdateClassroom = async (classroom) => {
-    return await classroomProviderHandler.put(`/update/${classroom.Id}`, classroom);
+    return await classroomProviderHandler.put(`/update`, classroom, { headers: { Authorization: `Bearer ${UserInfo.token}` } });
 }
 
-export const DeleteClassroom = async (id) => {
-    return await classroomProviderHandler.delete(`/delete/${id}`);
-}
-
-export const DeleteByBuilding = async ({buildingId, userId}) => {
-    return await classroomProviderHandler.delete(`/deleteByBuilding/${buildingId}/${userId}`, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
+export const DeleteClassroom = async (classroom) => {
+    return await classroomProviderHandler.delete(`/delete/${classroom.id}/${classroom.deletedBy}`, { headers: { Authorization: `Bearer ${UserInfo.token}` } });
 }

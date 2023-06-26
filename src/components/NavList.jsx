@@ -9,7 +9,7 @@ import {
 import SchoolIcon from "@mui/icons-material/School";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import TableViewIcon from "@mui/icons-material/TableView";
+import GroupsIcon from '@mui/icons-material/Groups';
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -61,7 +61,7 @@ export default function NavList() {
 
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMore />}>
-          <TableViewIcon sx={{ marginRight: "5%" }} />
+          <GroupsIcon sx={{ marginRight: "5%" }} />
           <Typography>Grupos</Typography>
         </AccordionSummary>
         <AccordionDetails>

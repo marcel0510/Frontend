@@ -15,7 +15,10 @@ export default function Group() {
   const [calendar] = useOutletContext();
   const [isEdit, setIsEdit] = useState(false);
   const [isSee, setIsSee] = useState(true);
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState({
+    code: "",
+    name: ""
+  });
   const editButtonHandle = () => {
     setIsEdit(false);
     setIsSee(true);
@@ -50,19 +53,28 @@ export default function Group() {
             <Divider />
             <Box
               component={"fieldset"}
-              sx={{ mt: 1, ml: 9, border: "1px solid #fff", width: "35%" }}
+              sx={{ mt: 1, ml: 9, border: "1px solid #fff", display: "flex", width: "50%" }}
             >
               <legend>
                 <Typography variant="body2">Filtrar por :</Typography>
               </legend>
               <TextField
+                label="Código de materia"
+                size="small"
+                sx={{ mt: 1.7, mr: 2 }}
+                value={filter.code}
+                inputProps={{ maxLength: 8 }}
+                onChange={(e) => setFilter({ ...filter,  code: e.target.value.toUpperCase()})}
+              />
+              <TextField
                 label="Nombre de materia"
                 size="small"
-                sx={{ mt: 1.7, mr: 2, width:"100%"  }}
-                value={filter}
+                sx={{ mt: 1.7, mr: 2, width:"75%"  }}
+                value={filter.name}
                 inputProps={{ maxLength: 40 }}
-                onChange={(e) => setFilter(e.target.value.toUpperCase())}
+                onChange={(e) => setFilter({ ...filter, name: e.target.value.toUpperCase()})}
               />
+              
             </Box>
           </>
         ) : (

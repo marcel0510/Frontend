@@ -27,9 +27,14 @@ export default function EditBuilding() {
   } = useUpdateBuilding();
   //Estado para controlar el formulario
   const [form, setForm] = useState({
-    id: 0,
+    id: id,
     code: "",
     name: "",
+    floors: [
+      {
+        code: ""
+      }
+    ],
     updatedBy: UserInfo.user.id,
   });
   //Estado que controla los errores del formulario
@@ -42,6 +47,10 @@ export default function EditBuilding() {
       error: false,
       message: "",
     },
+    floors: {
+      error: false,
+      message: "",
+    }
   });
   //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
@@ -55,9 +64,10 @@ export default function EditBuilding() {
     if (!isLoadingBuilding) {
       setForm({
         ...form,
-        id: building.id,
         code: building.code,
         name: building.name,
+        floors: building.floors
+
       });
       setIsEdit(true);
       setIsSee(false);
@@ -71,6 +81,7 @@ export default function EditBuilding() {
         ...formError,
         name: { error: false },
         code: { error: false },
+        floors: { error: false },
       });
       edit(
         { ...form },

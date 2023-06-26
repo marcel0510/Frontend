@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { GetDate } from "./date.helper";
-import { formToJSON } from "axios";
 //Funcion que maneja el formulario
 const handleForm = (e, form, setForm, formError, setFormError) => {
   setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });

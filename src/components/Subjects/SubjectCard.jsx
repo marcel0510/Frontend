@@ -91,7 +91,7 @@ export default function SubjectCard({
         </CardContent>
         <CardActions>
           <Button variant="outlined"
-          onClick={() => navigate(`/Main/Grupos/Ver/Filtro/${subject.name}`)}
+          onClick={() => navigate(`/Main/Grupos/Ver/Filtro/${subject.code}`)}
           >Ver Grupos</Button>
           <Button
             variant="outlined"

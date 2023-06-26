@@ -12,6 +12,19 @@ export const GetDate = (date) => {
 
 }
 
+export const GetTime = (time) => {
+    let hour = time.$H;
+    let minutes = time.$m;
+
+    if(hour < 10){
+        hour = "0"+hour;
+    }
+    if(minutes < 10)
+        minutes = "0"+minutes;
+
+    return hour + ":" + minutes + ":" + "00"
+}
+
 export const GetToday = (addMonth = 0) => {
     const fecha = new Date() ;
     let day = fecha.getDate();
@@ -25,3 +38,19 @@ export const GetToday = (addMonth = 0) => {
 
     return year + '-' + month + '-' + day;
 }
+
+export const getCurrentTime = () => {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+  
+    // Formatear la hora en formato HH:MM:SS
+    const formattedTime = `${padZero(hours)}:${padZero(minutes)}`;
+  
+    return formattedTime;
+  };
+  
+  // Función auxiliar para agregar un cero al frente si el número es menor que 10
+  const padZero = (num) => {
+    return num < 10 ? `0${num}` : num;
+  };

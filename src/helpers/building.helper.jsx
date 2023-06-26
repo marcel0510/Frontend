@@ -3,14 +3,18 @@ import {
   Box,
   Button,
   FormControl,
+  Grid,
+  IconButton,
   Paper,
   Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from '@mui/icons-material/Delete';
 //Funcion que maneja el formulario
 export const handleForm = (e, form, setForm, formError, setFormError) => {
-  if (e.target.name === "code")
+  if (e.target.name === "code" || e.target.name === "floors")
     setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
   else setForm({ ...form, [e.target.name]: e.target.value });
   setFormError({
@@ -18,6 +22,25 @@ export const handleForm = (e, form, setForm, formError, setFormError) => {
     name: { error: false },
     code: { error: false },
   });
+};
+const handleAddFloors = (form, setForm) => {
+  const newFloor = { code: "" };
+  setForm({ ...form, floors: [...form.floors, newFloor] });
+};
+
+const handleRemoveFloors = (index, form, setForm) => {
+  const updatedFloors = [...form.floors];
+  updatedFloors.splice(index, 1);
+  setForm({ ...form, floors: updatedFloors });
+};
+
+const handleFloorsChange = (index, e, form, setForm) => {
+  const updatedFloors = [...form.floors];
+  updatedFloors[index] = {
+    ...updatedFloors[index],
+    code: e.target.value.toUpperCase(),
+  };
+  setForm({ ...form, floors: updatedFloors });
 };
 //Funcion que valida el formualrio
 export const validateForm = (form, formError, setFormError) => {
@@ -155,6 +178,62 @@ export const RenderComponent = (
             value={form.name}
           />
         </FormControl>
+
+        <Box
+          sx={{ display: "flex", alignItems: "center", width: "50%", mt: 2 }}
+        >
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            {"Pisos: " + form.floors.length}
+          </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => handleAddFloors(form, setForm)}
+          >
+            <AddIcon />{" "}
+          </Button>
+        </Box>
+
+        <Grid
+        container
+          sx={{
+            width: "50%",
+            mt: 1.5,
+          }}
+        >
+          {form.floors.map((floor, index) => {
+            return (
+              <Grid
+              item
+                key={index}
+                sx={{ mt: 1, display: "flex", alignItems: "center" }}
+                md={5.9}
+              >
+                <TextField
+                  label={"Piso " + (index + 1)}
+                  variant="outlined"
+                  size="small"
+                  inputProps={{ maxLength: 3 }}
+                  onChange={(e) => handleFloorsChange(index, e, form, setForm)}
+                  onKeyDown={(e) => {
+                    if (!/^[a-zA-Z0-9]*$/.test(e.key)) e.preventDefault();
+                  }}
+                  value={floor.code}
+                  sx={{ mr: 0.5 }}
+                />
+                <IconButton
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handleRemoveFloors(index, form, setForm)}
+                >
+                  {" "}
+                  <DeleteIcon />{" "}
+                </IconButton>
+              </Grid>
+            );
+          })}
+        </Grid>
+
         {/* Boton de submit */}
         <Button
           type="submit"
@@ -169,15 +248,17 @@ export const RenderComponent = (
       <Snackbar
         open={successMessage}
         autoHideDuration={1500}
-        onClose={() => handleSuccessMessage(setSuccessMessage, navigate, setIsSee)}
+        onClose={() =>
+          handleSuccessMessage(setSuccessMessage, navigate, setIsSee)
+        }
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         sx={{ mt: "5%", mr: "5.5%" }}
       >
         <Alert severity="success" sx={{ width: "100%" }}>
           <Typography>
             {isEdit
-              ? "El edificio se agregó correctamente!"
-              : "El edificio se editó correctamente"}
+              ? "El edificio se editó correctamente!"
+              : "El edificio se agregó correctamente"}
           </Typography>
         </Alert>
       </Snackbar>

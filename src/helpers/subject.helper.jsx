@@ -16,7 +16,6 @@ export const handleForm = (
   setForm,
   formError,
   setFormError,
-  alias
 ) => {
   if (
     e.target.name === "code" ||
@@ -45,12 +44,7 @@ export const handleForm = (
   });
 };
 
-const handleAlias = (e, form, setForm, alias) => {
-  if (alias) setForm({ ...form, alias: e.target.value.toUpperCase() });
-  else setForm({ ...form, alias: null });
-};
-
-export const validateForm = (form, setForm, formError, setFormError) => {
+export const validateForm = (form, formError, setFormError) => {
   if (form.code === "" && form.name === "") {
     setFormError({
       name: { error: true, message: "No puede dejar este campo vacío" },

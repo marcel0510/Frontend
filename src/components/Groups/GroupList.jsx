@@ -25,7 +25,7 @@ export default function GroupList(){
       </ListItemButton>
       <ListItemButton
         sx={{ padding: 0, ml: 4 }}
-        onClick={() => navigate("/Main/Grupos/Agregar")}
+        onClick={() => navigate("/Main/Grupos/Algoritmo/Parametros")}
       >
         <QueuePlayNextIcon fontSize="small" sx={{ marginRight: "5%" }} />
         <Typography variant="body2">Agregar grupo automático</Typography>

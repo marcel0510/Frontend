@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { GetClassrooms, GetClassroomsByCalendar, GetClassroom, AddClassroom, UpdateClassroom, DeleteClassroom, DeleteByBuilding } from '../providers/Classroom.Provider'
+import { GetClassrooms, GetClassroomsByCalendar, GetClassroom, AddClassroom, UpdateClassroom, DeleteClassroom } from '../providers/Classroom.Provider'
 
 export const useClassrooms = () => {
     return useQuery(['GetClassrooms'], GetClassrooms)
@@ -35,15 +35,6 @@ export const useUpdateClassroom = () => {
 export const useDeleteClassroom = () => {
     const queryClient = useQueryClient();
     return useMutation(DeleteClassroom, { 
-        onSuccess: () => {
-        queryClient.invalidateQueries(['GetClassrooms']) 
-        }
-    });
-}
-
-export const useDeleteByBuilding = () => {
-    const queryClient = useQueryClient();
-    return useMutation(DeleteByBuilding, { 
         onSuccess: () => {
         queryClient.invalidateQueries(['GetClassrooms']) 
         }

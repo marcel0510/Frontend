@@ -85,7 +85,9 @@ export default function ClassroomCard({
           >
             Ver horario
           </Button>
-          <Button variant="outlined" color="warning">
+          <Button variant="outlined" color="warning"
+          onClick={() => navigate(`/Main/Aulas/Editar/${classroom.id}`)}
+          >
             Editar
           </Button>
           <Button variant="outlined" color="secondary">

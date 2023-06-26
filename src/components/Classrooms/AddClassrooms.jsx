@@ -3,43 +3,44 @@ import {
   RenderComponent,
   validateForm,
   ErrorMap,
-} from "../../helpers/subject.helper";
+} from "../../helpers/classroom.helper";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { useAddSubject } from "../../hooks/Subject.Hooks";
-export default function AddSubject() {
+import { useAddClassroom } from "../../hooks/Classroom.Hooks";
+import { useBuildings } from "../../hooks/Building.Hooks";
+export default function AddClassrooms() {
   const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
   const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre
   const navigate = useNavigate(); //Navegador de la aplicacion
-  const { mutate: add, isLoading, isError } = useAddSubject(); //Funcion que agrega el edicio
-  const [ alias, setAlias ] = useState(false);
-  //Estado para controlar el formulario
+  const {
+    data: buildings,
+    isLoading: isLoadingBuilding,
+    isError: isErrorBuilding,
+  } = useBuildings();
+  const { mutate: add, isLoading, isError } = useAddClassroom();
   const [form, setForm] = useState({
     code: "",
-    name: "",
-    alias: "",
-    numHours: 1,
-    numCredits: 1,
-    numSemester: 1,
     isLab: false,
+    name: "",
+    capacity: 10,
+    floor: "",
+    buildingId: 0,
     createdBy: UserInfo.user.id,
   });
-  //Estado que controla los errores del formulario
   const [formError, setFormError] = useState({
     code: {
       error: false,
       message: "",
     },
-    name: {
+    floor: {
       error: false,
       message: "",
     },
-    alias: {
-        error: false,
-        message: "",
-      },
+    buildingId: {
+      error: false,
+      message: "",
+    },
   });
-  //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
   //Estado para controlar los errores generales
   const [errorMessage, setErrorMessage] = useState({
@@ -50,15 +51,17 @@ export default function AddSubject() {
   useEffect(() => {
     setIsSee(false);
     setIsEdit(false);
-
   }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm(form, formError, setFormError)) {
+    if (validateForm(form, setForm, formError, setFormError)) {
       setFormError({
         ...formError,
-        name: { error: false },
         code: { error: false },
+        capacity: { error: false },
+        floor: { error: false },
+        buildingId: { error: false },
       });
       add(
         { ...form },
@@ -78,6 +81,27 @@ export default function AddSubject() {
       );
     }
   };
+  if(isLoading || isError || isLoadingBuilding || isErrorBuilding)
+  return(<Backdrop
+    open={true}
+    sx={{
+      color: "#fff",
+      zIndex: (theme) => theme.zIndex.drawer + 1,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+    }}
+  >
+    {isError || isErrorBuilding ? (
+      <Typography mb={"1.5%"} variant="h5" color="secondary">
+        Error de conexión con el servidor!
+      </Typography>
+    ) : (
+      <p></p>
+    )}
+    <CircularProgress size={100} />
+  </Backdrop>
+);
   return (
     <>
       {
@@ -93,37 +117,13 @@ export default function AddSubject() {
           setSuccessMessage,
           errorMessage,
           setErrorMessage,
-          alias,
-          setAlias,
+          buildings,
           isEdit,
           setIsSee
         )
       }
 
-      {/* Pantalla de carga */}
-      {isLoading || isError ? (
-        <Backdrop
-          open={true}
-          sx={{
-            color: "#fff",
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          {isError ? (
-            <Typography mb={"1.5%"} variant="h5" color="secondary">
-              Error de conexión con el servidor!
-            </Typography>
-          ) : (
-            <p></p>
-          )}
-          <CircularProgress size={100} />
-        </Backdrop>
-      ) : (
-        <p />
-      )}
+
     </>
   );
 }

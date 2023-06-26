@@ -48,7 +48,7 @@ root.render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} locate={esES.components.MuiLocalizationProvider.defaultProps.localeText}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} >
         <CssBaseline />
         <App />
         </LocalizationProvider>

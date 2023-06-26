@@ -86,7 +86,7 @@ export default function Subject() {
                 size="small"
                 sx={{ mt: 1.7 }}
                 value={filter.semester}
-                inputProps={{ maxLength: 40 }}
+                inputProps={{ maxLength: 1 }}
                 onChange={(e) =>
                   setFilter({ ...filter, semester: e.target.value})
                 }

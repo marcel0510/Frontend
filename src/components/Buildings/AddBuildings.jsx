@@ -13,6 +13,11 @@ export default function AddBuildings() {
   const [form, setForm] = useState({
     code: "",
     name: "",
+    floors: [
+      {
+        code: ""
+      }
+    ],
     createdBy: UserInfo.user.id,
   });
   //Estado que controla los errores del formulario
@@ -25,6 +30,10 @@ export default function AddBuildings() {
       error: false,
       message: "",
     },
+    floors: {
+      error: false,
+      message: "",
+    }
   });
   //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
@@ -47,6 +56,7 @@ export default function AddBuildings() {
         ...formError,
         name: { error: false },
         code: { error: false },
+        floors: { error: false },
       });
       add(
         { ...form },

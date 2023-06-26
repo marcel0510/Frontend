@@ -20,6 +20,11 @@ import Classroom from "./views/Classroom";
 import Classrooms from "./components/Classrooms/Classrooms";
 import ClassroomSchedule from "./components/Classrooms/ClassroomSchedule";
 import GroupSchedule from "./components/Groups/GroupSchedule";
+import AddClassrooms from "./components/Classrooms/AddClassrooms";
+import EditClassrooms from "./components/Classrooms/EditClassrooms";
+import GroupAlgorithm from "./components/Groups/Algorithm/GroupAlgorithm";
+import GroupAlgorithmForm from "./components/Groups/Algorithm/GroupAlgorithmForm";
+import AddGroups from "./components/Groups/AddGroups";
 
 
 function App() {
@@ -29,6 +34,8 @@ function App() {
       <Route exact path="/Main" Component={Main}>
         <Route exact path="/Main/Aulas" Component={Classroom}>
           <Route exact path="/Main/Aulas/Ver/" Component={Classrooms} />
+          <Route exact path="/Main/Aulas/Agregar/" Component={AddClassrooms} />
+          <Route exact path="/Main/Aulas/Editar/:id" Component={EditClassrooms} />
           <Route path="/Main/Aulas/Ver/Filtro/:fil" Component={Classrooms} />
           <Route exact path="/Main/Aulas/Horario/:id" Component={ClassroomSchedule} />
         </Route>
@@ -39,7 +46,11 @@ function App() {
         </Route>
         <Route exact path="/Main/Grupos/" Component={Group}>
           <Route exact path="/Main/Grupos/Ver" Component={Groups}  />
+          <Route exact path="/Main/Grupos/Agregar" Component={AddGroups}  />
           <Route path="/Main/Grupos/Ver/Filtro/:fil" Component={Groups}  />
+          <Route exact path="/Main/Grupos/Algoritmo" Component={GroupAlgorithm}>
+              <Route exact path="/Main/Grupos/Algoritmo/Parametros" Component={GroupAlgorithmForm} />
+          </Route>
           <Route exact path="/Main/Grupos/Horario/:id" Component={GroupSchedule}  />
         </Route>
         <Route exact path="/Main/Edificios" Component={Building}>

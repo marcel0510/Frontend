@@ -17,7 +17,6 @@ export const useAddBuilding = () => {
         onSuccess: () => {
             queryClient.invalidateQueries(['GetBuildings']);
         },
-        onError: (error) => console.log(error)
     })
 }
 

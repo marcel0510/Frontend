@@ -15,21 +15,33 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import {
+  CustomSelect,
+  CustomInputLabel,
+  CustomGrid,
+  ErrorFormHelperText,
+} from "../../../Styles/Styled";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useOutletContext } from "react-router-dom";
 import { useSubjects } from "../../../hooks/Subject.Hooks";
 import { useBuildings } from "../../../hooks/Building.Hooks";
-import { useClassrooms } from "../../../hooks/Classroom.Hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TimeField } from "@mui/x-date-pickers";
 import { GetTime } from "../../../helpers/date.helper";
 import dayjs from "dayjs";
+import { useAlgorithm } from "../../../hooks/Algorithm.Hook";
+import { useClassrooms } from "../../../hooks/Classroom.Hooks";
 
 export default function GroupAlgorithmForm() {
-  const [filters, setFilters, setIsForm] = useOutletContext();
+  const withoutErrors = {
+    nameGr: { error: false },
+    subjectId: { error: false },
+    sessions: { error: false },
+  };
+  const [form, setForm, setIsForm] = useOutletContext();
   const {
-    data: subjects,
+    data: subjectsData,
     isLoading: loadSubjects,
     isError: errorSubjects,
   } = useSubjects();
@@ -39,91 +51,181 @@ export default function GroupAlgorithmForm() {
     isError: errorBuildings,
   } = useBuildings();
   const {
-    data: classrooms,
+    data: classroomsData,
     isLoading: loadClassrooms,
     isError: errorClassrooms,
   } = useClassrooms();
-  const [ optional, setOptional ] = useState(false);
+  const {
+    mutate: execQuery,
+    isLoading: isLoadResults,
+    isErrorResults,
+  } = useAlgorithm();
+  const isInitialMount = useRef(true);
+  const [optional, setOptional] = useState(false);
   const [labs, setLabs] = useState([]);
   const [initHours, setInitHours] = useState([dayjs("0000/00/00T07:00")]);
   const [endHours, setEndHours] = useState([dayjs("0000/00/00T09:00")]);
+  const [subjects, setSubjects] = useState([]);
+  const [classrooms, setClassrooms] = useState([]);
+  const [formErrors, setFormErrors] = useState(withoutErrors);
+  const [filters, setFilters] = useState({
+    subject: "",
+    lab: "",
+  });
   const days = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
-  const isLoading = loadSubjects || loadBuildings || loadClassrooms;
-  const isError = errorSubjects || errorBuildings || errorClassrooms;
+  const isLoading = loadSubjects || loadBuildings;
+  const isError = errorSubjects || errorBuildings;
 
   useEffect(() => {
-    if (!isLoading) setLabs(classrooms.filter((s) => s.isLab));
-  }, [isLoading, classrooms]);
+    if (!isLoading && isInitialMount.current) {
+      setSubjects(subjectsData);
+      isInitialMount.current = false;
+    }
+    filterData();
+  }, [isLoading, filters, subjectsData, classroomsData]);
 
+  const filterData = () => {
+    if (filters.subject !== "")
+      setSubjects(
+        subjectsData.filter((s) => {
+          if (s.alias !== null)
+            return (
+              s.name.includes(filters.subject) ||
+              s.alias.includes(filters.subject) ||
+              s.code.includes(filters.subject)
+            );
+          else
+            return (
+              s.name.includes(filters.subject) ||
+              s.code.includes(filters.subject)
+            );
+        })
+      );
+    else if (!isLoading && !isInitialMount.current) setSubjects(subjectsData);
+  };
   const handleAddSessions = () => {
-    if (filters.sessions.length < 3) {
+    if (form.sessions.length < 3) {
       const newSession = {
         day: -1,
-        hourInit: "",
-        hourEnd: "",
+        startTime: "07:00",
+        endTime: "09:00",
       };
       const newInitHour = dayjs("0000/00/00T07:00");
-      const newEndHour = dayjs("0000/00/00T07:00");
-      setFilters({ ...filters, sessions: [...filters.sessions, newSession] });
-      setInitHours([ ...initHours, newInitHour ]);
-      setEndHours([ ...endHours, newEndHour ]);
+      const newEndHour = dayjs("0000/00/00T09:00");
+      setForm({ ...form, sessions: [...form.sessions, newSession] });
+      setInitHours([...initHours, newInitHour]);
+      setEndHours([...endHours, newEndHour]);
+      setFormErrors(withoutErrors);
     }
   };
-
   const handleRemoveSessions = (index) => {
-    if (filters.sessions.length > 1) {
-      const updatedSessions = [...filters.sessions];
-      const updatedInitHours = [...initHours]
-      const updatedEndHours = [...endHours]
+    if (form.sessions.length > 1) {
+      const updatedSessions = [...form.sessions];
+      const updatedInitHours = [...initHours];
+      const updatedEndHours = [...endHours];
       updatedSessions.splice(index, 1);
       updatedInitHours.splice(index, 1);
       updatedEndHours.splice(index, 1);
-      setFilters({ ...filters, sessions: updatedSessions });
-      setInitHours([updatedInitHours])
-      setEndHours([updatedEndHours])
+      setForm({ ...form, sessions: updatedSessions });
+      setInitHours([updatedInitHours]);
+      setEndHours([updatedEndHours]);
+      setFormErrors(withoutErrors);
     }
-
   };
-
   const handleSessionsChange = (index, e) => {
-    const updatedSessions = [...filters.sessions];
+    const updatedSessions = [...form.sessions];
     updatedSessions[index] = {
       ...updatedSessions[index],
       day: e.target.value,
     };
-    setFilters({ ...filters, sessions: updatedSessions });
+    setForm({ ...form, sessions: updatedSessions });
+    setFormErrors(withoutErrors);
   };
-
   const handleSessionsChangeInit = (index, e) => {
-    const updatedSessions = [...filters.sessions];
+    const updatedSessions = [...form.sessions];
     updatedSessions[index] = {
       ...updatedSessions[index],
-      hourInit: GetTime(e),
+      startTime: GetTime(e),
     };
-    const updatedInitHours = [ ...initHours ];
+    const updatedInitHours = [...initHours];
     updatedInitHours[index] = e;
-    setFilters({ ...filters, sessions: updatedSessions });
-    setInitHours([ ...updatedInitHours  ])
+    setForm({ ...form, sessions: updatedSessions });
+    setInitHours([...updatedInitHours]);
+    setFormErrors(withoutErrors);
   };
-
   const handleSessionsChangeEnd = (index, e) => {
-    const updatedSessions = [...filters.sessions];
+    const updatedSessions = [...form.sessions];
     updatedSessions[index] = {
       ...updatedSessions[index],
-      hourEnd: GetTime(e),
+      endTime: GetTime(e),
     };
-    const updatedEndHours = [ ...endHours ];
+    const updatedEndHours = [...endHours];
     updatedEndHours[index] = e;
-    setFilters({ ...filters, sessions: updatedSessions });
+    setForm({ ...form, sessions: updatedSessions });
     setEndHours([...updatedEndHours]);
+    setFormErrors(withoutErrors);
   };
+  const validateForm = () => {
+    const errors = {
+      nameGr: {},
+      subjectId: {},
+      sessions: {},
+      building: {},
+      floor: {},
+    };
+    var validate = true;
+    var validateSession1 = true;
+    var validateSession2 = true;
+    form.sessions.forEach((s) => {
+      if (s.day == -1 || s.startTime == "" || s.endTime == "") {
+        validateSession1 = false;
+      }
+      if (s.startTime === s.endTime) {
+        validateSession2 = false;
+      }
+    });
+    if (form.nameGr === "") {
+      errors["nameGr"]["error"] = true;
+      errors["nameGr"]["message"] = "No puede dejar este campo vacío";
+      validate = false;
+    }
 
+    if (form.subjectId === 0) {
+      errors["subjectId"]["error"] = true;
+      errors["subjectId"]["message"] = "Debe seleccionar una materia";
+      validate = false;
+    }
+
+    if (!validateSession1) {
+      errors["sessions"]["error"] = true;
+      errors["sessions"]["message"] =
+        "Debe llenar cada uno de los campos de las sesiones";
+      validate = false;
+    }
+    if (!validateSession2) {
+      errors["sessions"]["error"] = true;
+      errors["sessions"]["message"] =
+        "La hora de inicio no puede ser igual a la hora de fin";
+      validate = false;
+    }
+    if (validate) return true;
+    else {
+      setFormErrors(errors);
+      return false;
+    }
+  };
   const onSubmitHandle = (e) => {
     e.preventDefault();
-    console.log(filters);
-  } 
+    if (validateForm()) {
+      execQuery(
+        { ...form }, 
+        {
+        onSuccess: res => console.log(res)
+      })
+    }
+  };
 
-  if (isLoading || isError)
+  if (isLoading || isError || isLoadResults)
     return (
       <Backdrop
         open={true}
@@ -148,6 +250,7 @@ export default function GroupAlgorithmForm() {
 
   return (
     <>
+      {/* Formulario */}
       <Paper
         component={"form"}
         onSubmit={onSubmitHandle}
@@ -159,15 +262,16 @@ export default function GroupAlgorithmForm() {
           width: "70%",
         }}
       >
+        {/* Campos obligatorios */}
         <Box
           component={"fieldset"}
           sx={{
-            mb: 4,
             padding: "15px 4%",
             border: "1px solid #000",
             width: "100%",
             display: "flex",
             flexDirection: "column",
+            mb: 3,
           }}
         >
           <legend>
@@ -175,7 +279,9 @@ export default function GroupAlgorithmForm() {
               Parámetros obligatorios:
             </Typography>
           </legend>
+          {/* Primera fila */}
           <Box sx={{ display: "flex", gap: "2%", width: "75%" }}>
+            {/* Nombre del grupo */}
             <FormControl sx={{ flex: 1 }}>
               <TextField
                 name="nameGr"
@@ -183,30 +289,57 @@ export default function GroupAlgorithmForm() {
                 label="Grupo"
                 variant="outlined"
                 inputProps={{ maxLength: 5 }}
-                onChange={(e) =>
-                  setFilters({
-                    ...filters,
+                onChange={(e) => {
+                  setForm({
+                    ...form,
                     nameGr: e.target.value.toUpperCase(),
-                  })
+                  });
+                  setFormErrors(withoutErrors);
+                }}
+                helperText={
+                  formErrors.nameGr.error
+                    ? formErrors.nameGr.message
+                    : "Ej. GR1"
                 }
-                helperText={"Ej. GR1"}
+                error={formErrors.nameGr.error}
                 value={filters.nameGr}
               />
             </FormControl>
+
+            {/* Seleccion de la materia */}
             <FormControl size="small" sx={{ flex: 3 }}>
-              <InputLabel id="materia">Materia</InputLabel>
-              <Select
+              <CustomInputLabel id="materia" error={formErrors.subjectId.error}>
+                Materia
+              </CustomInputLabel>
+              <CustomSelect
                 labelId="materia"
-                value={filters.subjectId}
+                value={form.subjectId}
                 label="Materia"
                 name="subjectId"
-                onChange={(e) =>
-                  setFilters({
-                    ...filters,
+                error={formErrors.subjectId.error}
+                onChange={(e) => {
+                  setForm({
+                    ...form,
                     subjectId: parseInt(e.target.value),
-                  })
-                }
+                  });
+                  setFormErrors(withoutErrors);
+                }}
               >
+                <TextField
+                  value={filters.subjectName}
+                  size="small"
+                  sx={{ width: "100%" }}
+                  variant="standard"
+                  label="Filtrar..."
+                  inputProps={{ style: { textTransform: "uppercase" } }}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      subject: e.target.value.toUpperCase(),
+                    })
+                  }
+                />
                 <MenuItem value={0}></MenuItem>
                 {subjects.map((subject, index) => {
                   return (
@@ -215,7 +348,12 @@ export default function GroupAlgorithmForm() {
                     </MenuItem>
                   );
                 })}
-              </Select>
+              </CustomSelect>
+              {formErrors.subjectId.error && (
+                <ErrorFormHelperText>
+                  {formErrors.subjectId.message}
+                </ErrorFormHelperText>
+              )}
             </FormControl>
           </Box>
           {/* Laboratorio */}
@@ -277,7 +415,7 @@ export default function GroupAlgorithmForm() {
               width: "100%",
             }}
           >
-            {/*  */}
+            {/* Label con el numero de sesiones y boton para agregar sesiones */}
             <Box
               sx={{
                 display: "flex",
@@ -287,7 +425,7 @@ export default function GroupAlgorithmForm() {
               }}
             >
               <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 300 }}>
-                {"Sesiones: " + filters.sessions.length}
+                {"Sesiones: " + form.sessions.length}
               </Typography>
               <Button
                 variant="outlined"
@@ -298,14 +436,17 @@ export default function GroupAlgorithmForm() {
               </Button>
             </Box>
 
-            <Grid
+            {/* Contenedor de sesiones */}
+            <CustomGrid
               container
+              error={formErrors.sessions.error ? 1 : 0}
               sx={{
                 width: "100%",
                 mt: 1.5,
+                padding: "2.5%",
               }}
             >
-              {filters.sessions.map((session, index) => {
+              {form.sessions.map((session, index) => {
                 return (
                   <Grid
                     item
@@ -318,6 +459,7 @@ export default function GroupAlgorithmForm() {
                     }}
                     md={12}
                   >
+                    {/* Dia */}
                     <FormControl size="small" sx={{ flex: 1.5 }}>
                       <InputLabel id="dia">Día</InputLabel>
                       <Select
@@ -337,20 +479,26 @@ export default function GroupAlgorithmForm() {
                         })}
                       </Select>
                     </FormControl>
+
+                    {/* Hora de inicio */}
                     <TimeField
                       label="Hora de inicio"
                       sx={{ flex: 3 }}
                       value={initHours[index]}
                       size="small"
-                      onChange={(e) => handleSessionsChangeInit(index, e) }
+                      onChange={(e) => handleSessionsChangeInit(index, e)}
                     />
+
+                    {/* Hora de fin */}
                     <TimeField
                       label="Hora de Fin"
                       sx={{ flex: 3 }}
                       value={endHours[index]}
                       size="small"
-                      onChange={(e) =>  handleSessionsChangeEnd(index, e) }
+                      onChange={(e) => handleSessionsChangeEnd(index, e)}
                     />
+
+                    {/* Boton para quitar sesiones */}
                     <IconButton
                       variant="outlined"
                       size="small"
@@ -362,105 +510,126 @@ export default function GroupAlgorithmForm() {
                   </Grid>
                 );
               })}
-            </Grid>
+            </CustomGrid>
+            {formErrors.sessions.error && (
+              <ErrorFormHelperText>
+                {formErrors.sessions.message}
+              </ErrorFormHelperText>
+            )}
           </Box>
           {/*------------------ End Sessions ---------------- */}
+
+          {/* Checkbox para activar los parametros opcionales */}
           <FormControlLabel
-              control={
-                <Checkbox
-                  checked={optional}
-                  onChange={() => setOptional(!optional)}
-                />
-              }
-              label="Agregar parámetros opcionales"
-              sx={{ mt: 4 }}
-            />
-
-
+            control={
+              <Checkbox
+                checked={optional}
+                onChange={() => setOptional(!optional)}
+              />
+            }
+            label="Agregar parámetros opcionales"
+            sx={{ mt: 4 }}
+          />
         </Box>
 
-        {
-          optional ?
-        <Box
-          component={"fieldset"}
-          sx={{
-            padding: "15px 4%",
-            border: "1px solid #000",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <legend>
-            <Typography variant="h6" sx={{ mr: 1, ml: 0.5, fontWeight: 400 }}>
-              Parámetros opcionales:
-            </Typography>
-          </legend>
-          <Box sx={{ width: "75%", display: "flex", gap: 1 }}>
-            <FormControl size="small" sx={{ flex: 2 }}>
-              <InputLabel id="edificio">Edificio</InputLabel>
-              <Select
-                labelId="edificio"
-                value={filters.building}
-                label="Edificio"
-                name="building"
-                onChange={(e) =>
-                  setFilters({ ...filters, building: e.target.value })
-                }
-              >
-                <MenuItem value={""}></MenuItem>
-                {buildings.map((building, index) => {
-                  return (
-                    <MenuItem key={index} value={building.code}>
-                      {building.name}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-            <FormControl size="small" sx={{ flex: 1 }}>
-              <InputLabel id="Piso">Piso</InputLabel>
-              <Select
-                labelId="piso"
-                value={filters.floor}
-                label="Piso"
-                name="floor"
-                onChange={(e) =>
-                  setFilters({ ...filters, floor: e.target.value })
-                }
-              >
-                {filters.building === "" ? (
+        {/* Parametros opcionales */}
+        {optional && (
+          <Box
+            component={"fieldset"}
+            sx={{
+              padding: "15px 4%",
+              border: "1px solid #000",
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              mb: 3,
+            }}
+          >
+            <legend>
+              <Typography variant="h6" sx={{ mr: 1, ml: 0.5, fontWeight: 400 }}>
+                Parámetros opcionales:
+              </Typography>
+            </legend>
+            <Box sx={{ width: "75%", display: "flex", gap: 1 }}>
+              {/* Seleccion dle edificio */}
+              <FormControl size="small" sx={{ flex: 2 }}>
+                <CustomInputLabel id="edificio">Edificio</CustomInputLabel>
+                <CustomSelect
+                  labelId="edificio"
+                  value={form.building}
+                  label="Edificio"
+                  name="building"
+                  onChange={(e) => {
+                    setForm({ ...form, building: e.target.value });
+                    setFormErrors(withoutErrors);
+                  }}
+                >
                   <MenuItem value={""}></MenuItem>
-                ) : (
-                  buildings[
-                    buildings.findIndex((b) => b.code === filters.building)
-                  ].floors.map((floor, index) => {
+                  {buildings.map((building, index) => {
                     return (
-                      <MenuItem key={index} value={floor.code}>
-                        {floor.code}
+                      <MenuItem key={index} value={building.code}>
+                        {building.name}
                       </MenuItem>
                     );
-                  })
-                )}
-              </Select>
-            </FormControl>
-            <FormControl sx={{ width: "25%" }}>
-              <TextField
-                name="capacity"
-                size="small"
-                label="Capacidad"
-                variant="outlined"
-                inputProps={{ type: "number" }}
-                onChange={(e) =>
-                  setFilters({ ...filters, capacity: parseInt(e.target.value) })
-                }
-                value={filters.capacity}
-              />
-            </FormControl>
+                  })}
+                </CustomSelect>
+              </FormControl>
+
+              {/* Seleccion del piso */}
+              <FormControl size="small" sx={{ flex: 1 }}>
+                <CustomInputLabel id="Piso">Piso</CustomInputLabel>
+                <CustomSelect
+                  labelId="piso"
+                  value={form.floor}
+                  label="Piso"
+                  name="floor"
+                  onChange={(e) => {
+                    setForm({ ...form, floor: e.target.value });
+                    setFormErrors(withoutErrors);
+                  }}
+                >
+                  {form.building === "" ? (
+                    <MenuItem value={""}></MenuItem>
+                  ) : (
+                    buildings[
+                      buildings.findIndex((b) => b.code === form.building)
+                    ].floors.map((floor, index) => {
+                      return (
+                        <MenuItem key={index} value={floor.code}>
+                          {floor.code}
+                        </MenuItem>
+                      );
+                    })
+                  )}
+                </CustomSelect>
+              </FormControl>
+
+              {/* Capacidad */}
+              <FormControl sx={{ width: "25%" }}>
+                <TextField
+                  name="capacity"
+                  size="small"
+                  label="Capacidad"
+                  variant="outlined"
+                  inputProps={{ type: "number" }}
+                  onChange={(e) => {
+                    setForm({
+                      ...form,
+                      capacity: parseInt(e.target.value),
+                    });
+                    setFormErrors(withoutErrors);
+                  }}
+                  value={filters.capacity}
+                />
+              </FormControl>
+            </Box>
           </Box>
-        </Box>:<p />
-        }
-        <Button type="submit" sx={{ mt: 5, width: "30%" }} variant="contained">Enviar</Button>
+        )}
+
+        {/* Boton de submit */}
+        <Button type="submit" sx={{ width: "30%" }} variant="contained">
+          Enviar
+        </Button>
       </Paper>
     </>
   );

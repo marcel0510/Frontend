@@ -12,12 +12,12 @@ import { useState } from "react";
 import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 export default function Group() {
   const navigate = useNavigate();
-  const [calendar] = useOutletContext();
+  const [calendar, calendars, , setIsEditGroup] = useOutletContext();
   const [isEdit, setIsEdit] = useState(false);
-  const [isSee, setIsSee] = useState(true);
+  const [isSee, setIsSee] = useState(false);
   const [filter, setFilter] = useState({
     code: "",
-    name: ""
+    name: "",
   });
   const editButtonHandle = () => {
     setIsEdit(false);
@@ -53,7 +53,13 @@ export default function Group() {
             <Divider />
             <Box
               component={"fieldset"}
-              sx={{ mt: 1, ml: 9, border: "1px solid #fff", display: "flex", width: "50%" }}
+              sx={{
+                mt: 1,
+                ml: 9,
+                border: "1px solid #fff",
+                display: "flex",
+                width: "50%",
+              }}
             >
               <legend>
                 <Typography variant="body2">Filtrar por :</Typography>
@@ -64,24 +70,38 @@ export default function Group() {
                 sx={{ mt: 1.7, mr: 2 }}
                 value={filter.code}
                 inputProps={{ maxLength: 8 }}
-                onChange={(e) => setFilter({ ...filter,  code: e.target.value.toUpperCase()})}
+                onChange={(e) =>
+                  setFilter({ ...filter, code: e.target.value.toUpperCase() })
+                }
               />
               <TextField
                 label="Nombre de materia"
                 size="small"
-                sx={{ mt: 1.7, mr: 2, width:"75%"  }}
+                sx={{ mt: 1.7, mr: 2, width: "75%" }}
                 value={filter.name}
                 inputProps={{ maxLength: 40 }}
-                onChange={(e) => setFilter({ ...filter, name: e.target.value.toUpperCase()})}
+                onChange={(e) =>
+                  setFilter({ ...filter, name: e.target.value.toUpperCase() })
+                }
               />
-              
             </Box>
           </>
         ) : (
           <p />
         )}
       </Paper>
-      <Outlet context={[calendar, isEdit, setIsEdit, setIsSee, filter, setFilter]} />
+      <Outlet
+        context={[
+          calendar,
+          calendars,
+          setIsEditGroup,
+          isEdit,
+          setIsEdit,
+          setIsSee,
+          filter,
+          setFilter
+        ]}
+      />
     </>
   );
 }

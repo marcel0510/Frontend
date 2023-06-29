@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Grid, InputLabel, Select } from "@mui/material";
+import { FormHelperText, Grid, InputLabel, Select } from "@mui/material";
 
 export const CustomSelect = styled(Select)(({ error }) => ({
   "& .MuiOutlinedInput-root": {
@@ -16,3 +16,7 @@ export const CustomInputLabel = styled(InputLabel)(({ error }) => ({
 export const CustomGrid = styled(Grid)(({ error }) => ({
   border: error ? "1px solid red" : "none"
 }));
+
+export const ErrorFormHelperText = styled(FormHelperText)({
+  color: "#d62f36"
+});

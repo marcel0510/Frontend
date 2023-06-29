@@ -11,7 +11,7 @@ import ClassroomCard from "./ClassroomCard";
 import { useEffect, useRef, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 export default function Classrooms() {
-  const [_, setIsEdit, setIsSee, filter, setFilter] = useOutletContext();
+  const [ , , setIsSee, filter, setFilter] = useOutletContext();
   const { fil } = useParams();
   const isInitialMount = useRef(true);
   const { data, isLoading, isError } = useClassrooms();
@@ -23,13 +23,13 @@ export default function Classrooms() {
   });
 
   useEffect(() => {
-    setIsSee(true);
-    setIsEdit(false);
     if(isInitialMount.current && !isLoading && fil){
       isInitialMount.current = false;
       setFilter({ ...filter, code: fil });
     }
     filterData();
+    setIsSee(true);
+    return () => setIsSee(false);
   }, [filter, isLoading, data]);
 
   const filterData = () => {
@@ -46,12 +46,13 @@ export default function Classrooms() {
       setClassrooms(
         data
           .filter((c) => {
-            if (c.isLab) return c.name.includes(filter.name);
+            if (c.isLab) return c.name.toLowerCase().includes(filter.name.toLowerCase());
           })
           .reverse()
       );
     else if (!isLoading) setClassrooms(data.reverse());
   };
+
   if (isLoading || isError)
     return (
       <Backdrop

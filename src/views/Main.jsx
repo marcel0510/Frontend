@@ -10,7 +10,7 @@ import {
   Select,
   Toolbar,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
 import MuiAppBar from "@mui/material/AppBar";
 import Typography from "@mui/material/Typography";
@@ -21,6 +21,13 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import logo from "../assets/logo.png";
 import { RoleMap } from "../helpers/user.helpers";
 import { useCalendars } from "../hooks/Calendar.Hooks";
+import {
+  GetUser,
+  ManageSession,
+  EndSession,
+  isAdmin,
+  thereIsSession,
+} from "../session/session";
 
 const drawerWidth = 270;
 
@@ -74,14 +81,23 @@ const Img = styled("img")({
 
 export default function Main() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(true);
-  const [calendar, setCalendar] = useState(0);
   const { data: calendars, isLoading, isError } = useCalendars();
-  const userInfo = JSON.parse(localStorage.getItem("UserInfo"));
+  const [open, setOpen] = useState(true);
+  const [admin, setIsAdmin] = useState(false);
+  const [calendar, setCalendar] = useState(0);
+  const [isEditGroup, setIsEditGroup] = useState(false);
+  const [user, setUser] = useState({ name: "", role: "" });
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    if (!localStorage.getItem("UserInfo")) {
-      navigate("/");
+    if (isInitialMount.current) {
+      if (!thereIsSession()) navigate("/");
+      else {
+      }
+      const { Name, Role } = GetUser();
+      setUser({ ...user, name: Name, role: Role });
+      if (isAdmin()) setIsAdmin(true);
+      isInitialMount.current = false;
     }
     if (!isLoading && !isError) {
       calendars.reverse();
@@ -90,7 +106,7 @@ export default function Main() {
   }, [isLoading, calendars, isError]);
 
   const handleCloseSession = () => {
-    localStorage.removeItem("UserInfo");
+    EndSession();
     navigate("/");
   };
   const handleDrawerOpen = () => {
@@ -186,10 +202,8 @@ export default function Main() {
                 flexGrow: 1,
               }}
             >
-              <Typography>Usuario: {userInfo["user"]["name"]}</Typography>
-              <Typography>
-                Perfil: {RoleMap(userInfo["user"]["role"])}
-              </Typography>
+              <Typography>Usuario: {user.name}</Typography>
+              <Typography>Perfil: {RoleMap(user.role)}</Typography>
             </Box>
 
             <Typography mr={3}>Calendario: </Typography>
@@ -203,11 +217,16 @@ export default function Main() {
                 minWidth: 100,
                 height: 40,
               }}
+              disabled={isEditGroup}
             >
               <MenuItem key={-1} value={0}></MenuItem>
               {calendars.map((calendar, index) => {
                 return (
-                  <MenuItem key={index} value={calendar.id} sx={{ display:  index < 3 ? "block":"none"  }}>
+                  <MenuItem
+                    key={index}
+                    value={calendar.id}
+                    sx={{ display: index < 3 ? "block" : "none" }}
+                  >
                     <Typography>{calendar.period}</Typography>
                   </MenuItem>
                 );
@@ -238,10 +257,12 @@ export default function Main() {
           anchor="left"
           open={open}
         >
-          <NavList />
+          <NavList admin={admin} />
         </Drawer>
         <Body open={open}>
-          <Outlet context={[calendar, setCalendar, calendars]} />
+          <Outlet
+            context={[calendar, calendars, setCalendar, setIsEditGroup]}
+          />
         </Body>
       </Box>
       {}

@@ -9,7 +9,7 @@ import CalendarCard from "./CalendarCard";
 import { useOutletContext } from "react-router-dom";
 
 export default function Calendars() {
-  const [ _ , setIsEdit , setCalendar, calendars, setIsSee, filter ] = useOutletContext();
+  const [ calendars, setCalendar, , , setIsSee, filter] = useOutletContext();
   const [ Calendars, setCalendars ] = useState([]);
   const [successMessage, setSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState({
@@ -19,16 +19,14 @@ export default function Calendars() {
 
   useEffect(() => {
     setIsSee(true);
-    setIsEdit(false);
     filterData();
+    return () => setIsSee(false);
   }, [filter, calendars])
 
   const filterData = () => {
-    if(filter !== ""){
+    if(filter !== "")
       setCalendars(calendars.filter(b => b.period.includes(filter)).reverse())
-    }else{
-      setCalendars(calendars.reverse())
-    }
+    else if (calendars) setCalendars(calendars.reverse())
   }
 
   return (

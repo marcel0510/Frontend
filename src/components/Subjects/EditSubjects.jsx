@@ -3,9 +3,16 @@ import { RenderComponent, validateForm } from "../../helpers/subject.helper";
 import { useSubject, useUpdateSubject } from "../../hooks/Subject.Hooks";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { GetUser } from "../../session/session";
 export default function () {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
-  const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre8
+  const { Id } = GetUser();
+
+  const withoutErrors = {
+    code: { error: false },
+    name: { error: false },
+    alias: { error: false },
+  };
+  const [isEdit, setIsEdit] = useOutletContext(); //Informacion del padre8
   const navigate = useNavigate(); //Navegador de la aplicacion
   const { id } = useParams(); //Informacion del URL
   const [alias, setAlias] = useState(false);
@@ -29,24 +36,10 @@ export default function () {
     numCredits: 1,
     numSemester: 1,
     isLab: false,
-    aliasBool: false,
-    updatedBy: UserInfo.user.id,
+    updatedBy: Id,
   });
   //Estado que controla los errores del formulario
-  const [formError, setFormError] = useState({
-    code: {
-      error: false,
-      message: "",
-    },
-    name: {
-      error: false,
-      message: "",
-    },
-    alias: {
-      error: false,
-      message: "",
-    },
-  });
+  const [formErrors, setFormErrors] = useState(withoutErrors);
   //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
   //Estado para controlar los errores generales
@@ -72,17 +65,13 @@ export default function () {
       }
     }
     setIsEdit(true);
-    setIsSee(false);
+    return () => setIsEdit(false);
   }, [isLoadingSubject, subject]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm(form, formError, setFormError)) {
-      setFormError({
-        ...formError,
-        name: { error: false },
-        code: { error: false },
-      });
+    if (validateForm(form, setFormErrors, alias)) {
+      
       edit(
         { ...form },
         {
@@ -110,8 +99,9 @@ export default function () {
           handleSubmit,
           form,
           setForm,
-          formError,
-          setFormError,
+          formErrors,
+          setFormErrors,
+          withoutErrors,
           successMessage,
           setSuccessMessage,
           errorMessage,
@@ -119,7 +109,6 @@ export default function () {
           alias,
           setAlias,
           isEdit,
-          setIsSee
         )
       }
       {/* Pantalla de carga */}

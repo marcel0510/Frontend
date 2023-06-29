@@ -4,37 +4,32 @@ import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAddCalendar } from "../../hooks/Calendar.Hooks";
 import { GetToday } from "../../helpers/date.helper";
+import { GetUser } from "../../session/session";
 import dayjs from "dayjs";
 
 export default function AddCalendars() {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
-  const [isEdit, setIsEdit , _ , calendars, setIsSee] = useOutletContext(); //Informacion del padre
+  const { Id } = GetUser();
+  const withoutErrors = {
+    period: { error: false },
+    periodInit: { error: false },
+    periodEnd: { error: false },
+  };
+  const [calendars, , isEdit] = useOutletContext(); //Informacion del padre
   const navigate = useNavigate(); //Navegador de la aplicacion
   const { mutate: add, isLoading, isError } = useAddCalendar(); //Funcion que agrega el edicio
+  const [ periodInit, setPeriodInit ] = useState(dayjs(GetToday()));
+  const [ periodEnd, setPeriodEnd ] = useState(dayjs(GetToday(5)));
   //Estado para controlar el formulario
   const [form, setForm] = useState({
     period: "",
-    periodInit: dayjs(GetToday()),
-    periodEnd: dayjs(GetToday(5)),
+    periodInit: GetToday(),
+    periodEnd: GetToday(5),
     needsCopy: false,
     calendarId: 0,
-    createdBy: UserInfo.user.id,
+    createdBy: Id,
   });
   //Estado que controla los errores del formulario
-  const [formError, setFormError] = useState({
-    period: {
-      error: false,
-      message: "",
-    },
-    periodInit: {
-      error: false,
-      message: "",
-    },
-    periodEnd: {
-      error: false,
-      message: "",
-    },
-  });
+  const [formErrors, setFormErrors] = useState(withoutErrors);
   //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
   //Estado para controlar los errores generales
@@ -42,23 +37,10 @@ export default function AddCalendars() {
     error: false,
     message: "",
   });
-
-  useEffect(() => {
-    setIsSee(false);
-    setIsEdit(false)
-  }, [])
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm(form, formError, setFormError)) {
-      setFormError({
-        ...formError,
-        period: { error: false },
-      });
-      setForm({
-        ...form,
-       
-      });
+    if (validateForm(form, setFormErrors)) {
       add(
         { ...form },
         {
@@ -88,14 +70,19 @@ export default function AddCalendars() {
           handleSubmit,
           form,
           setForm,
-          formError,
-          setFormError,
+          formErrors,
+          setFormErrors,
+          withoutErrors,
           successMessage,
           setSuccessMessage,
           errorMessage,
           setErrorMessage,
           calendars,
-          isEdit
+          periodInit,
+          setPeriodInit,
+          periodEnd,
+          setPeriodEnd,
+          isEdit,
         )
       }
       {/* Pantalla de carga */}

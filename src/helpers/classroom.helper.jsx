@@ -5,73 +5,49 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
-  FormHelperText,
-  InputLabel,
   MenuItem,
   Paper,
-  Select,
   Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
-export const handleForm = (e, form, setForm, formError, setFormError, setSelectedBuilding) => {
-  if (e.target.name === "capacity") {
-    if (parseInt(e.target.value) >= 10 && parseInt(e.target.value) <= 50)
-      setForm({ ...form, [e.target.name]: parseInt(e.target.value) });
-  }
-  if (e.target.name === "code" || e.target.name === "name") 
-      setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
-  if(e.target.name == "buildingId" || e.target.name == "floor"){
-    setForm({ ...form, [e.target.name]: e.target.value });
-    console.log(form)
-  }
-    
-  setFormError({
-    ...formError,
-    code: { error: false },
-    floor: { error: false },
-    buildingId: { error: false },
-  });
-};
+import {
+  CustomInputLabel,
+  CustomSelect,
+  ErrorFormHelperText,
+} from "../Styles/Styled";
+import { alpha } from "../helpers/regularExpressions.helper";
 
-export const validateForm = (form, formError, setFormError) => {
-  if (form.code === "" && form.floor === "" && form.buildingId == 0) {
-    setFormError({
-      code: { error: true, message: "No puede dejar este campo vacío" },
-      floor: { error: true, message: "Debe seleccionar un piso" },
-      buildingId: { error: true, message: "Debe seleccionar un edificio" },
-    });
-    return false;
+
+export const validateForm = (form, setFormErrors) => {
+  const errors = { code: {}, name: {}, floor: {}, buildingId: {} };
+  var validate = true;
+  if (form.buildingId === 0) {
+    errors["buildingId"]["error"] = true;
+    errors["buildingId"]["message"] = "Debe seleccionar un edificio";
+    validate = false;
+  }
+  if (form.floor === "") {
+    errors["floor"]["error"] = true;
+    errors["floor"]["message"] = "Debe seleccionar un piso";
+    validate = false;
   }
   if (form.code === "") {
-    setFormError({
-      ...formError,
-      code: { error: true, message: "No puede dejar este campo vacío" },
-    });
+    errors["code"]["error"] = true;
+    errors["code"]["message"] = "No puede dejar este campo vacío";
+    validate = false;
+  }
+  if (form.isLab && form.name === "") {
+    errors["name"]["error"] = true;
+    errors["name"]["message"] = "No puede dejar este campo vacío";
+    validate = false;
+  }
+  if (validate) return true;
+  else {
+    setFormErrors(errors);
     return false;
   }
-  
-  if(form.buildingId == 0){
-    setFormError({
-      ...formError,
-      buildingId: { error: true, message: "Debe seleccionar un edificio" },
-    });
-    return false;
-  }
-
-  return true;
 };
-//Funcion que maneja el mensaje de exito
-export const handleSuccessMessage = (setSuccessMessage, navigate, setIsSee) => {
-  setSuccessMessage(false);
-  setIsSee(true);
-  navigate("/Main/Aulas/Ver");
-};
-
-const getIndex = (buildings, buildingId) => {
-  const foundBuilding = buildings.find(b => b.id === buildingId);
-  return foundBuilding.index;
-}
 
 export const ErrorMap = (errorType) => {
   switch (errorType) {
@@ -84,20 +60,40 @@ export const ErrorMap = (errorType) => {
   }
 };
 
+const handleForm = (e, form, setForm, setFormErrors, withoutErrors) => {
+  if (e.target.name === "capacity") {
+    if (parseInt(e.target.value) >= 10 && parseInt(e.target.value) <= 50)
+      setForm({ ...form, capacity: parseInt(e.target.value) });
+  }
+  if (e.target.name == "buildingId")
+    setForm({ ...form, buildingId: parseInt(e.target.value) });
+  if (e.target.name === "name") setForm({ ...form, name: e.target.value });
+  if (e.target.name === "code" || e.target.name == "floor")
+    setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
+
+  setFormErrors(withoutErrors);
+};
+
+//Funcion que maneja el mensaje de exito
+export const handleSuccessMessage = (setSuccessMessage, navigate) => {
+  setSuccessMessage(false);
+  navigate("/Main/Aulas/Ver");
+};
+
 export const RenderComponent = (
   navigate,
   handleSubmit,
   form,
   setForm,
-  formError,
-  setFormError,
+  formErrors,
+  setFormErrors,
+  withoutErrors,
   successMessage,
   setSuccessMessage,
   errorMessage,
   setErrorMessage,
-  buildings,  
+  buildings,
   isEdit,
-  setIsSee
 ) => {
   return (
     // Contenedor
@@ -121,7 +117,7 @@ export const RenderComponent = (
         component={"form"}
         sx={{
           width: "50%",
-          padding: "1% 2.5%",
+          padding: "1.8% 2.5%",
           mt: 2,
           display: "flex",
           flexDirection: "column",
@@ -129,16 +125,22 @@ export const RenderComponent = (
           alignItems: "center",
         }}
       >
-        {/* Campos Edificio y piso */}
+        {/* Primera fila de formulario */}
         <Box sx={{ width: "100%", display: "flex", gap: 1 }}>
+          {/* Campo para seleccionar el edificio */}
           <FormControl size="small" sx={{ flex: 2 }}>
-            <InputLabel id="edificio">Edificio</InputLabel>
-            <Select
+            <CustomInputLabel id="edificio" error={formErrors.buildingId.error}>
+              Edificio
+            </CustomInputLabel>
+            <CustomSelect
               labelId="edificio"
               value={form.buildingId}
               label="Edificio"
               name="buildingId"
-              onChange={(e) => handleForm(e, form, setForm, formError, setFormError)}
+              error={formErrors.buildingId.error}
+              onChange={(e) =>
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
+              }
             >
               <MenuItem value={0}></MenuItem>
               {buildings.map((building, index) => {
@@ -148,27 +150,35 @@ export const RenderComponent = (
                   </MenuItem>
                 );
               })}
-            </Select>
-            {
-              formError.buildingId.error ?
-              <FormHelperText sx={{color: "#ec1c18"}}>{formError.buildingId.message}</FormHelperText>:
-              <p/>
-
-            }
+            </CustomSelect>
+            {formErrors.buildingId.error && (
+              <ErrorFormHelperText error={formErrors.buildingId.error}>
+                {formErrors.buildingId.message}
+              </ErrorFormHelperText>
+            )}
           </FormControl>
+
+          {/* Campo para seleccionar el piso */}
           <FormControl size="small" sx={{ flex: 1 }}>
-            <InputLabel id="Piso">Piso</InputLabel>
-            <Select
+            <CustomInputLabel id="Piso" error={formErrors.floor.error}>
+              Piso
+            </CustomInputLabel>
+            <CustomSelect
               labelId="piso"
               value={form.floor}
               label="Edificio"
               name="floor"
-              onChange={(e) => handleForm(e, form, setForm, formError, setFormError)}
+              error={formErrors.floor.error}
+              onChange={(e) =>
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
+              }
             >
               {form.buildingId === 0 ? (
                 <MenuItem value={""}></MenuItem>
               ) : (
-                buildings[buildings.findIndex(b => b.id === form.buildingId)].floors.map((floor, index) => {
+                buildings[
+                  buildings.findIndex((b) => b.id === form.buildingId)
+                ].floors.map((floor, index) => {
                   return (
                     <MenuItem key={index} value={floor.code}>
                       {floor.code}
@@ -176,33 +186,38 @@ export const RenderComponent = (
                   );
                 })
               )}
-            </Select>
-            {
-              formError.floor.error ?
-              <FormHelperText sx={{color: "#ec1c18"}}>{formError.floor.message}</FormHelperText>:
-              <p/>
-
-            }
+            </CustomSelect>
+            {formErrors.floor.error && (
+              <ErrorFormHelperText error={formErrors.floor.error}>
+                {formErrors.floor.message}
+              </ErrorFormHelperText>
+            )}
           </FormControl>
         </Box>
-        <Box sx={{ mt: 2, width: "100%", display: "flex", gap: 1 }} >
-        <FormControl sx={{ width: "30%" }}>
+
+        {/* Segunda fila del formulario */}
+        <Box sx={{ mt: 2, width: "100%", display: "flex", gap: 1 }}>
+          {/* Campo del Codigo del Aula */}
+          <FormControl sx={{ width: "30%" }}>
             <TextField
               name="code"
               size="small"
               label="Codigo del aula"
               variant="outlined"
-              inputProps={{ maxLength: 5 }}
+              inputProps={{ maxLength: 6 }}
+              onKeyDown={e => { if(!alphaNumeric.test(e.key)) e.preventDefault() }}
               onChange={(e) =>
-                handleForm(e, form, setForm, formError, setFormError)
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
               }
               value={form.code}
-              error={formError.code.error}
-              helperText={formError.code.error ? formError.code.message: "Ej. E002"}
+              error={formErrors.code.error}
+              helperText={
+                formErrors.code.error ? formErrors.code.message : "Ej. E002"
+              }
             />
-
           </FormControl>
 
+          {/* Campo Capacidad del Aula */}
           <FormControl sx={{ width: "25%" }}>
             <TextField
               name="capacity"
@@ -210,18 +225,20 @@ export const RenderComponent = (
               label="Capacidad"
               variant="outlined"
               inputProps={{ type: "number" }}
-              onChange={(e) =>
-                handleForm(e, form, setForm, formError, setFormError)
-              }
+              onChange={(e) => handleForm(e, form, setForm, setFormErrors, withoutErrors)}
               value={form.capacity}
             />
           </FormControl>
-         
-          </Box>
-          <Box sx={{ mt: 0.5, width: "100%", display: "flex", gap: 1 }} >
+        </Box>
+
+        {/* Campo para agregar un nombre de laboratorio */}
+        <Box sx={{ mt: 0.5, width: "100%", display: "flex", gap: 1 }}>
           <FormControlLabel
             control={
-              <Checkbox checked={form.isLab} onChange={() => setForm({ ...form, isLab: !form.isLab })} />
+              <Checkbox
+                checked={form.isLab}
+                onChange={() => setForm({ ...form, isLab: !form.isLab })}
+              />
             }
             label={"¿Laboratorio?"}
           />
@@ -233,19 +250,23 @@ export const RenderComponent = (
               variant="outlined"
               inputProps={{ maxLength: 90 }}
               value={form.name}
-              onChange={(e) =>
-                handleForm(e, form, setForm, formError, setFormError)
-              }
-              onKeyDown={(e) => {
-                if (/^[0-9]+$/.test(e.key)) e.preventDefault();
-              }}
-            sx={{ flex: 2 }}
+              onKeyDown={e => { if(!alpha.test(e.key)) e.preventDefault() }}
 
+              onChange={(e) =>
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
+              }
+              sx={{ flex: 2 }}
+              error={formErrors.name.error}
+              helperText={
+                formErrors.name.error
+                  ? formErrors.name.message
+                  : "Ej. Laboratorio de..."
+              }
             />
           ) : (
             <p />
           )}
-          </Box>
+        </Box>
         {/* Boton de submit */}
         <Button
           type="submit"
@@ -261,7 +282,7 @@ export const RenderComponent = (
         open={successMessage}
         autoHideDuration={1500}
         onClose={() =>
-          handleSuccessMessage(setSuccessMessage, navigate, setIsSee)
+          handleSuccessMessage(setSuccessMessage, navigate)
         }
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         sx={{ mt: "5%", mr: "5.5%" }}

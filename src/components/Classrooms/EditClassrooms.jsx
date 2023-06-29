@@ -1,13 +1,24 @@
 import { Backdrop, CircularProgress, Typography } from "@mui/material";
-import { RenderComponent, validateForm, ErrorMap } from "../../helpers/classroom.helper";
+import {
+  RenderComponent,
+  validateForm,
+  ErrorMap,
+} from "../../helpers/classroom.helper";
 import { useClassroom, useUpdateClassroom } from "../../hooks/Classroom.Hooks";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useBuildings } from "../../hooks/Building.Hooks";
+import { GetUser } from "../../session/session";
 
 export default function EditClassrooms() {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
-  const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre
+  const { Id } = GetUser();
+  const withoutErrors = {
+    code: { error: false },
+    name: { error: false },
+    floor: { error: false },
+    buildingId: { error: false },
+  };
+  const [isEdit, setIsEdit] = useOutletContext(); //Informacion del padre
   const navigate = useNavigate(); //Navegador de la aplicacion
   const { id } = useParams(); //Informacion del URL
   const {
@@ -25,8 +36,6 @@ export default function EditClassrooms() {
     isLoading: isLoadingBuilding,
     isError: isErrorBuilding,
   } = useBuildings();
-  const isLoading = isLoadingClassroom || isLoadingBuilding ;
-  const isError = isErrorClassroom || isErrorBuilding ;
   const [form, setForm] = useState({
     id: id,
     code: "",
@@ -35,31 +44,20 @@ export default function EditClassrooms() {
     capacity: 10,
     floor: "",
     buildingId: 0,
-    updatedBy: UserInfo.user.id,
+    updatedBy: Id
   });
-  const [formError, setFormError] = useState({
-    code: {
-      error: false,
-      message: "",
-    },
-    floor: {
-      error: false,
-      message: "",
-    },
-    buildingId: {
-      error: false,
-      message: "",
-    },
-  });
+  const [formErrors, setFormErrors] = useState(withoutErrors);
   const [successMessage, setSuccessMessage] = useState(false);
   //Estado para controlar los errores generales
   const [errorMessage, setErrorMessage] = useState({
     error: false,
     message: "",
   });
+  const isLoading = isLoadingClassroom || isLoadingBuilding;
+  const isError = isErrorClassroom || isErrorBuilding;
 
   useEffect(() => {
-    if (!isLoadingClassroom){
+    if (!isLoadingClassroom) {
       setForm({
         ...form,
         code: classroom.code,
@@ -70,20 +68,13 @@ export default function EditClassrooms() {
         buildingId: classroom.building.id,
       });
     }
-    setIsSee(false);
     setIsEdit(true);
-  }, [isLoadingClassroom, classroom ]);
+    return () => setIsEdit(false);
+  }, [isLoadingClassroom, classroom]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm(form, setForm, formError, setFormError)) {
-      setFormError({
-        ...formError,
-        code: { error: false },
-        capacity: { error: false },
-        floor: { error: false },
-        buildingId: { error: false },
-      });
+    if (validateForm(form, setFormErrors)) {
       edit(
         { ...form },
         {
@@ -135,15 +126,15 @@ export default function EditClassrooms() {
           handleSubmit,
           form,
           setForm,
-          formError,
-          setFormError,
+          formErrors,
+          setFormErrors,
+          withoutErrors,
           successMessage,
           setSuccessMessage,
           errorMessage,
           setErrorMessage,
           buildings,
-          isEdit,
-          setIsSee
+          isEdit
         )
       }
     </>

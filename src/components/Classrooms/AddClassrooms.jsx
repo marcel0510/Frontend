@@ -4,17 +4,24 @@ import {
   validateForm,
   ErrorMap,
 } from "../../helpers/classroom.helper";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAddClassroom } from "../../hooks/Classroom.Hooks";
 import { useBuildings } from "../../hooks/Building.Hooks";
+import { GetUser } from "../../session/session";
 export default function AddClassrooms() {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
-  const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre
+  const { Id } = GetUser();
+  const withoutErrors = {
+    code: { error: false },
+    name: { error: false },
+    floor: { error: false },
+    buildingId: { error: false },
+  };
+  const [isEdit] = useOutletContext(); //Informacion del padre
   const navigate = useNavigate(); //Navegador de la aplicacion
   const {
     data: buildings,
-    isLoading: isLoadingBuilding,
+    isLoading: isLoadBuilding,
     isError: isErrorBuilding,
   } = useBuildings();
   const { mutate: add, isLoading, isError } = useAddClassroom();
@@ -25,22 +32,9 @@ export default function AddClassrooms() {
     capacity: 10,
     floor: "",
     buildingId: 0,
-    createdBy: UserInfo.user.id,
+    createdBy: Id,
   });
-  const [formError, setFormError] = useState({
-    code: {
-      error: false,
-      message: "",
-    },
-    floor: {
-      error: false,
-      message: "",
-    },
-    buildingId: {
-      error: false,
-      message: "",
-    },
-  });
+  const [formErrors, setFormErrors] = useState(withoutErrors);
   const [successMessage, setSuccessMessage] = useState(false);
   //Estado para controlar los errores generales
   const [errorMessage, setErrorMessage] = useState({
@@ -48,21 +42,9 @@ export default function AddClassrooms() {
     message: "",
   });
 
-  useEffect(() => {
-    setIsSee(false);
-    setIsEdit(false);
-  }, []);
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm(form, setForm, formError, setFormError)) {
-      setFormError({
-        ...formError,
-        code: { error: false },
-        capacity: { error: false },
-        floor: { error: false },
-        buildingId: { error: false },
-      });
+    if (validateForm(form, setFormErrors)) {
       add(
         { ...form },
         {
@@ -81,27 +63,30 @@ export default function AddClassrooms() {
       );
     }
   };
-  if(isLoading || isError || isLoadingBuilding || isErrorBuilding)
-  return(<Backdrop
-    open={true}
-    sx={{
-      color: "#fff",
-      zIndex: (theme) => theme.zIndex.drawer + 1,
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-    }}
-  >
-    {isError || isErrorBuilding ? (
-      <Typography mb={"1.5%"} variant="h5" color="secondary">
-        Error de conexión con el servidor!
-      </Typography>
-    ) : (
-      <p></p>
-    )}
-    <CircularProgress size={100} />
-  </Backdrop>
-);
+
+  if(isLoading || isError || isLoadBuilding || isErrorBuilding)
+  return(
+    <Backdrop
+          open={true}
+          sx={{
+            color: "#fff",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          {isError || isErrorBuilding ? (
+            <Typography mb={"1.5%"} variant="h5" color="secondary">
+              Error de conexión con el servidor!
+            </Typography>
+          ) : (
+            <p></p>
+          )}
+          <CircularProgress size={100} />
+        </Backdrop>
+  );
+
   return (
     <>
       {
@@ -111,19 +96,17 @@ export default function AddClassrooms() {
           handleSubmit,
           form,
           setForm,
-          formError,
-          setFormError,
+          formErrors,
+          setFormErrors,
+          withoutErrors,
           successMessage,
           setSuccessMessage,
           errorMessage,
           setErrorMessage,
           buildings,
           isEdit,
-          setIsSee
         )
-      }
-
-
+      } 
     </>
   );
 }

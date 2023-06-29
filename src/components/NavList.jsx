@@ -14,15 +14,13 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
 import ApartmentIcon from "@mui/icons-material/Apartment";
-import { useNavigate } from "react-router-dom";
 import BuildingList from "./Buildings/BuildingList";
 import CalendarList from "./Calendars/CalendarLis";
 import SubjectList from "./Subjects/SubjectList";
 import GroupList from "./Groups/GroupList";
 import ClassroomList from "./Classrooms/ClassroomList";
 
-export default function NavList() {
-  const navigate = useNavigate();
+export default function NavList({ admin }) {
   return (
     <Box sx={{ mt: "30%" }}>
       <Box
@@ -87,12 +85,16 @@ export default function NavList() {
           <BuildingList />
         </AccordionDetails>
       </Accordion>
-      <Accordion>
+      {
+        admin && 
+        <Accordion>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <AccountCircleIcon sx={{ marginRight: "5%" }} />
           <Typography>Usuarios</Typography>
         </AccordionSummary>
       </Accordion>
+      }
+      
     </Box>
   );
 }

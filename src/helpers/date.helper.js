@@ -22,7 +22,7 @@ export const GetTime = (time) => {
     if(minutes < 10)
         minutes = "0"+minutes;
 
-    return hour + ":" + minutes + ":" + "00"
+    return hour + ":" + minutes;
 }
 
 export const GetToday = (addMonth = 0) => {
@@ -44,13 +44,11 @@ export const getCurrentTime = () => {
     const hours = now.getHours();
     const minutes = now.getMinutes();
   
-    // Formatear la hora en formato HH:MM:SS
     const formattedTime = `${padZero(hours)}:${padZero(minutes)}`;
   
     return formattedTime;
   };
   
-  // Función auxiliar para agregar un cero al frente si el número es menor que 10
   const padZero = (num) => {
     return num < 10 ? `0${num}` : num;
   };

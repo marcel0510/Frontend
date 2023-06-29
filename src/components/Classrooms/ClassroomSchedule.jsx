@@ -14,13 +14,13 @@ import { useEffect } from "react";
 export default function ClassroomSchedule() {
   const { id } = useParams();
   const { data: classroom, isLoading, isError } = useClassroom(id);
-  const [_, setIsEdit, setIsSee] = useOutletContext();
+  const [ , setIsEdit] = useOutletContext();
   const Header = ["Hora", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
   const Schedule = new Array(13).fill(0).map(() => new Array(6).fill("")); // 14 filas y 6 columnas (horas y días)
 
   useEffect(() => {
-    setIsSee(false);
     setIsEdit(true);
+    return () => setIsEdit(false);
   }, []);
 
   const MakeMatrix = () => {

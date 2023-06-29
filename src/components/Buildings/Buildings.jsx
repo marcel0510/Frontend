@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 export default function Buildings() {
-  const [_, setIsEdit, setIsSee, filter, setFilter] = useOutletContext();
+  const [ , , setIsSee, filter] = useOutletContext();
   const { data, isLoading, isError } = useBuildings();
   const [buildings, setBuildings] = useState([]);
   const [successMessage, setSuccessMessage] = useState(false);
@@ -22,9 +22,9 @@ export default function Buildings() {
   });
 
   useEffect(() => {
-    setIsSee(true);
-    setIsEdit(false);
     filterData();
+    setIsSee(true);
+    return () => setIsSee(false);
   }, [filter, isLoading, data]);
 
   const filterData = () => {
@@ -60,7 +60,7 @@ export default function Buildings() {
   return (
     <>
       <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
-        {buildings.reverse().map((building, index) => {
+        {buildings.map((building, index) => {
           return (
             <Grid item key={index} md={3.15} marginBottom={"1.3%"}>
               <BuildingCard

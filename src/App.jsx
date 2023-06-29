@@ -25,6 +25,7 @@ import EditClassrooms from "./components/Classrooms/EditClassrooms";
 import GroupAlgorithm from "./components/Groups/Algorithm/GroupAlgorithm";
 import GroupAlgorithmForm from "./components/Groups/Algorithm/GroupAlgorithmForm";
 import AddGroups from "./components/Groups/AddGroups";
+import EditGroups from "./components/Groups/EditGroups";
 
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
         <Route exact path="/Main/Grupos/" Component={Group}>
           <Route exact path="/Main/Grupos/Ver" Component={Groups}  />
           <Route exact path="/Main/Grupos/Agregar" Component={AddGroups}  />
+          <Route exact path="/Main/Grupos/Editar/:id" Component={EditGroups}  />
           <Route path="/Main/Grupos/Ver/Filtro/:fil" Component={Groups}  />
           <Route exact path="/Main/Grupos/Algoritmo" Component={GroupAlgorithm}>
               <Route exact path="/Main/Grupos/Algoritmo/Parametros" Component={GroupAlgorithmForm} />

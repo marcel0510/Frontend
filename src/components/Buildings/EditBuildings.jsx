@@ -7,10 +7,15 @@ import { RenderComponent, validateForm } from "../../helpers/building.helper";
 import { useBuilding, useUpdateBuilding } from "../../hooks/Building.Hooks";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-
+import { GetUser } from "../../session/session";
 export default function EditBuilding() {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
-  const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre8
+  const { Id } = GetUser
+  const withoutErrors = {
+    code: { error: false },
+    name: { error: false },
+    floors: { error: false },
+  };
+  const [isEdit, setIsEdit] = useOutletContext(); //Informacion del padre8
   const navigate = useNavigate(); //Navegador de la aplicacion
   const { id } = useParams(); //Informacion del URL
   //Funcion para obtener el edificio
@@ -35,23 +40,10 @@ export default function EditBuilding() {
         code: ""
       }
     ],
-    updatedBy: UserInfo.user.id,
+    updatedBy: Id,
   });
   //Estado que controla los errores del formulario
-  const [formError, setFormError] = useState({
-    code: {
-      error: false,
-      message: "",
-    },
-    name: {
-      error: false,
-      message: "",
-    },
-    floors: {
-      error: false,
-      message: "",
-    }
-  });
+  const [formErrors, setFormErrors] = useState(withoutErrors);
   //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
   //Estado para controlar los errores generales
@@ -70,19 +62,13 @@ export default function EditBuilding() {
 
       });
       setIsEdit(true);
-      setIsSee(false);
     }
+    return () => setIsEdit(false);
   }, [isLoadingBuilding, building]);
-  //Funcion que maneja la edicion del edificio
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm(form, formError, setFormError)) {
-      setFormError({
-        ...formError,
-        name: { error: false },
-        code: { error: false },
-        floors: { error: false },
-      });
+    if (validateForm(form, setFormErrors)) {
       edit(
         { ...form },
         {
@@ -114,14 +100,14 @@ export default function EditBuilding() {
           handleSubmit,
           form,
           setForm,
-          formError,
-          setFormError,
+          formErrors,
+          withoutErrors,
+          setFormErrors,
           successMessage,
           setSuccessMessage,
           errorMessage,
           setErrorMessage,
-          isEdit,
-          setIsSee
+          isEdit
         )
       }
       {/* Pantalla de carga */}

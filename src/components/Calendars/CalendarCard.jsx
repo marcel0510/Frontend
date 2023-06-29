@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useDeleteCalendar } from "../../hooks/Calendar.Hooks";
 import { useState } from "react";
 import { ErrorMap } from "../../helpers/calendars.helper";
+import { GetUser } from "../../session/session";
 
 export default function CalendarCard({
   calendar,
@@ -22,14 +23,14 @@ export default function CalendarCard({
   setErrorMessage,
   setCalendar,
 }) {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
+  const { Id } = GetUser();
   const navigate = useNavigate();
 
   const { mutate: drop, isLoading, isError } = useDeleteCalendar();
   const [modal, setModal] = useState({
     isOpen: false,
     id: 0,
-    deletedBy: UserInfo.user.id,
+    deletedBy: Id,
   });
 
   const handleDelete = () => {
@@ -39,7 +40,10 @@ export default function CalendarCard({
       {
         onSuccess: (res) => {
           console.log(res);
-          if (res.data.isSuccess) setSuccessMessage(true);
+          if (res.data.isSuccess) {
+            setSuccessMessage(true);
+            
+          }
           else
             setErrorMessage({
               error: true,

@@ -11,8 +11,7 @@ import GroupCard from "./GroupCard";
 import { useEffect, useRef, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
 export default function Groups() {
-  const [calendar, _, setIsEdit, setIsSee, filter, setFilter] =
-    useOutletContext();
+  const [calendar, , , , , setIsSee, filter, setFilter] = useOutletContext();
   const { fil } = useParams();
   const isInitialMount = useRef(true);
   const { data, isLoading, isError } = useGroups();
@@ -22,27 +21,34 @@ export default function Groups() {
     error: false,
     message: "",
   });
-
   useEffect(() => {
-    setIsSee(true);
-    setIsEdit(false);
     if (isInitialMount.current && !isLoading && fil) {
       isInitialMount.current = false;
       setFilter({ ...filter, code: fil });
     }
     filterData();
+    setIsSee(true);
+    return () => setIsSee(false);
   }, [filter, isLoading, calendar, data]);
 
   const filterData = () => {
     if (filter.name !== "" && filter.code === "")
-      setGroups(data.filter((g) =>
+      setGroups(
+        data
+          .filter(
+            (g) =>
               g.subject.name.includes(filter.name) && g.calendar.id == calendar
-          ).reverse()
+          )
+          .reverse()
       );
     else if (filter.name === "" && filter.code !== "")
-    setGroups(data.filter((g) =>
+      setGroups(
+        data
+          .filter(
+            (g) =>
               g.subject.code.includes(filter.code) && g.calendar.id == calendar
-          ).reverse()
+          )
+          .reverse()
       );
     else if (!isLoading)
       setGroups(data.filter((g) => g.calendar.id == calendar).reverse());
@@ -69,7 +75,6 @@ export default function Groups() {
         <CircularProgress size={100} />
       </Backdrop>
     );
-
   return (
     <>
       <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>

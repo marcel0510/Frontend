@@ -15,13 +15,13 @@ export default function GroupSchedule() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: group, isLoading, isError } = useGroup(id);
-  const [_, _2, setIsEdit, setIsSee] = useOutletContext();
+  const [ , , , , setIsEdit] = useOutletContext();
   const Header = ["Hora", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
   const Schedule = new Array(13).fill(0).map(() => new Array(6).fill("")); // 13 filas y 6 columnas (horas y días)
 
   useEffect(() => {
-    setIsSee(false);
     setIsEdit(true);
+    return () => setIsEdit(false);
   }, []);
 
   const MakeMatrix = () => {

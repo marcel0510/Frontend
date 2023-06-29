@@ -1,6 +1,8 @@
 import axios from 'axios'
+import { GetUser } from '../session/session';
 
-const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
+
+const { Token } = GetUser();
 const SubjectProviderHandler = axios.create({
     baseURL: 'https://localhost:7130/api/subject',
 })
@@ -16,13 +18,13 @@ export const GetSubject = async (id) => {
 }
 
 export const AddSubject = async (subject) => {
-    return await SubjectProviderHandler.post(`/new`, subject, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
+    return await SubjectProviderHandler.post(`/new`, subject, { headers: { Authorization: `Bearer ${Token}` }});
 }
 
 export const UpdateSubject = async (subject) => {
-    return await SubjectProviderHandler.put(`/update`, subject, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
+    return await SubjectProviderHandler.put(`/update`, subject, { headers: { Authorization: `Bearer ${Token}` }});
 }
 
 export const DeleteSubject = async (subject) => {
-    return await SubjectProviderHandler.delete(`/delete/${subject.id}/${subject.deletedBy}`, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
+    return await SubjectProviderHandler.delete(`/delete/${subject.id}/${subject.deletedBy}`, { headers: { Authorization: `Bearer ${Token}` }});
 }

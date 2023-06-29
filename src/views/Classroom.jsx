@@ -14,16 +14,11 @@ import { Outlet, useNavigate } from "react-router-dom";
 export default function Classroom() {
   const navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
-  const [isSee, setIsSee] = useState(true);
+  const [isSee, setIsSee] = useState(false);
   const [filter, setFilter] = useState({
     code: "",
     name: ""
   });
-  const editButtonHandle = () => {
-    setIsEdit(false);
-    setIsSee(true);
-    navigate("/Main/Aulas/Ver");
-  };
 
   return (
     <>
@@ -42,7 +37,7 @@ export default function Classroom() {
             Módulo de Aulas
           </Typography>
           {isEdit ? (
-            <IconButton onClick={() => editButtonHandle()}>
+            <IconButton onClick={() => navigate("/Main/Aulas/Ver")}>
               <ArrowBackIcon color="primary" />
             </IconButton>
           ) : (
@@ -76,7 +71,7 @@ export default function Classroom() {
                 value={filter.name}
                 inputProps={{ maxLength: 40 }}
                 onChange={(e) =>
-                  setFilter({ ...filter, name: e.target.value.toUpperCase() })
+                  setFilter({ ...filter, name: e.target.value })
                 }
               />
             </Box>

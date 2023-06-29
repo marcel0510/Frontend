@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   FormControl,
-  FormHelperText,
   Grid,
   IconButton,
   InputLabel,
@@ -17,10 +16,65 @@ import {
 import { TimeField } from "@mui/x-date-pickers";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { CustomSelect, CustomInputLabel, CustomGrid } from "../Styles/Styled";
+import {
+  CustomSelect,
+  CustomInputLabel,
+  CustomGrid,
+  ErrorFormHelperText,
+} from "../Styles/Styled";
 import { GetTime } from "./date.helper";
 import dayjs from "dayjs";
 
+export const ValidateForm = (form, setFormErrors) => {
+  const errors = { name: {}, subjectId: {}, classroomId: {}, sessions: {} };
+  var validate = true;
+  var validateSession1 = true;
+  var validateSession2 = true;
+  form.sessions.forEach((s) => {
+    if (s.day == -1 || s.startTime == "" || s.endTime == "") {
+      validateSession1 = false;
+    }
+    if (s.startTime === s.endTime) {
+      validateSession2 = false;
+    }
+  });
+  if (form.name === "") {
+    errors["name"]["error"] = true;
+    errors["name"]["message"] = "No puede dejar este campo vacio";
+    validate = false;
+  }
+
+  if (form.subjectId === 0) {
+    errors["subjectId"]["error"] = true;
+    errors["subjectId"]["message"] = "Debe seleccionar una materia";
+    validate = false;
+  }
+
+  if (form.classroomId === 0) {
+    errors["classroomId"]["error"] = true;
+    errors["classroomId"]["message"] = "Debe seleccionar un aula";
+    validate = false;
+  }
+
+  if (!validateSession1) {
+    errors["sessions"]["error"] = true;
+    errors["sessions"]["message"] =
+      "Debe llenar cada uno de los campos de las sesiones";
+    validate = false;
+  }
+  if (!validateSession2) {
+    errors["sessions"]["error"] = true;
+    errors["sessions"]["message"] =
+      "La hora de inicio no puede ser igual a la hora de fin";
+    validate = false;
+  }
+
+  if (validate) return true;
+  else {
+    setFormErrors(errors);
+    return false;
+  }
+};
 export const ErrorMap = (errorType, props) => {
   switch (errorType) {
     case 1:
@@ -29,7 +83,6 @@ export const ErrorMap = (errorType, props) => {
       return `Existe un cruce con el grupo ${props.name} de la materia ${props.subject}`;
   }
 };
-
 const handleForm = (e, form, setForm, setFormErrors, withoutErrors) => {
   if (e.target.name === "name")
     setForm({ ...form, name: e.target.value.toUpperCase() });
@@ -57,7 +110,6 @@ const handleSessionsChange = (
   setForm({ ...form, sessions: updatedSessions });
   setFormErrors(withoutErrors);
 };
-
 const handleSessionsChangeInit = (
   form,
   setForm,
@@ -71,7 +123,7 @@ const handleSessionsChangeInit = (
   const updatedSessions = [...form.sessions];
   updatedSessions[index] = {
     ...updatedSessions[index],
-    hourInit: GetTime(e),
+    startTime: GetTime(e),
   };
   const updatedInitHours = [...initHours];
   updatedInitHours[index] = e;
@@ -79,7 +131,6 @@ const handleSessionsChangeInit = (
   setInitHours([...updatedInitHours]);
   setFormErrors(withoutErrors);
 };
-
 const handleSessionsChangeEnd = (
   form,
   setForm,
@@ -93,7 +144,7 @@ const handleSessionsChangeEnd = (
   const updatedSessions = [...form.sessions];
   updatedSessions[index] = {
     ...updatedSessions[index],
-    hourEnd: GetTime(e),
+    endTime: GetTime(e),
   };
   const updatedEndHours = [...endHours];
   updatedEndHours[index] = e;
@@ -101,48 +152,6 @@ const handleSessionsChangeEnd = (
   setEndHours([...updatedEndHours]);
   setFormErrors(withoutErrors);
 };
-
-export const ValidateForm = (form, setFormErrors) => {
-  const errors = { name: {}, subjectId: {}, classroomId: {}, sessions: {} };
-  var validate = true;
-  var validateSession = false;
-  form.sessions.forEach((s) => {
-    if (s.day == -1 || s.startTime == "" || s.endTime == "") {
-      validateSession = true;
-    }
-  });
-  if (form.name === "") {
-    errors["name"]["error"] = true;
-    errors["name"]["message"] = "No puede dejar este campo vacio";
-    validate = false;
-  }
-
-  if (form.subjectId === 0) {
-    errors["subjectId"]["error"] = true;
-    errors["subjectId"]["message"] = "Debe seleccionar una materia";
-    validate = false;
-  }
-
-  if (form.classroomId === 0) {
-    errors["classroomId"]["error"] = true;
-    errors["classroomId"]["message"] = "Debe seleccionar un aula";
-    validate = false;
-  }
-
-  if (validateSession) {
-    errors["sessions"]["error"] = true;
-    errors["sessions"]["message"] =
-      "Debe llenar cada uno de los campos de las sesiones";
-    validate = false;
-  }
-
-  if (validate) return true;
-  else {
-    setFormErrors(errors);
-    return false;
-  }
-};
-
 const handleAddSessions = (
   form,
   setForm,
@@ -154,17 +163,16 @@ const handleAddSessions = (
   if (form.sessions.length < 3) {
     const newSession = {
       day: -1,
-      startTime: "",
-      endTime: "",
+      startTime: "07:00",
+      endTime: "09:00",
     };
     const newInitHour = dayjs("0000/00/00T07:00");
-    const newEndHour = dayjs("0000/00/00T07:00");
+    const newEndHour = dayjs("0000/00/00T09:00");
     setForm({ ...form, sessions: [...form.sessions, newSession] });
     setInitHours([...initHours, newInitHour]);
     setEndHours([...endHours, newEndHour]);
   }
 };
-
 const handleRemoveSessions = (
   form,
   setForm,
@@ -186,10 +194,8 @@ const handleRemoveSessions = (
     setEndHours([updatedEndHours]);
   }
 };
-
-export const handleSuccessMessage = (setSuccessMessage, navigate, setIsSee) => {
+const handleSuccessMessage = (setSuccessMessage, navigate) => {
   setSuccessMessage(false);
-  setIsSee(true);
   navigate("/Main/Grupos/Ver");
 };
 
@@ -213,10 +219,10 @@ export const RenderComponent = (
   subjects,
   classrooms,
   currentCalendar,
+  setCurrentCalendar,
   filters,
   setFilters,
-  isEdit,
-  setIsSee
+  isEdit
 ) => {
   return (
     // Contenedor
@@ -285,6 +291,7 @@ export const RenderComponent = (
                 sx={{ width: "100%" }}
                 variant="standard"
                 label="Filtrar..."
+                inputProps={{ style: { textTransform: "uppercase" } }}
                 onKeyDown={(e) => e.stopPropagation()}
                 onChange={(e) =>
                   setFilters({
@@ -303,17 +310,17 @@ export const RenderComponent = (
               })}
             </CustomSelect>
             {formErrors.subjectId.error && (
-              <FormHelperText sx={{ color: "#d62f36" }}>
+              <ErrorFormHelperText>
                 {formErrors.subjectId.message}
-              </FormHelperText>
+              </ErrorFormHelperText>
             )}
           </FormControl>
         </Box>
 
         {/* Segunda fila del Formulario */}
-        <Box sx={{ mt: 2, display: "flex", gap: "2%", width: "70%" }}>
+        <Box sx={{ mt: 2, display: "flex", gap: "2%", width: "100%" }}>
           {/* Select para escoger Aula */}
-          <FormControl size="small" sx={{ flex: 3 }}>
+          <FormControl size="small" sx={{ flex: 3.5 }}>
             <CustomInputLabel id="Aula" error={formErrors.subjectId.error}>
               Aula
             </CustomInputLabel>
@@ -333,6 +340,7 @@ export const RenderComponent = (
                 sx={{ width: "100%" }}
                 variant="standard"
                 label="Filtrar..."
+                inputProps={{ style: { textTransform: "uppercase" } }}
                 onKeyDown={(e) => e.stopPropagation()}
                 onChange={(e) =>
                   setFilters({
@@ -357,23 +365,30 @@ export const RenderComponent = (
               })}
             </CustomSelect>
             {formErrors.classroomId.error && (
-              <FormHelperText sx={{ color: "#d62f36" }}>
+              <ErrorFormHelperText>
                 {formErrors.classroomId.message}
-              </FormHelperText>
+              </ErrorFormHelperText>
             )}
           </FormControl>
 
           {/* TextField con el calendario del GR */}
-          <FormControl sx={{ flex: 1 }}>
+          <Box sx={{ flex: 2, display: "flex", alignItems: "center" }}>
+            <Typography variant="h6" mr={1.2} sx={{ fontWeight: 200 }}>
+              Calendario:
+            </Typography>
             <TextField
               disabled
               size="small"
-              id="calendar"
-              label="Calendario"
               variant="outlined"
-              value={currentCalendar}
+              value={currentCalendar.period}
+              onChange={(e) =>
+                setCurrentCalendar({
+                  ...currentCalendar,
+                  period: e.target.value,
+                })
+              }
             />
-          </FormControl>
+          </Box>
         </Box>
 
         {/* Tercera fila: Sesiones */}
@@ -441,7 +456,7 @@ export const RenderComponent = (
                   md={12}
                 >
                   {/* Dia de la sesion */}
-                  <FormControl size="small" sx={{ flex: 1.5 }}>
+                  <FormControl size="small" sx={{ flex: 0.8 }}>
                     <InputLabel id="dia">Día</InputLabel>
                     <Select
                       labelId="dia"
@@ -473,7 +488,7 @@ export const RenderComponent = (
                   {/* Hora de inicio de la sesion */}
                   <TimeField
                     label="Hora de inicio"
-                    sx={{ flex: 3 }}
+                    sx={{ flex: 1 }}
                     value={initHours[index]}
                     size="small"
                     onChange={(e) =>
@@ -493,7 +508,7 @@ export const RenderComponent = (
                   {/* Hora de fin de la sesion */}
                   <TimeField
                     label="Hora de Fin"
-                    sx={{ flex: 3 }}
+                    sx={{ flex: 1 }}
                     value={endHours[index]}
                     size="small"
                     onChange={(e) =>
@@ -504,8 +519,8 @@ export const RenderComponent = (
                         setEndHours,
                         index,
                         e,
-                        withoutErrors,
-                        setFormErrors
+                        setFormErrors,
+                        withoutErrors
                       )
                     }
                   />
@@ -535,9 +550,9 @@ export const RenderComponent = (
           </CustomGrid>
           {/* Mensaje de error para las sesiones */}
           {formErrors.sessions.error && (
-            <FormHelperText sx={{ color: "#d62f36" }}>
+            <ErrorFormHelperText>
               {formErrors.sessions.message}
-            </FormHelperText>
+            </ErrorFormHelperText>
           )}
 
           {/* Boton de submit */}
@@ -553,16 +568,14 @@ export const RenderComponent = (
           </Box>
         </Box>
 
-      {/* Fin del Formulario */}
+        {/* Fin del Formulario */}
       </Paper>
 
       {/* Mensaje de exito */}
       <Snackbar
         open={successMessage}
         autoHideDuration={1500}
-        onClose={() =>
-          handleSuccessMessage(setSuccessMessage, navigate, setIsSee)
-        }
+        onClose={() => handleSuccessMessage(setSuccessMessage, navigate)}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         sx={{ mt: "5%", mr: "5.5%" }}
       >

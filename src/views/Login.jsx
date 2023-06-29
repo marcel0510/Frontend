@@ -5,7 +5,6 @@ import {
   Button,
   CircularProgress,
   FormControl,
-  Modal,
   Paper,
   Snackbar,
   TextField,
@@ -29,17 +28,14 @@ export default function Login() {
     email: "",
     password: "",
   });
-
   const [errorEmail, setErrorEmail] = useState({
     error: false,
     message: "",
   });
-
   const [errorPassword, setErrorPassword] = useState({
     error: false,
     message: "",
   });
-
   const [successMessage, setSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState(false);
 
@@ -57,19 +53,15 @@ export default function Login() {
       validate(form, {
         onSuccess: (res) => {
           const data = res.data;
-          setErrorEmail({
-            error: false,
-          });
-          setErrorPassword({
-            error: false,
-          });
           if (data.isSuccess) {
-            localStorage.setItem("UserInfo", JSON.stringify(data));
+            delete data.isSuccess;
+            data.currentTime = Date.now();
+            localStorage.setItem("user", JSON.stringify(data));
             setSuccessMessage(true);
           } else {
             setErrorMessage(true);
           }
-        }
+        },
       });
     }
   };
@@ -110,15 +102,18 @@ export default function Login() {
     return true;
   };
 
+  const handleForm = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setErrorEmail({ error: false });
+    setErrorPassword({ error: false });
+  };
+
   const handleSuccessMessage = () => {
     setSuccessMessage(false);
     navigate("/Main");
   };
 
-  const handleErrorMessage = () => {
-    setErrorMessage(false);
-  };
-
+  const handleErrorMessage = () => setErrorMessage(false);
 
   return (
     <Box
@@ -140,7 +135,9 @@ export default function Login() {
           <Typography>Usuario iniciado correctamente!</Typography>
         </Alert>
       </Snackbar>
+
       <Img src={logo} />
+
       <Snackbar
         open={errorMessage}
         autoHideDuration={1500}
@@ -151,6 +148,7 @@ export default function Login() {
           <Typography>El correo o la contraseña no son correctos!</Typography>
         </Alert>
       </Snackbar>
+
       <Typography align="center" variant="h4">
         Inicio de Sesión
       </Typography>
@@ -168,10 +166,10 @@ export default function Login() {
       >
         <FormControl fullWidth>
           <TextField
-            id="email"
+            name="email"
             label="Correo electrónico"
             variant="outlined"
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            onChange={(e) => handleForm(e)}
             error={errorEmail.error}
             helperText={errorEmail.message}
             value={form.email}
@@ -180,11 +178,11 @@ export default function Login() {
 
         <FormControl fullWidth>
           <TextField
-            id="password"
+            name="password"
             label="Contraseña"
             variant="outlined"
             type="password"
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            onChange={(e) => handleForm(e)}
             error={errorPassword.error}
             helperText={errorPassword.message}
             value={form.password}

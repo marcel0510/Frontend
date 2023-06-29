@@ -1,13 +1,21 @@
 import { Backdrop, CircularProgress, Typography } from "@mui/material";
-import { RenderComponent, validateForm } from "../../helpers/calendars.helper"
+import { RenderComponent, validateForm } from "../../helpers/calendars.helper";
 import { useCalendar, useUpdateCalendar } from "../../hooks/Calendar.Hooks";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import dayjs from "dayjs";
+import { GetToday } from "../../helpers/date.helper";
+import { GetUser } from "../../session/session";
 
 export default function EditCalendars() {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
-  const [isEdit, setIsEdit, _ , _1 , setIsSee] = useOutletContext(); //Informacion del padre8
+  const { Id } = GetUser();
+
+  const withoutErrors = {
+    period: { error: false },
+    periodInit: { error: false },
+    periodEnd: { error: false },
+  };
+  const [calendars, , isEdit, setIsEdit] = useOutletContext(); //Informacion del padre8
   const navigate = useNavigate(); //Navegador de la aplicacion
   const { id } = useParams(); //Informacion del URL
   //Funcion para obtener el calendario
@@ -22,24 +30,18 @@ export default function EditCalendars() {
     isLoading: isLoadingUpdate,
     isError: isErrorUpdate,
   } = useUpdateCalendar();
+  const [periodInit, setPeriodInit] = useState(dayjs(GetToday()));
+  const [periodEnd, setPeriodEnd] = useState(dayjs(GetToday(5)));
   //Estado para controlar el formulario
   const [form, setForm] = useState({
-    id: 0,
-    periodInit: '',
-    periodEnd: '',
-    updatedBy: UserInfo.user.id,
+    id: id,
+    period: "",
+    periodInit: "",
+    periodEnd: "",
+    updatedBy: Id,
   });
   //Estado que controla los errores del formulario
-  const [formError, setFormError] = useState({
-    period: {
-      error: false,
-      message: "",
-    },
-    periodEnd: {
-        error: false,
-        message: "",
-      },
-  });
+  const [formErrors, setFormErrors] = useState(withoutErrors);
   //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
   //Estado para controlar los errores generales
@@ -52,25 +54,20 @@ export default function EditCalendars() {
     if (!isLoadingCalendar) {
       setForm({
         ...form,
-        id: calendar.id,
         period: calendar.period,
-        periodInit: dayjs(calendar.periodInit),
-        periodEnd: dayjs(calendar.periodEnd),
+        periodInit: calendar.periodInit,
+        periodEnd: calendar.periodEnd,
       });
-      setIsEdit(true);
-      setIsSee(false);
+      setPeriodInit(dayjs(calendar.periodInit));
+      setPeriodEnd(dayjs(calendar.periodEnd));
     }
+    setIsEdit(true);
+    return () => setIsEdit(false);
   }, [isLoadingCalendar, calendar]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm(form, formError, setFormError)) {
-      setFormError({
-        ...formError,
-        name: { error: false },
-        code: { error: false },
-      });
-     
+    if (validateForm(form, setFormErrors)) {
       edit(
         { ...form },
         {
@@ -78,8 +75,7 @@ export default function EditCalendars() {
             if (res.data.isSuccess) {
               setSuccessMessage(true);
               setIsEdit(false);
-            }
-            else
+            } else
               setErrorMessage({
                 error: true,
                 message: ErrorMap(res.data.errorType),
@@ -102,12 +98,18 @@ export default function EditCalendars() {
           handleSubmit,
           form,
           setForm,
-          formError,
-          setFormError,
+          formErrors,
+          setFormErrors,
+          withoutErrors,
           successMessage,
           setSuccessMessage,
           errorMessage,
           setErrorMessage,
+          calendars,
+          periodInit,
+          setPeriodInit,
+          periodEnd,
+          setPeriodEnd,
           isEdit
         )
       }
@@ -126,7 +128,7 @@ export default function EditCalendars() {
             justifyContent: "center",
           }}
         >
-          {isErrorCalendar|| isErrorUpdate ? (
+          {isErrorCalendar || isErrorUpdate ? (
             <Typography mb={"1.5%"} variant="h5" color="secondary">
               Error de conexión con el servidor!
             </Typography>

@@ -13,15 +13,11 @@ import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 
 export default function Calendar() {
   const navigate = useNavigate();
-  const [_, setCalendar, calendars] = useOutletContext();
+  const [, calendars, setCalendar] = useOutletContext();
   const [isEdit, setIsEdit] = useState(false);
-  const [isSee, setIsSee] = useState(true);
+  const [isSee, setIsSee] = useState(false);
   const [filter, setFilter] = useState("");
-  const editButtonHandle = () => {
-    setIsEdit(false);
-    setIsSee(true);
-    navigate("/Main/Calendarios/Ver");
-  };
+
   return (
     <>
       <Paper
@@ -39,7 +35,7 @@ export default function Calendar() {
             Módulo de Calendarios
           </Typography>
           {isEdit ? (
-            <IconButton onClick={() => editButtonHandle()}>
+            <IconButton onClick={() => navigate("/Main/Calendarios/Ver")}>
               <ArrowBackIcon color="primary" />
             </IconButton>
           ) : (
@@ -71,7 +67,7 @@ export default function Calendar() {
         )}
       </Paper>
       <Outlet
-        context={[isEdit, setIsEdit, setCalendar, calendars, setIsSee, filter]}
+        context={[calendars, setCalendar, isEdit, setIsEdit, setIsSee, filter]}
       />
     </>
   );

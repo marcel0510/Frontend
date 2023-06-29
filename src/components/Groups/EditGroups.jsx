@@ -5,15 +5,16 @@ import {
   ErrorMap,
 } from "../../helpers/group.helper";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useSubjects } from "../../hooks/Subject.Hooks";
 import { useClassrooms } from "../../hooks/Classroom.Hooks";
-import { useAddGroup } from "../../hooks/Group.Hooks";
+import { useGroup, useUpdateGroup } from "../../hooks/Group.Hooks";
 import { GetUser } from "../../session/session";
 import dayjs from "dayjs";
 
-export default function AddGroups() {
+export default function EditGroups() {
   const { Id } = GetUser();
+
   const days = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
   const withoutErrors = {
     name: { error: false },
@@ -21,8 +22,10 @@ export default function AddGroups() {
     classroomId: { error: false },
     sessions: { error: false },
   };
-  const [calendar, calendars, , isEdit] = useOutletContext(); //Informacion del padre
+  const [calendar, calendars, setIsEditGroup, isEdit, setIsEdit] =
+    useOutletContext(); //Informacion del padre
   const navigate = useNavigate(); //Navegador de la aplicacion
+  const { id } = useParams(); //Informacion del URL
   const isInitialMount = useRef(true);
   const {
     data: subjectsData,
@@ -35,16 +38,22 @@ export default function AddGroups() {
     isError: errorClassrooms,
   } = useClassrooms();
   const {
-    mutate: add,
-    isLoading: isLoadAdd,
-    isError: isErrorAdd,
-  } = useAddGroup();
+    data: group,
+    isLoading: loadGroup,
+    isError: errorGroup,
+  } = useGroup(id);
+  const {
+    mutate: edit,
+    isLoading: isLoadUpdate,
+    isError: errorUpdate,
+  } = useUpdateGroup();
   const [subjects, setSubjects] = useState([]);
   const [classrooms, setClassrooms] = useState([]);
   const [currentCalendar, setCurrentCalendar] = useState("");
   const [initHours, setInitHours] = useState([dayjs("0000/00/00T07:00")]);
   const [endHours, setEndHours] = useState([dayjs("0000/00/00T09:00")]);
   const [form, setForm] = useState({
+    id: id,
     name: "",
     subjectId: 0,
     classroomId: 0,
@@ -56,42 +65,60 @@ export default function AddGroups() {
         endTime: "09:00:00",
       },
     ],
-    createdBy: Id
+    updatedBy: Id,
   });
   const [formErrors, setFormErrors] = useState(withoutErrors);
   const [filters, setFilters] = useState({
     subjectName: "",
     classroomCode: "",
   });
-  //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
   //Estado para controlar los errores generales
   const [errorMessage, setErrorMessage] = useState({
     error: false,
     message: "",
   });
-
   const LoadCalendar = calendar && calendars;
-  const isLoading = loadSubjects || loadClassrooms;
-  const isError = errorSubjects || errorClassrooms;
+  const isLoading = loadSubjects || loadClassrooms || loadGroup;
+  const isError = errorSubjects || errorClassrooms || errorGroup;
 
   useEffect(() => {
     if (!isLoading && isInitialMount.current) {
       setSubjects(subjectsData);
       setClassrooms(classroomsData);
       isInitialMount.current = false;
+      group.sessions.forEach((s) => {
+        s.startTime = s.startTime + ":00";
+        s.endTime = s.endTime + ":00";
+      });
     }
     if (!isLoading && LoadCalendar) {
       setCurrentCalendar(calendars.find((c) => c.id == calendar));
-      setForm({ ...form, calendarId: calendar });
+     
+      setForm({
+        ...form,
+        name: group.name,
+        subjectId: group.subject.id,
+        classroomId: group.classroom.id,
+        calendarId: calendar,
+        sessions: group.sessions,
+      });
+      console.log(group.sessions);
+      fillDates();
     }
+    setIsEditGroup(true);
+    setIsEdit(true);
     filterData();
+    return () => {
+      setIsEditGroup(false);
+      setIsEdit(false);
+    };
   }, [filters, isLoading, subjectsData, classroomsData, calendar, calendars]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (ValidateForm(form, setFormErrors)) {
-      add(
+      edit(
         { ...form },
         {
           onSuccess: (res) => {
@@ -162,6 +189,17 @@ export default function AddGroups() {
       setClassrooms(classroomsData);
   };
 
+  const fillDates = () => {
+    const iHours = [];
+    const eHours = [];
+    group.sessions.forEach((session) => {
+      iHours.push(dayjs(`0000/00/00T${session.startTime}`));
+      eHours.push(dayjs(`0000/00/00T${session.endTime}`));
+    });
+    setInitHours(iHours);
+    setEndHours(eHours);
+  };
+
   return (
     <>
       {
@@ -189,11 +227,11 @@ export default function AddGroups() {
           setCurrentCalendar,
           filters,
           setFilters,
-          isEdit,
+          isEdit
         )
       }
       {/* Pantalla de carga */}
-      {isLoading || isError || isLoadAdd ? (
+      {isLoading || isError || isLoadUpdate ? (
         <Backdrop
           open={true}
           sx={{
@@ -204,7 +242,7 @@ export default function AddGroups() {
             justifyContent: "center",
           }}
         >
-          {isError || isErrorAdd ? (
+          {isError || errorUpdate ? (
             <Typography mb={"1.5%"} variant="h5" color="secondary">
               Error de conexión con el servidor!
             </Typography>

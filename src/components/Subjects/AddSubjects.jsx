@@ -4,15 +4,22 @@ import {
   validateForm,
   ErrorMap,
 } from "../../helpers/subject.helper";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAddSubject } from "../../hooks/Subject.Hooks";
+import { GetUser } from "../../session/session";
 export default function AddSubject() {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
-  const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre
+  const { Id } = GetUser();
+
+  const withoutErrors = {
+    code: { error: false },
+    name: { error: false },
+    alias: { error: false },
+  };
+  const [isEdit] = useOutletContext(); //Informacion del padre
   const navigate = useNavigate(); //Navegador de la aplicacion
   const { mutate: add, isLoading, isError } = useAddSubject(); //Funcion que agrega el edicio
-  const [ alias, setAlias ] = useState(false);
+  const [alias, setAlias] = useState(false);
   //Estado para controlar el formulario
   const [form, setForm] = useState({
     code: "",
@@ -22,23 +29,10 @@ export default function AddSubject() {
     numCredits: 1,
     numSemester: 1,
     isLab: false,
-    createdBy: UserInfo.user.id,
+    createdBy: Id,
   });
   //Estado que controla los errores del formulario
-  const [formError, setFormError] = useState({
-    code: {
-      error: false,
-      message: "",
-    },
-    name: {
-      error: false,
-      message: "",
-    },
-    alias: {
-        error: false,
-        message: "",
-      },
-  });
+  const [formErrors, setFormErrors] = useState(withoutErrors);
   //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
   //Estado para controlar los errores generales
@@ -46,20 +40,10 @@ export default function AddSubject() {
     error: false,
     message: "",
   });
-
-  useEffect(() => {
-    setIsSee(false);
-    setIsEdit(false);
-
-  }, []);
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm(form, formError, setFormError)) {
-      setFormError({
-        ...formError,
-        name: { error: false },
-        code: { error: false },
-      });
+    if (validateForm(form, setFormErrors, alias)) {
+      
       add(
         { ...form },
         {
@@ -87,8 +71,9 @@ export default function AddSubject() {
           handleSubmit,
           form,
           setForm,
-          formError,
-          setFormError,
+          formErrors,
+          setFormErrors,
+          withoutErrors,
           successMessage,
           setSuccessMessage,
           errorMessage,
@@ -96,7 +81,6 @@ export default function AddSubject() {
           alias,
           setAlias,
           isEdit,
-          setIsSee
         )
       }
 

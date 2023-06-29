@@ -1,12 +1,18 @@
 import { Backdrop, CircularProgress, Typography } from "@mui/material";
 import { RenderComponent, validateForm, ErrorMap } from "../../helpers/building.helper";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAddBuilding } from "../../hooks/Building.Hooks";
+import { GetUser } from "../../session/session";
 
 export default function AddBuildings() {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo")); //Informacion del usuario
-  const [isEdit, setIsEdit, setIsSee] = useOutletContext(); //Informacion del padre
+  const { Id } = GetUser
+  const withoutErrors = {
+    code: { error: false },
+    name: { error: false },
+    floors: { error: false },
+  };
+  const [isEdit] = useOutletContext(); //Informacion del padre
   const navigate = useNavigate(); //Navegador de la aplicacion
   const { mutate: add, isLoading, isError } = useAddBuilding(); //Funcion que agrega el edicio
   //Estado para controlar el formulario
@@ -18,23 +24,10 @@ export default function AddBuildings() {
         code: ""
       }
     ],
-    createdBy: UserInfo.user.id,
+    createdBy: Id,
   });
   //Estado que controla los errores del formulario
-  const [formError, setFormError] = useState({
-    code: {
-      error: false,
-      message: "",
-    },
-    name: {
-      error: false,
-      message: "",
-    },
-    floors: {
-      error: false,
-      message: "",
-    }
-  });
+  const [formErrors, setFormErrors] = useState(withoutErrors);
   //Estado para controlar el mensaje exito
   const [successMessage, setSuccessMessage] = useState(false);
   //Estado para controlar los errores generales
@@ -43,21 +36,10 @@ export default function AddBuildings() {
     message: "",
   });
 
-  useEffect(() => {
-    setIsSee(false);
-    setIsEdit(false)
-  }, [])
-
   //Funcion que maneja el agregado del edificio
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm(form, formError, setFormError)) {
-      setFormError({
-        ...formError,
-        name: { error: false },
-        code: { error: false },
-        floors: { error: false },
-      });
+    if (validateForm(form, setFormErrors)) {
       add(
         { ...form },
         {
@@ -85,14 +67,14 @@ export default function AddBuildings() {
           handleSubmit,
           form,
           setForm,
-          formError,
-          setFormError,
+          formErrors,
+          setFormErrors,
+          withoutErrors,
           successMessage,
           setSuccessMessage,
           errorMessage,
           setErrorMessage,
           isEdit,
-          setIsSee
         )
       }
 

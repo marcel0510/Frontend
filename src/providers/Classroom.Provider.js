@@ -1,6 +1,9 @@
 import axios from 'axios'
+import { GetUser } from '../session/session';
 
-const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
+
+const { Token } = GetUser();
+
 const classroomProviderHandler = axios.create({
     baseURL: 'https://localhost:7130/api/classroom'
 })
@@ -22,13 +25,13 @@ export const GetClassroom = async (id) => {
 }
 
 export const AddClassroom = async (classroom) => {
-    return await classroomProviderHandler.post('/new', classroom, { headers: { Authorization: `Bearer ${UserInfo.token}` } });
+    return await classroomProviderHandler.post('/new', classroom, { headers: { Authorization: `Bearer ${Token}` } });
 }
 
 export const UpdateClassroom = async (classroom) => {
-    return await classroomProviderHandler.put(`/update`, classroom, { headers: { Authorization: `Bearer ${UserInfo.token}` } });
+    return await classroomProviderHandler.put(`/update`, classroom, { headers: { Authorization: `Bearer ${Token}` } });
 }
 
 export const DeleteClassroom = async (classroom) => {
-    return await classroomProviderHandler.delete(`/delete/${classroom.id}/${classroom.deletedBy}`, { headers: { Authorization: `Bearer ${UserInfo.token}` } });
+    return await classroomProviderHandler.delete(`/delete/${classroom.id}/${classroom.deletedBy}`, { headers: { Authorization: `Bearer ${Token}` } });
 }

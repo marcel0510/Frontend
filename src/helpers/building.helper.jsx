@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
   Grid,
   IconButton,
   Paper,
@@ -11,78 +12,43 @@ import {
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from '@mui/icons-material/Delete';
-//Funcion que maneja el formulario
-export const handleForm = (e, form, setForm, formError, setFormError) => {
-  if (e.target.name === "code" || e.target.name === "floors")
-    setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
-  else setForm({ ...form, [e.target.name]: e.target.value });
-  setFormError({
-    ...formError,
-    name: { error: false },
-    code: { error: false },
+import DeleteIcon from "@mui/icons-material/Delete";
+import { CustomGrid } from "../Styles/Styled";
+import { alpha, alphaNumeric } from "./regularExpressions.helper";
+
+export const validateForm = (form, setFormErrors) => {
+  const errors = { code: {}, name: {}, floors: {} };
+  var validate = true;
+  var validateFloors = true;
+  form.floors.forEach((f) => {
+    if (f.code === "") validateFloors = false;
   });
-};
-const handleAddFloors = (form, setForm) => {
-  const newFloor = { code: "" };
-  setForm({ ...form, floors: [...form.floors, newFloor] });
-};
 
-const handleRemoveFloors = (index, form, setForm) => {
-  const updatedFloors = [...form.floors];
-  updatedFloors.splice(index, 1);
-  setForm({ ...form, floors: updatedFloors });
-};
-
-const handleFloorsChange = (index, e, form, setForm) => {
-  const updatedFloors = [...form.floors];
-  updatedFloors[index] = {
-    ...updatedFloors[index],
-    code: e.target.value.toUpperCase(),
-  };
-  setForm({ ...form, floors: updatedFloors });
-};
-//Funcion que valida el formualrio
-export const validateForm = (form, formError, setFormError) => {
-  if (form.code === "" && form.name === "") {
-    setFormError({
-      name: { error: true, message: "No puede dejar este campo vacío" },
-      code: { error: true, message: "No puede dejar este campo vacío" },
-    });
-    return false;
-  }
   if (form.code === "") {
-    setFormError({
-      ...formError,
-      code: { error: true, message: "No puede dejar este campo vacío" },
-    });
-    return false;
+    errors["code"]["error"] = true;
+    errors["code"]["message"] = "No puede dejar este campo vacío";
+    validate = false;
   }
+
   if (form.name === "") {
-    setFormError({
-      ...formError,
-      name: { error: true, message: "No puede dejar este campo vacío" },
-    });
-    return false;
-  } else if (form.name.length < 3) {
-    setFormError({
-      ...formError,
-      name: {
-        error: true,
-        message: "El nombre debe tener más de 3 caracteres",
-      },
-    });
+    errors["name"]["error"] = true;
+    errors["name"]["message"] = "No puede dejar este campo vacío";
+    validate = false;
+  }
+
+  if (!validateFloors) {
+    errors["floors"]["error"] = true;
+    errors["floors"]["message"] =
+      "Debe poner el codigo en cada uno de los pisos";
+    validate = false;
+  }
+
+  if (validate) return true;
+  else {
+    setFormErrors(errors);
     return false;
   }
-  return true;
 };
-//Funcion que maneja el mensaje de exito
-export const handleSuccessMessage = (setSuccessMessage, navigate, setIsSee) => {
-  setSuccessMessage(false);
-  setIsSee(true);
-  navigate("/Main/Edificios/Ver");
-};
-//Funcion para mapear los errores
 export const ErrorMap = (errorType) => {
   switch (errorType) {
     case 1:
@@ -93,19 +59,66 @@ export const ErrorMap = (errorType) => {
       return "No se lograron eliminar las aulas asociadas";
   }
 };
+//Funcion que maneja el formulario
+const handleForm = (e, form, setForm, setFormError, withoutErrors) => {
+  if (e.target.name === "code" || e.target.name === "floors")
+    setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
+  else setForm({ ...form, [e.target.name]: e.target.value });
+
+  setFormError(withoutErrors);
+};
+const handleAddFloors = (form, setForm, setFormErrors, withoutErrors) => {
+  const newFloor = { code: "" };
+  setForm({ ...form, floors: [...form.floors, newFloor] });
+  setFormErrors(withoutErrors);
+};
+const handleRemoveFloors = (
+  index,
+  form,
+  setForm,
+  setFormErrors,
+  withoutErrors
+) => {
+  if (form.floors.length > 1) {
+    const updatedFloors = [...form.floors];
+    updatedFloors.splice(index, 1);
+    setForm({ ...form, floors: updatedFloors });
+    setFormErrors(withoutErrors);
+  }
+};
+const handleFloorsChange = (
+  index,
+  e,
+  form,
+  setForm,
+  setFormErrors,
+  withoutErrors
+) => {
+  const updatedFloors = [...form.floors];
+  updatedFloors[index] = {
+    ...updatedFloors[index],
+    code: e.target.value.toUpperCase(),
+  };
+  setForm({ ...form, floors: updatedFloors });
+  setFormErrors(withoutErrors);
+};
+const handleSuccessMessage = (setSuccessMessage, navigate) => {
+  setSuccessMessage(false);
+  navigate("/Main/Edificios/Ver");
+};
 export const RenderComponent = (
   navigate,
   handleSubmit,
   form,
   setForm,
-  formError,
-  setFormError,
+  formErrors,
+  setFormErrors,
+  withoutErrors,
   successMessage,
   setSuccessMessage,
   errorMessage,
   setErrorMessage,
   isEdit,
-  setIsSee
 ) => {
   return (
     // Contenedor
@@ -123,6 +136,7 @@ export const RenderComponent = (
           {isEdit ? "Editar Edificio" : "Agregar Edificio"}
         </Typography>
       </Paper>
+
       {/* Formulario */}
       <Paper
         onSubmit={handleSubmit}
@@ -137,7 +151,7 @@ export const RenderComponent = (
           alignItems: "center",
         }}
       >
-        {/* Campo de codigo de edificio */}
+        {/* Primera fila: Codigo de edificio */}
         <FormControl sx={{ width: "50%" }}>
           <TextField
             size="small"
@@ -145,16 +159,18 @@ export const RenderComponent = (
             name="code"
             variant="outlined"
             inputProps={{ maxLength: 3, style: { textTransform: "uppercase" } }}
+            onKeyDown={e => { if(!alphaNumeric.test(e.key)) e.preventDefault() }}
             onChange={(e) =>
-              handleForm(e, form, setForm, formError, setFormError)
+              handleForm(e, form, setForm, setFormErrors, withoutErrors)
             }
-            error={formError.code.error}
+            error={formErrors.code.error}
             helperText={
-              formError.code.error ? formError.code.message : "Ej. E17"
+              formErrors.code.error ? formErrors.code.message : "Ej. E17"
             }
             value={form.code}
           />
         </FormControl>
+
         {/* Campo de nombre de edificio */}
         <FormControl sx={{ width: "50%", mt: 1 }}>
           <TextField
@@ -163,48 +179,53 @@ export const RenderComponent = (
             label="Nombre del Edificio"
             variant="outlined"
             inputProps={{ maxLength: 40 }}
+            onKeyDown={e => { if(!alpha.test(e.key)) e.preventDefault() }}
             onChange={(e) =>
-              handleForm(e, form, setForm, formError, setFormError)
+              handleForm(e, form, setForm, setFormErrors, withoutErrors)
             }
-            onKeyDown={(e) => {
-              if (/^[0-9]+$/.test(e.key)) e.preventDefault();
-            }}
-            error={formError.name.error}
+            error={formErrors.name.error}
             helperText={
-              formError.name.error
-                ? formError.name.message
+              formErrors.name.error
+                ? formErrors.name.message
                 : "Ej. Edificio de..."
             }
             value={form.name}
           />
         </FormControl>
 
+        {/* Inicia el campo de los pisos */}
+        {/* Contenero para Label Pisos y boton Agregar */}
         <Box
           sx={{ display: "flex", alignItems: "center", width: "50%", mt: 2 }}
         >
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 300 }}>
             {"Pisos: " + form.floors.length}
           </Typography>
           <Button
             variant="outlined"
             size="small"
-            onClick={() => handleAddFloors(form, setForm)}
+            onClick={() =>
+              handleAddFloors(form, setForm, setFormErrors, withoutErrors)
+            }
           >
             <AddIcon />{" "}
           </Button>
         </Box>
 
-        <Grid
-        container
+        {/* Conjunto de pisos en Grid */}
+        <CustomGrid
+          container
+          error={formErrors.floors.error ? 1 : 0}
           sx={{
             width: "50%",
             mt: 1.5,
+            padding: "2.5%",
           }}
         >
           {form.floors.map((floor, index) => {
             return (
               <Grid
-              item
+                item
                 key={index}
                 sx={{ mt: 1, display: "flex", alignItems: "center" }}
                 md={5.9}
@@ -214,17 +235,32 @@ export const RenderComponent = (
                   variant="outlined"
                   size="small"
                   inputProps={{ maxLength: 3 }}
-                  onChange={(e) => handleFloorsChange(index, e, form, setForm)}
-                  onKeyDown={(e) => {
-                    if (!/^[a-zA-Z0-9]*$/.test(e.key)) e.preventDefault();
-                  }}
+                  onKeyDown={e => {if(!alphaNumeric.test(e.key)) e.preventDefault()}}
+                  onChange={(e) =>
+                    handleFloorsChange(
+                      index,
+                      e,
+                      form,
+                      setForm,
+                      setFormErrors,
+                      withoutErrors
+                    )
+                  }
                   value={floor.code}
                   sx={{ mr: 0.5 }}
                 />
                 <IconButton
                   variant="outlined"
                   size="small"
-                  onClick={() => handleRemoveFloors(index, form, setForm)}
+                  onClick={() =>
+                    handleRemoveFloors(
+                      index,
+                      form,
+                      setForm,
+                      setFormErrors,
+                      withoutErrors
+                    )
+                  }
                 >
                   {" "}
                   <DeleteIcon />{" "}
@@ -232,7 +268,12 @@ export const RenderComponent = (
               </Grid>
             );
           })}
-        </Grid>
+        </CustomGrid>
+        {formErrors.floors.error && (
+          <FormHelperText sx={{ color: "#d62f36" }}>
+            {formErrors.floors.message}
+          </FormHelperText>
+        )}
 
         {/* Boton de submit */}
         <Button
@@ -249,7 +290,7 @@ export const RenderComponent = (
         open={successMessage}
         autoHideDuration={1500}
         onClose={() =>
-          handleSuccessMessage(setSuccessMessage, navigate, setIsSee)
+          handleSuccessMessage(setSuccessMessage, navigate)
         }
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         sx={{ mt: "5%", mr: "5.5%" }}
@@ -262,6 +303,7 @@ export const RenderComponent = (
           </Typography>
         </Alert>
       </Snackbar>
+
       {/* Mensaje de error */}
       <Snackbar
         open={errorMessage.error}

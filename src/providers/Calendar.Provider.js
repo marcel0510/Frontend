@@ -1,7 +1,7 @@
 import axios from 'axios'
+import { GetUser } from '../session/session';
 
-const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
-
+const { Token } = GetUser();
 const calendarProviderHandler = axios.create({
     baseURL: 'https://localhost:7130/api/calendar'
 })
@@ -17,13 +17,13 @@ export const GetCalendar = async (id) => {
 }
 
 export const AddCalendar = async (calendar) => {
-    return await calendarProviderHandler.post(`/new`, calendar,  { headers: { Authorization: `Bearer ${UserInfo.token}` } });
+    return await calendarProviderHandler.post(`/new`, calendar,  { headers: { Authorization: `Bearer ${Token}` } });
 }
 
 export const UpdateCalendar = async (calendar) => {
-    return await calendarProviderHandler.put(`/update/${calendar.Id}`, calendar, { headers: { Authorization: `Bearer ${UserInfo.token}` } });
+    return await calendarProviderHandler.put(`/update`, calendar, { headers: { Authorization: `Bearer ${Token}` } });
 }
-
+ 
 export const DeleteCalendar = async (calendar) => {
-    return await calendarProviderHandler.delete(`/delete/${calendar.id}/${calendar.deletedBy}`, { headers: { Authorization: `Bearer ${UserInfo.token}` }});
+    return await calendarProviderHandler.delete(`/delete/${calendar.id}/${calendar.deletedBy}`, { headers: { Authorization: `Bearer ${Token}` }});
 }

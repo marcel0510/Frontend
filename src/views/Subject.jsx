@@ -20,11 +20,6 @@ export default function Subject() {
     name: "",
     semester: "",
   });
-  const editButtonHandle = () => {
-    setIsEdit(false);
-    setIsSee(true);
-    navigate("/Main/Materias/Ver");
-  };
 
   return (
     <>
@@ -43,7 +38,7 @@ export default function Subject() {
             Módulo de Materias
           </Typography>
           {isEdit ? (
-            <IconButton onClick={() => editButtonHandle()}>
+            <IconButton onClick={() => navigate("/Main/Materias/Ver")}>
               <ArrowBackIcon color="primary" />
             </IconButton>
           ) : (
@@ -81,14 +76,14 @@ export default function Subject() {
                 }
               />
 
-          <TextField
+              <TextField
                 label="Semestre"
                 size="small"
                 sx={{ mt: 1.7 }}
                 value={filter.semester}
                 inputProps={{ maxLength: 1 }}
                 onChange={(e) =>
-                  setFilter({ ...filter, semester: e.target.value})
+                  setFilter({ ...filter, semester: e.target.value })
                 }
               />
             </Box>
@@ -97,7 +92,7 @@ export default function Subject() {
           <p />
         )}
       </Paper>
-      <Outlet context={[isEdit, setIsEdit, setIsSee, filter, setFilter]} />
+      <Outlet context={[isEdit, setIsEdit, setIsSee, filter]} />
     </>
   );
 }

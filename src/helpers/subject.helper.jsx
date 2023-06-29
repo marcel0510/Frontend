@@ -10,18 +10,43 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-export const handleForm = (
-  e,
-  form,
-  setForm,
-  formError,
-  setFormError,
-) => {
-  if (
-    e.target.name === "code" ||
-    e.target.name === "name" ||
-    e.target.name === "alias"
-  ) {
+import { alpha, alphaNumeric } from "./regularExpressions.helper";
+export const validateForm = (form, setFormErrors, alias) => {
+  const errors = { code: {}, name: {}, alias: {} };
+  var validate = true;
+  if (form.code === "") {
+    errors["code"]["error"] = true;
+    errors["code"]["message"] = "No puede dejar este campo vacío";
+    validate = false;
+  }
+  if (form.name === "") {
+    errors["name"]["error"] = true;
+    errors["name"]["message"] = "No puede dejar este campo vacío";
+    validate = false;
+  }
+  if (alias && form.alias === "") {
+    errors["alias"]["error"] = true;
+    errors["alias"]["message"] = "No puede dejar este campo vacío";
+    validate = false;
+  }
+  if (validate) return true;
+  else {
+    setFormErrors(errors);
+    return false;
+  }
+};
+export const ErrorMap = (errorType) => {
+  switch (errorType) {
+    case 1:
+      return "El código de la materia ya está registrado";
+    case 2:
+      return "Ya existe una materia con ese código";
+    case 3:
+      return "No se lograron eliminar los grupos asociadas";
+  }
+};
+const handleForm = (e, form, setForm, setFormErrors, withtoutErrors) => {
+  if (e.target.name === "code" || e.target.name === "name") {
     setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
   } else {
     if (e.target.name === "numCredits") {
@@ -36,73 +61,32 @@ export const handleForm = (
       if (parseInt(e.target.value) >= 1 && parseInt(e.target.value) <= 9)
         setForm({ ...form, [e.target.name]: parseInt(e.target.value) });
     }
+    if (e.target.name === "alias") {
+      setForm({ ...form, alias: e.target.value });
+    }
   }
-  setFormError({
-    ...formError,
-    name: { error: false },
-    code: { error: false },
-  });
+  setFormErrors(withtoutErrors);
 };
-
-export const validateForm = (form, formError, setFormError) => {
-  if (form.code === "" && form.name === "") {
-    setFormError({
-      name: { error: true, message: "No puede dejar este campo vacío" },
-      code: { error: true, message: "No puede dejar este campo vacío" },
-    });
-    return false;
-  }
-  if (form.code === "") {
-    setFormError({
-      ...formError,
-      code: { error: true, message: "No puede dejar este campo vacío" },
-    });
-    return false;
-  }
-  if (form.name === "") {
-    setFormError({
-      ...formError,
-      name: { error: true, message: "No puede dejar este campo vacío" },
-    });
-    return false;
-  }else if (form.name.length < 3) {
-    setFormError({
-      ...formError,
-      name: {
-        error: true,
-        message: "El nombre debe tener más de 3 caracteres",
-      },
-    });
-    return false;
-  }
-  return true;
+const onChangeAlias = (form, setForm, alias, setAlias) => {
+  setAlias(!alias);
+  if (alias) setForm({ ...form, alias: "" });
 };
 //Funcion que maneja el mensaje de exito
-export const handleSuccessMessage = (setSuccessMessage, navigate, setIsSee) => {
+const handleSuccessMessage = (setSuccessMessage, navigate) => {
   setSuccessMessage(false);
-  setIsSee(true);
   navigate("/Main/Materias/Ver");
 };
 
 //Funcion para mapear los errores
-export const ErrorMap = (errorType) => {
-  switch (errorType) {
-    case 1:
-      return "El código de la materia ya está registrado";
-    case 2:
-      return "Ya existe una materia con ese código";
-    case 3:
-      return "No se lograron eliminar los grupos asociadas";
-  }
-};
 
 export const RenderComponent = (
   navigate,
   handleSubmit,
   form,
   setForm,
-  formError,
-  setFormError,
+  formErrors,
+  setFormErrors,
+  withoutErrors,
   successMessage,
   setSuccessMessage,
   errorMessage,
@@ -110,7 +94,6 @@ export const RenderComponent = (
   alias,
   setAlias,
   isEdit,
-  setIsSee
 ) => {
   return (
     // Contenedor
@@ -142,7 +125,7 @@ export const RenderComponent = (
           alignItems: "center",
         }}
       >
-        {/* Campos Codigo y nombre */}
+        {/* Primera fila */}
         <Box sx={{ width: "100%", display: "flex", gap: 2 }}>
           {/* Campos Codigo */}
           <FormControl sx={{ flex: 1 }}>
@@ -155,16 +138,20 @@ export const RenderComponent = (
                 maxLength: 7,
                 style: { textTransform: "uppercase" },
               }}
+              onKeyDown={(e) => {
+                if (!alphaNumeric.test(e.key)) e.preventDefault();
+              }}
               onChange={(e) =>
-                handleForm(e, form, setForm, formError, setFormError)
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
               }
-              error={formError.code.error}
+              error={formErrors.code.error}
               helperText={
-                formError.code.error ? formError.code.message : "Ej. ITID843"
+                formErrors.code.error ? formErrors.code.message : "Ej. ITID843"
               }
               value={form.code}
             />
           </FormControl>
+
           {/* Campo de nombre */}
           <FormControl sx={{ flex: 3 }}>
             <TextField
@@ -173,19 +160,20 @@ export const RenderComponent = (
               label="Nombre de la Materia"
               variant="outlined"
               inputProps={{ maxLength: 90 }}
-              onChange={(e) =>
-                handleForm(e, form, setForm, formError, setFormError)
-              }
               onKeyDown={(e) => {
-                if (/^[0-9]+$/.test(e.key)) e.preventDefault();
+                if (!alpha.test(e.key)) e.preventDefault();
               }}
-              error={formError.name.error}
-              helperText={formError.name.message}
+              onChange={(e) =>
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
+              }
+              error={formErrors.name.error}
+              helperText={formErrors.name.message}
               value={form.name}
             />
           </FormControl>
-          {/* Campos Creditos, Horas y Semestre */}
         </Box>
+
+        {/* Segunda fila */}
         <Box sx={{ width: "100%", display: "flex", gap: 2, mt: 2.5 }}>
           {/* Creditos */}
           <FormControl sx={{ flex: 1 }}>
@@ -198,11 +186,12 @@ export const RenderComponent = (
                 type: "number",
               }}
               onChange={(e) =>
-                handleForm(e, form, setForm, formError, setFormError)
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
               }
               value={form.numCredits}
             />
           </FormControl>
+
           {/* Campo de horas */}
           <FormControl sx={{ flex: 1 }}>
             <TextField
@@ -212,11 +201,12 @@ export const RenderComponent = (
               variant="outlined"
               inputProps={{ type: "number" }}
               onChange={(e) =>
-                handleForm(e, form, setForm, formError, setFormError)
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
               }
               value={form.numHours}
             />
           </FormControl>
+
           {/* Campo de Semestre */}
           <FormControl sx={{ flex: 1 }}>
             <TextField
@@ -226,13 +216,15 @@ export const RenderComponent = (
               variant="outlined"
               inputProps={{ type: "number" }}
               onChange={(e) =>
-                handleForm(e, form, setForm, formError, setFormError)
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
               }
               value={form.numSemester}
             />
           </FormControl>
+
           <Box sx={{ flex: 0.6 }} />
         </Box>
+        {/* Tercera Fila */}
         <Box
           sx={{
             display: "flex",
@@ -241,6 +233,7 @@ export const RenderComponent = (
             mt: 2.3,
           }}
         >
+          {/* Checkbox para laboratorio */}
           <FormControlLabel
             control={
               <Checkbox
@@ -250,31 +243,33 @@ export const RenderComponent = (
             }
             label="¿Es un laboratorio?"
           />
+          {/* Checkbox para agregar un alias */}
           <FormControlLabel
             control={
-              <Checkbox checked={alias} onChange={() => setAlias(!alias)} />
+              <Checkbox
+                checked={alias}
+                onChange={() => onChangeAlias(form, setForm, alias, setAlias)}
+              />
             }
             label={isEdit ? "Alias" : "¿Agregar alias?"}
           />
-          {alias ? (
+          {alias && (
             <TextField
               name="alias"
               size="small"
               label="Alias de la Materia"
               variant="outlined"
               inputProps={{ maxLength: 90 }}
-              onChange={(e) =>
-                handleForm(e, form, setForm, formError, setFormError, alias)
-              }
               onKeyDown={(e) => {
-                if (/^[0-9]+$/.test(e.key)) e.preventDefault();
+                if (!alpha.test(e.key)) e.preventDefault();
               }}
-              error={formError.alias.error}
-              helperText={formError.alias.message}
+              onChange={(e) =>
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
+              }
+              error={formErrors.alias.error}
+              helperText={formErrors.alias.message}
               value={form.alias}
             />
-          ) : (
-            <p />
           )}
         </Box>
         {/* Boton de submit */}
@@ -292,7 +287,7 @@ export const RenderComponent = (
         open={successMessage}
         autoHideDuration={1500}
         onClose={() =>
-          handleSuccessMessage(setSuccessMessage, navigate, setIsSee)
+          handleSuccessMessage(setSuccessMessage, navigate)
         }
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         sx={{ mt: "5%", mr: "5.5%" }}

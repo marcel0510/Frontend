@@ -15,18 +15,19 @@ import { useNavigate } from "react-router-dom";
 import { useDeleteSubject } from "../../hooks/Subject.Hooks";
 import { useState } from "react";
 import { ErrorMap } from "../../helpers/subject.helper";
+import { GetUser } from "../../session/session";
 export default function SubjectCard({
   subject,
   setSuccessMessage,
   setErrorMessage,
 }) {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
+  const { Id } =  GetUser();
   const navigate = useNavigate();
   const { mutate: drop, isLoading, isError } = useDeleteSubject();
   const [modal, setModal] = useState({
     isOpen: false,
     id: 0,
-    deletedBy: UserInfo.user.id,
+    deletedBy: Id
   });
 
   const handleDelete = () => {

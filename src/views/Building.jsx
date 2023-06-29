@@ -14,7 +14,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 export default function Buildings() {
   const navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
-  const [isSee, setIsSee] = useState(true);
+  const [isSee, setIsSee] = useState(false);
   const [filter, setFilter] = useState("");
 
   const editButtonHandle = () => {
@@ -72,7 +72,7 @@ export default function Buildings() {
           <p />
         )}
       </Paper>
-      <Outlet context={[isEdit, setIsEdit, setIsSee, filter, setFilter]} />
+      <Outlet context={[isEdit, setIsEdit, setIsSee, filter]} />
     </>
   );
 }

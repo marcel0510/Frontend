@@ -11,7 +11,7 @@ import SubjectCard from "../Subjects/SubjectCard";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 export default function Subjects() {
-  const [_, setIsEdit, setIsSee, filter, setFilter] = useOutletContext();
+  const [ , , setIsSee, filter] = useOutletContext();
   const { data, isLoading, isError } = useSubjects();
   const [subjects, setSubjects] = useState([]);
   const [successMessage, setSuccessMessage] = useState(false);
@@ -20,9 +20,9 @@ export default function Subjects() {
     message: "",
   });
   useEffect(() => {
-    setIsSee(true);
-    setIsEdit(false);
     filterData();
+    setIsSee(true);
+    return () => setIsSee(false);
   }, [filter, isLoading, data]);
 
   const filterData = () => {

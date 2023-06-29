@@ -15,19 +15,20 @@ import { useNavigate } from "react-router-dom";
 import { useDeleteGroup } from "../../hooks/Group.Hooks";
 import { useState } from "react";
 import { ErrorMap } from "../../helpers/group.helper";
+import { GetUser } from "../../session/session";
 
 export default function GroupCard({
   group,
   setSuccessMessage,
   setErrorMessage,
 }) {
-  const UserInfo = JSON.parse(localStorage.getItem("UserInfo"));
+  const { Id } = GetUser();
   const navigate = useNavigate();
   const { mutate: deleteGroup, isLoading, isError } = useDeleteGroup();
   const [modal, setModal] = useState({
     isOpen: false,
     id: 0,
-    deletedBy: UserInfo.user.id
+    deletedBy: Id
   });
 
   const handleDelete = () => {

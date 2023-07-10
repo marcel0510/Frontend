@@ -1,7 +1,7 @@
 import axios from 'axios'
-
+import { IP } from '../global/variables';
 const UserProviderHandler = axios.create({
-    baseURL: 'https://localhost:7130/api/user'
+    baseURL: `https://${IP}:7130/api/user`
 })
 
 export const GetUsers = async () => {
@@ -19,11 +19,15 @@ export const AddUser = async (user) => {
 }
 
 export const UpdateUser = async (user) => {
-    return await UserProviderHandler.put(`/update/${user.Id}`, user);
+    return await UserProviderHandler.put(`/update`, user);
 }
 
-export const DeleteUser = async (id) => {
-    return await UserProviderHandler.delete(`/delete/${id}`);
+export const DeleteUser = async (user) => {
+    return await UserProviderHandler.delete(`/delete/${user.id}/${user.deletedBy}`);
+}
+
+export const ChangePassword = async (password) => {
+    return await UserProviderHandler.put(`/update/password`, password);
 }
 
 export const ValidateUser = async (user) => {

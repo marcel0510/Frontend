@@ -15,7 +15,7 @@ import logo from "../assets/logo.png";
 import styled from "@emotion/styled";
 import { useEffect, useState } from "react";
 import { useValidateUser } from "../hooks/User.Hooks";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Img = styled("img")({
   width: "13%",
@@ -40,7 +40,7 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem("UserInfo")) {
+    if (localStorage.getItem("user")) {
       navigate("/Main");
     }
   }, []);
@@ -189,6 +189,7 @@ export default function Login() {
           />
         </FormControl>
 
+        <Link to={"/Registrar"} >Registrate aquí</Link>
         <Button
           type="submit"
           variant="contained"

@@ -85,6 +85,7 @@ export default function Classrooms() {
                 classroom={classroom}
                 setSuccessMessage={setSuccessMessage}
                 setErrorMessage={setErrorMessage}
+                forInformation={true}
               />
             </Grid>
           );

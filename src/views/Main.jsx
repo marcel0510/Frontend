@@ -23,10 +23,10 @@ import { RoleMap } from "../helpers/user.helpers";
 import { useCalendars } from "../hooks/Calendar.Hooks";
 import {
   GetUser,
-  ManageSession,
   EndSession,
   isAdmin,
   thereIsSession,
+  thereIsRestore
 } from "../session/session";
 
 const drawerWidth = 270;
@@ -91,9 +91,15 @@ export default function Main() {
 
   useEffect(() => {
     if (isInitialMount.current) {
-      if (!thereIsSession()) navigate("/");
-      else {
+      if (!thereIsSession()){ 
+        navigate("/Ingresar");
+        isInitialMount.current = false;
       }
+      else if (thereIsRestore()){
+        navigate("/CambiarContraseña")
+        isInitialMount.current = false;
+      }
+      
       const { Name, Role } = GetUser();
       setUser({ ...user, name: Name, role: Role });
       if (isAdmin()) setIsAdmin(true);
@@ -107,7 +113,7 @@ export default function Main() {
 
   const handleCloseSession = () => {
     EndSession();
-    navigate("/");
+    navigate("/Ingresar");
   };
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -203,7 +209,7 @@ export default function Main() {
               }}
             >
               <Typography>Usuario: {user.name}</Typography>
-              <Typography>Perfil: {RoleMap(user.role)}</Typography>
+              <Typography>{RoleMap(user.role)}</Typography>
             </Box>
 
             <Typography mr={3}>Calendario: </Typography>

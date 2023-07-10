@@ -6,32 +6,63 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { Backdrop, CircularProgress } from "@mui/material";
-import { useClassroom } from "../../hooks/Classroom.Hooks";
-import { useOutletContext, useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { Alert, Backdrop, Box, Button, CircularProgress, Snackbar } from "@mui/material";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useClassroom } from "../../../hooks/Classroom.Hooks";
+import { useAddGroup } from "../../../hooks/Group.Hooks";
 
+const color1 = "rgba(255, 0, 0, 0.2)";
+const color2 = "rgba(0, 150, 255, 0.2)";
 
-function randomColor(){
-  var r = Math.floor(Math.random() * 256);
-  var g = Math.floor(Math.random() * 256);
-  var b = Math.floor(Math.random() * 256);
-  var color = `rgba(${r}, ${g}, ${b}, 0.2)`;
-  return color;
-}
-
-export default function ClassroomSchedule() {
+export default function () {
   const { id } = useParams();
+  const [ , setIsForm ] = useOutletContext();
+  const parameters = JSON.parse(localStorage.getItem("parameters"));
+  const newGroup = {
+    name: parameters.nameGr,
+    subject: {
+      code: parameters.subjectCode,
+      name: parameters.subjectName,
+      alias: parameters.subjectAlias,
+    },
+    sessions: parameters.sessions,
+  };
+  const newAddGroup = {
+    name: parameters.nameGr,
+    subjectId: parameters.subjectId,
+    classroomId: id,
+    calendarId: parameters.calendar,
+    sessions: parameters.sessions,
+  };
+  const navigate = useNavigate();
   const { data: classroom, isLoading, isError } = useClassroom(id);
-  const [ , setIsEdit] = useOutletContext();
+  const { mutate: add, isLoading: isLoadAdd, isError: isErrorAdd } = useAddGroup();
+  const [render, setRender] = useState(0);
+  const [successMessage, setSuccessMessage] = useState(false);
   const Header = ["Hora", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
-  const Schedule = new Array(13).fill(0).map(() => new Array(6).fill("")); // 14 filas y 6 columnas (horas y días)
+  const Schedule = new Array(13).fill(0).map(() => new Array(6).fill("")); // 13 filas y 6 columnas (horas y días)
 
   useEffect(() => {
-    setIsEdit(true);
-    return () => setIsEdit(false);
-  }, []);
+    if (!isLoading) {
+      classroom.groups.push(newGroup);
+      setRender(render + 1);
+    }
+    setIsForm(false);
+  }, [isLoading, classroom]);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    add(
+      {...newAddGroup},
+      {
+        onSuccess: () => {
+          setSuccessMessage(true);
+        }
+      }
+    )
+
+  }
   const MakeMatrix = () => {
     //Llenar la columna de horas
     for (let i = 0; i < 13; i++) {
@@ -41,8 +72,7 @@ export default function ClassroomSchedule() {
         .padStart(2, "0")}:00`;
     }
 
-    classroom.groups.forEach((group) => {
-      const color = randomColor();
+    classroom.groups.forEach((group, index) => {
       group.sessions.forEach((session) => {
         var startHour = parseInt(session.startTime.substr(0, 2));
         var endHour = parseInt(session.endTime.substr(0, 2));
@@ -54,11 +84,10 @@ export default function ClassroomSchedule() {
           Schedule[row][col] = {
             gr: group.name,
             code: group.subject.code,
-            name:
-              group.subject.alias !== null
-                ? group.subject.alias
-                : group.subject.name,
-            color: color
+            name: group.subject.alias
+              ? group.subject.alias
+              : group.subject.name,
+            color: index == classroom.groups.length - 1 ? color1 : color2,
           };
         }
       });
@@ -93,11 +122,11 @@ export default function ClassroomSchedule() {
     <>
       <Paper
         sx={{
-          mt: 1,
           mb: 1,
           padding: "10px 2%",
           display: "flex",
           justifyContent: "space-evenly",
+          width: "100%",
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: 300 }}>
@@ -116,10 +145,32 @@ export default function ClassroomSchedule() {
           <p />
         )}
 
-        <Typography variant="h6" sx={{ fontWeight: 300 }}>
-          {" "}
-          Capacidad: {classroom.capacity} estudiantes{" "}
-        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box
+              component={"div"}
+              sx={{
+                backgroundColor: color1,
+                padding: 1,
+                mr: 1,
+                border: "1px solid black",
+              }}
+            />
+            <Typography variant="body2">Grupo nuevo</Typography>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+              component={"div"}
+              sx={{
+                backgroundColor: color2,
+                padding: 1,
+                mr: 1,
+                border: "1px solid black",
+              }}
+            />
+          <Typography variant="body2">Grupos almacenados  </Typography>
+          </Box>
+        </Box>
       </Paper>
       <TableContainer component={Paper} sx={{ mb: 1.5, pb: 2 }}>
         <Table size="small" sx={{ width: "100%" }}>
@@ -154,7 +205,7 @@ export default function ClassroomSchedule() {
                         key={indexGroup}
                         sx={{
                           border: "1px solid rgba(224, 224, 224, 1)",
-                          backgroundColor: group.color
+                          backgroundColor: group.color,
                         }}
                       >
                         <Typography variant="body2" align="center">
@@ -166,6 +217,7 @@ export default function ClassroomSchedule() {
                       </TableCell>
                     ) : (
                       <TableCell
+                        key={indexGroup}
                         sx={{
                           border: "1px solid rgba(224, 224, 224, 1)",
                           width: "14.4%",
@@ -180,7 +232,28 @@ export default function ClassroomSchedule() {
             })}
           </TableBody>
         </Table>
+        <Box sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", mt: 2 }}>
+        <Button onClick={(e) => handleSubmit(e)} sx={{ width: "20%" }} variant="contained">
+          Guardar
+        </Button>
+        </Box>
       </TableContainer>
+       {/* Mensaje de exito */}
+       <Snackbar
+        open={successMessage}
+        autoHideDuration={1500}
+        onClose={() => {
+          navigate(`/Main/Aulas/Horario/${id}`)
+        }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        sx={{ mt: "5%", mr: "5.5%" }}
+      >
+        <Alert severity="success" sx={{ width: "100%" }}>
+          <Typography>
+            {"El grupo se agregó correctamente"}
+          </Typography>
+        </Alert>
+      </Snackbar>
     </>
   );
 }

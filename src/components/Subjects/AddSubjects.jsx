@@ -10,7 +10,7 @@ import { useAddSubject } from "../../hooks/Subject.Hooks";
 import { GetUser } from "../../session/session";
 export default function AddSubject() {
   const { Id } = GetUser();
-
+  
   const withoutErrors = {
     code: { error: false },
     name: { error: false },

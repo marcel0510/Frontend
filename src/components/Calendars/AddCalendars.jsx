@@ -45,7 +45,10 @@ export default function AddCalendars() {
         { ...form },
         {
           onSuccess: (res) => {
-            if (res.data.isSuccess) setSuccessMessage(true);
+            if (res.data.isSuccess) {
+              setSuccessMessage(true);
+              console.log(res.data)
+            }
             else
               setErrorMessage({
                 error: true,

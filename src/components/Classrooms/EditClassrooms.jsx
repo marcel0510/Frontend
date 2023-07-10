@@ -79,7 +79,6 @@ export default function EditClassrooms() {
         { ...form },
         {
           onSuccess: (res) => {
-            console.log(res);
             if (res.data.isSuccess) setSuccessMessage(true);
             else
               setErrorMessage({

@@ -1,5 +1,5 @@
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Login from "./views/Login";
 import Main from "./views/Main";
 import Building from "./views/Building";
@@ -26,12 +26,31 @@ import GroupAlgorithm from "./components/Groups/Algorithm/GroupAlgorithm";
 import GroupAlgorithmForm from "./components/Groups/Algorithm/GroupAlgorithmForm";
 import AddGroups from "./components/Groups/AddGroups";
 import EditGroups from "./components/Groups/EditGroups";
+import GroupAlgorithmResults from "./components/Groups/Algorithm/GroupAlgorithmResults";
+import GroupAlgorithmSchedule from "./components/Groups/Algorithm/GroupAlgorithmSchedule";
+import User from "./views/User";
+import Users from "./components/Users/users";
+import AddUsers from "./views/Register";
+import { useEffect } from "react";
+import EditUsers from "./components/Users/EditUsers";
+import EditAccounts from "./components/Users/EditAccounts";
+import ResetPasswordForm from "./components/Users/ResetPasswordForm";
+import ResetPassword from "./views/ResetPassword";
+import Account from "./views/Account";
+import ChangePassword from "./components/Users/ChangePassword";
+
 
 
 function App() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate("/Ingresar")
+  }, [])
   return ( 
     <Routes>
-      <Route exact path="/" Component={Login} />
+      <Route exact path="/Ingresar" Component={Login} />
+      <Route exact path="/Registrar" Component={AddUsers} />
+      <Route exact path="/CambiarContraseña" Component={ResetPassword} />
       <Route exact path="/Main" Component={Main}>
         <Route exact path="/Main/Aulas" Component={Classroom}>
           <Route exact path="/Main/Aulas/Ver/" Component={Classrooms} />
@@ -52,6 +71,8 @@ function App() {
           <Route path="/Main/Grupos/Ver/Filtro/:fil" Component={Groups}  />
           <Route exact path="/Main/Grupos/Algoritmo" Component={GroupAlgorithm}>
               <Route exact path="/Main/Grupos/Algoritmo/Parametros" Component={GroupAlgorithmForm} />
+              <Route exact path="/Main/Grupos/Algoritmo/Resultados" Component={GroupAlgorithmResults} />
+              <Route exact path="/Main/Grupos/Algoritmo/Horario/:id" Component={GroupAlgorithmSchedule} />
           </Route>
           <Route exact path="/Main/Grupos/Horario/:id" Component={GroupSchedule}  />
         </Route>
@@ -65,7 +86,18 @@ function App() {
           <Route exact path="/Main/Calendarios/Agregar" Component={AddCalendars}/>
           <Route exact path="/Main/Calendarios/Editar/:id" Component={EditCalendars} />
         </Route>
+        <Route exact path="/Main/Usuarios" Component={User}>
+        <Route exact path="/Main/Usuarios/Ver" Component={Users} />
+        <Route exact path="/Main/Usuarios/Editar/:id" Component={EditUsers} />
+        <Route exact path="/Main/Usuarios/ReestrablecerContraseña" Component={ResetPasswordForm} />
+        </Route>
+        <Route exact path="/Main/Cuenta" Component={Account}>
+          <Route exact path="/Main/Cuenta/Editar/:id" Component={EditAccounts} />
+          <Route exact path="/Main/Cuenta/CambiarContraseña" Component={ChangePassword} />
+
+        </Route>
       </Route>
+     
     </Routes>
   );
 }

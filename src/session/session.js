@@ -2,8 +2,27 @@ export const thereIsSession = () => {
     return localStorage.getItem("user");
 }
 
+export const thereIsRestore = () => {
+    return JSON.parse(localStorage.getItem("user")).reset;
+}
+
+export const Restored = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    user.reset = false;
+    localStorage.setItem("user", JSON.stringify(user));
+}
+
+export const UpdatedAccount = ({ name, role }) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    user.name = name;
+    user.role = role
+    localStorage.setItem("user", JSON.stringify(user));
+}
+
 export const isAdmin = () => {
-    return JSON.parse(localStorage.getItem("user")).role === 0
+    const user = JSON.parse(localStorage.getItem("user"));
+    if(user)
+    return JSON.parse(localStorage.getItem("user")).role === 1
 } 
 
 export const EndSession = () => {
@@ -17,20 +36,9 @@ export const GetUser = () => {
         const Name = JSON.parse(localStorage.getItem("user")).name;
         const Role = JSON.parse(localStorage.getItem("user")).role;
         const Token = JSON.parse(localStorage.getItem("user")).token
-        return {Id, Name, Role, Token}
+        const Reset = JSON.parse(localStorage.getItem("user")).reset
+        return {Id, Name, Role, Token, Reset}
     }
     return {Id: 0, Name: "", Role: -1, Token: ""}
     
-}
-export const ManageSession = () => {
-    const user = JSON.parse(localStorage.getItem("user"))
-    if(user){
-        const timeSession = 60 * 1000;
-        const storedTime = user.currentTime;
-        const now = Date.now();
-        const elapsedTime = now - storedTime;
-        if(elapsedTime >= timeSession){
-            localStorage.removeItem("user");
-        }
-    }
 }

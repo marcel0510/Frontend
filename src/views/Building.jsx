@@ -17,11 +17,7 @@ export default function Buildings() {
   const [isSee, setIsSee] = useState(false);
   const [filter, setFilter] = useState("");
 
-  const editButtonHandle = () => {
-    setIsEdit(false);
-    setIsSee(true);
-    navigate("/Main/Edificios/Ver");
-  };
+
 
   return (
     <>
@@ -40,7 +36,7 @@ export default function Buildings() {
             Módulo de Edificios
           </Typography>
           {isEdit ? (
-            <IconButton onClick={() => editButtonHandle()}>
+            <IconButton onClick={() => navigate("/Main/Edificios/Ver")}>
               <ArrowBackIcon color="primary" />
             </IconButton>
           ) : (

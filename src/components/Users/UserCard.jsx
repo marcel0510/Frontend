@@ -10,27 +10,23 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import SchoolIcon from "@mui/icons-material/School";
+import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from "react-router-dom";
-import { useDeleteSubject } from "../../hooks/Subject.Hooks";
-import { useState } from "react";
-import { ErrorMap } from "../../helpers/subject.helper";
 import { GetUser } from "../../session/session";
-
-export default function ClassroomCard({
-  classroom,
-  setSuccessMessage,
-  setErrorMessage,
-  forInformation,
-}) {
+import { useDeleteUser } from "../../hooks/User.Hooks";
+import { RoleMap } from "../../helpers/user.helpers";
+import { useState } from "react";
+export default function UserCard({ user, setSuccessMessage, setErrorMessage }) {
   const { Id } = GetUser();
   const navigate = useNavigate();
-  const { mutate: drop, isLoading, isError } = useDeleteSubject();
+  const { mutate: drop, isLoading, isError } = useDeleteUser();
+
   const [modal, setModal] = useState({
     isOpen: false,
     id: 0,
-    deletedBy: Id,
+    deletedBy: Id
   });
+
   const handleDelete = () => {
     setModal({ ...modal, isOpen: false });
     drop(
@@ -54,61 +50,40 @@ export default function ClassroomCard({
       }
     );
   };
+
   return (
     <>
       <Card>
         <CardContent>
-          <Typography variant="h5" marginBottom={"3%"}>
-            Aula: {classroom.code}
-            <SchoolIcon sx={{ marginLeft: "5%" }} />
+          <Typography variant="h5" marginBottom={"3%"} sx={{ display: "flex", alignItems: "center" }} align="center">
+            {user.name}
+            <PersonIcon fontSize="large" sx={{ marginLeft: "5%" }} />
           </Typography>
           <Divider />
-          <Typography variant="h6" marginTop={"2%"}>
-            {classroom.isLab ? classroom.name : "No es laboratorio"}
+          <Typography marginTop={"2%"} variant="h6" sx={{ fontWeight: 200 }}>
+            {"Correo:  " + user.email}
           </Typography>
-          <Typography variant="body1">
-            Capacidad: {classroom.capacity}
+          <Typography marginTop={"2%"} variant="h6" sx={{ fontWeight: 200 }}>
+            {RoleMap(user.role)}
           </Typography>
-          <Typography variant="body1">{classroom.building.name}</Typography>
-          <Typography variant="body1">Piso: {classroom.floor}</Typography>
-          <Typography variant="body1">
-            Codigo SAEw:{" "}
-            {classroom.building.code +
-              "/" +
-              classroom.floor +
-              "/" +
-              classroom.code}
-          </Typography>
+         
         </CardContent>
-        <CardActions
-          sx={
-            forInformation ? {} : { display: "flex", justifyContent: "center" }
-          }
-        >
+        <CardActions>
+
           <Button
             variant="outlined"
-            onClick={() =>
-              forInformation
-                ? navigate(`/Main/Aulas/Horario/${classroom.id}`)
-                : navigate(`/Main/Grupos/Algoritmo/Horario/${classroom.id}`)
-            }
+            color="warning"
+            onClick={() => navigate(`/Main/Usuarios/Editar/${user.id}`)}
           >
-            {forInformation ? "Ver horario" : "Ver nuevo horario"}
+            Editar
           </Button>
-          {forInformation && (
-            <>
-              <Button
-                variant="outlined"
-                color="warning"
-                onClick={() => navigate(`/Main/Aulas/Editar/${classroom.id}`)}
-              >
-                Editar
-              </Button>
-              <Button variant="outlined" color="secondary">
-                Eliminar
-              </Button>
-            </>
-          )}
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => setModal({ ...modal, isOpen: true, id: user.id })}
+          >
+            Eliminar
+          </Button>
         </CardActions>
       </Card>
       <Modal open={modal.isOpen}>
@@ -125,16 +100,11 @@ export default function ClassroomCard({
           }}
         >
           <Typography variant="h6" mb={1}>
-            Eliminar materia
+            Eliminar usuario
           </Typography>
           <Divider />
           <Typography mt={1} mb={2}>
-            ¿Esta seguro de que desea eliminar esta materia?
-            <Typography color={"secondary"}>
-              {" "}
-              Todos los grupos relaciondas con esta materia también se
-              eliminarán
-            </Typography>
+            ¿Esta seguro de que desea eliminar esta usuario?
           </Typography>
           <Button
             color="secondary"

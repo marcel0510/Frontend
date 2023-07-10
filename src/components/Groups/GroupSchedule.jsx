@@ -11,6 +11,7 @@ import { useGroup } from "../../hooks/Group.Hooks";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useEffect } from "react";
 
+const color = "rgba(0, 150, 255, 0.2)";
 export default function GroupSchedule() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ export default function GroupSchedule() {
             group.subject.alias !== null
               ? group.subject.alias
               : group.subject.name,
+          color: color
         };
       }
     });
@@ -147,6 +149,7 @@ export default function GroupSchedule() {
                         key={indexGroup}
                         sx={{
                           border: "1px solid rgba(224, 224, 224, 1)",
+                          backgroundColor: group.color
                         }}
                       >
                         <Typography variant="body2" align="center">
@@ -162,6 +165,7 @@ export default function GroupSchedule() {
                           border: "1px solid rgba(224, 224, 224, 1)",
                           width: "14.4%",
                         }}
+                        key={indexGroup}
                       >
                         {""}
                       </TableCell>

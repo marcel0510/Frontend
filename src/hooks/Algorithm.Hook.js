@@ -1,6 +1,6 @@
-import { useMutation } from "react-query";
+import { useQuery } from "react-query";
 import { Algorithm } from "../providers/Algorithm.Provider";
 
-export const useAlgorithm = () => {
-        return useMutation(Algorithm)
+export const useAlgorithm = (parameters) => {
+        return useQuery(["AlgorithmResults", parameters], () => Algorithm(parameters))
 }

@@ -23,23 +23,23 @@ import {
 } from "../../../Styles/Styled";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useSubjects } from "../../../hooks/Subject.Hooks";
 import { useBuildings } from "../../../hooks/Building.Hooks";
 import { useEffect, useRef, useState } from "react";
 import { TimeField } from "@mui/x-date-pickers";
 import { GetTime } from "../../../helpers/date.helper";
 import dayjs from "dayjs";
-import { useAlgorithm } from "../../../hooks/Algorithm.Hook";
 import { useClassrooms } from "../../../hooks/Classroom.Hooks";
 
 export default function GroupAlgorithmForm() {
+  const navigate = useNavigate();
+  const [calendar, setIsForm] = useOutletContext();
   const withoutErrors = {
     nameGr: { error: false },
     subjectId: { error: false },
     sessions: { error: false },
   };
-  const [form, setForm, setIsForm] = useOutletContext();
   const {
     data: subjectsData,
     isLoading: loadSubjects,
@@ -55,34 +55,52 @@ export default function GroupAlgorithmForm() {
     isLoading: loadClassrooms,
     isError: errorClassrooms,
   } = useClassrooms();
-  const {
-    mutate: execQuery,
-    isLoading: isLoadResults,
-    isErrorResults,
-  } = useAlgorithm();
   const isInitialMount = useRef(true);
   const [optional, setOptional] = useState(false);
-  const [labs, setLabs] = useState([]);
   const [initHours, setInitHours] = useState([dayjs("0000/00/00T07:00")]);
   const [endHours, setEndHours] = useState([dayjs("0000/00/00T09:00")]);
   const [subjects, setSubjects] = useState([]);
   const [classrooms, setClassrooms] = useState([]);
+  const [form, setForm] = useState({
+    nameGr: "",
+    subjectId: 0,
+    subjectCode: "",
+    subjectName: "",
+    subjectAlias: "",
+    isLab: false,
+    nameLab: "",
+    sessions: [
+      {
+        day: -1,
+        startTime: "07:00",
+        endTime: "09:00",
+      },
+    ],
+    capacity: 0,
+    building: "",
+    floor: "",
+    calendar: 0,
+  });
   const [formErrors, setFormErrors] = useState(withoutErrors);
   const [filters, setFilters] = useState({
     subject: "",
     lab: "",
   });
   const days = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
-  const isLoading = loadSubjects || loadBuildings;
-  const isError = errorSubjects || errorBuildings;
+  const isLoading = loadSubjects || loadClassrooms || loadBuildings;
+  const isError = errorSubjects || errorClassrooms || errorBuildings;
 
   useEffect(() => {
-    if (!isLoading && isInitialMount.current) {
+    if (!isLoading && calendar && isInitialMount.current) {
       setSubjects(subjectsData);
+      setClassrooms(classroomsData.filter((c) => c.isLab));
+      setForm({ ...form, calendar: calendar });
       isInitialMount.current = false;
     }
     filterData();
-  }, [isLoading, filters, subjectsData, classroomsData]);
+    setIsForm(true);
+    return () => setIsForm(false);
+  }, [isLoading, filters, subjectsData, classroomsData, calendar]);
 
   const filterData = () => {
     if (filters.subject !== "")
@@ -102,6 +120,16 @@ export default function GroupAlgorithmForm() {
         })
       );
     else if (!isLoading && !isInitialMount.current) setSubjects(subjectsData);
+
+    if (filters.lab !== "")
+      setClassrooms(
+        classrooms.filter((c) => {
+          const code = c.building.code + "/" + c.floor + "/" + c.code;
+          return code.includes(filters.lab) || c.name.includes(filters.lab);
+        })
+      );
+    else if (!isLoading && !isInitialMount.current)
+      setClassrooms(classroomsData.filter((c) => c.isLab));
   };
   const handleAddSessions = () => {
     if (form.sessions.length < 3) {
@@ -214,18 +242,16 @@ export default function GroupAlgorithmForm() {
       return false;
     }
   };
+
   const onSubmitHandle = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      execQuery(
-        { ...form }, 
-        {
-        onSuccess: res => console.log(res)
-      })
+      navigate("/Main/Grupos/Algoritmo/Resultados");
+      localStorage.setItem("parameters", JSON.stringify(form));
     }
   };
 
-  if (isLoading || isError || isLoadResults)
+  if (isLoading || isError)
     return (
       <Backdrop
         open={true}
@@ -251,6 +277,7 @@ export default function GroupAlgorithmForm() {
   return (
     <>
       {/* Formulario */}
+
       <Paper
         component={"form"}
         onSubmit={onSubmitHandle}
@@ -259,7 +286,7 @@ export default function GroupAlgorithmForm() {
           flexDirection: "column",
           alignItems: "center",
           padding: "10px 2.5%",
-          width: "70%",
+          width: "75%",
         }}
       >
         {/* Campos obligatorios */}
@@ -288,7 +315,10 @@ export default function GroupAlgorithmForm() {
                 size="small"
                 label="Grupo"
                 variant="outlined"
-                inputProps={{ maxLength: 5 }}
+                inputProps={{
+                  maxLength: 5,
+                  style: { textTransform: "uppercase" },
+                }}
                 onChange={(e) => {
                   setForm({
                     ...form,
@@ -318,9 +348,13 @@ export default function GroupAlgorithmForm() {
                 name="subjectId"
                 error={formErrors.subjectId.error}
                 onChange={(e) => {
+                  const auxSubject = subjects.find(s => s.id == e.target.value)
                   setForm({
                     ...form,
                     subjectId: parseInt(e.target.value),
+                    subjectCode: auxSubject.code,
+                    subjectName: auxSubject.name,
+                    subjectAlias: auxSubject.alias
                   });
                   setFormErrors(withoutErrors);
                 }}
@@ -369,31 +403,44 @@ export default function GroupAlgorithmForm() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={filters.isLab}
-                  onChange={() =>
-                    setFilters({ ...filters, isLab: !filters.isLab })
-                  }
+                  checked={form.isLab}
+                  onChange={() => setForm({ ...form, isLab: !form.isLab })}
                 />
               }
               label="¿Laboratorio?"
             />
-            {filters.isLab ? (
+            {form.isLab ? (
               <FormControl size="small" sx={{ flex: 3 }}>
                 <InputLabel id="lab">Laboratorio</InputLabel>
                 <Select
                   labelId="lab"
-                  value={filters.name}
+                  value={form.nameLab}
                   label="Laboratorio"
                   name="lab"
                   onChange={(e) =>
-                    setFilters({
-                      ...filters,
+                    setForm({
+                      ...form,
                       nameLab: e.target.value,
                     })
                   }
                 >
+                  <TextField
+                    value={filters.lab}
+                    size="small"
+                    sx={{ width: "100%" }}
+                    variant="standard"
+                    label="Filtrar..."
+                    inputProps={{ style: { textTransform: "uppercase" } }}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        lab: e.target.value.toUpperCase(),
+                      })
+                    }
+                  />
                   <MenuItem value={""}></MenuItem>
-                  {labs.map((lab, index) => {
+                  {classrooms.map((lab, index) => {
                     return (
                       <MenuItem key={index} value={lab.name}>
                         {lab.name}
@@ -628,7 +675,7 @@ export default function GroupAlgorithmForm() {
 
         {/* Boton de submit */}
         <Button type="submit" sx={{ width: "30%" }} variant="contained">
-          Enviar
+          Buscar aulas
         </Button>
       </Paper>
     </>

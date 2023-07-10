@@ -75,7 +75,6 @@ export default function EditBuilding() {
           onSuccess: (res) => {
             if (res.data.isSuccess) {
               setSuccessMessage(true);
-              setIsEdit(false);
             }
             else
               setErrorMessage({

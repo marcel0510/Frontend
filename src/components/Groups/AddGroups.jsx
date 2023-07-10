@@ -52,8 +52,8 @@ export default function AddGroups() {
     sessions: [
       {
         day: -1,
-        startTime: "07:00:00",
-        endTime: "09:00:00",
+        startTime: "07:00",
+        endTime: "09:00",
       },
     ],
     createdBy: Id
@@ -90,13 +90,17 @@ export default function AddGroups() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(form)
+
     if (ValidateForm(form, setFormErrors)) {
       add(
         { ...form },
         {
           onSuccess: (res) => {
             console.log(res);
-            if (res.data.isSuccess) setSuccessMessage(true);
+            if (res.data.isSuccess) {
+              setSuccessMessage(true);
+            }
             else {
               if (res.data.errorType == 2) {
                 const currectGroups = classrooms.find(

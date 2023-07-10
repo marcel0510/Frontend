@@ -1,9 +1,10 @@
 import axios from 'axios'
 import { GetUser } from '../session/session';
+import { IP } from '../global/variables';
 
 const { Token } = GetUser();
 const calendarProviderHandler = axios.create({
-    baseURL: 'https://localhost:7130/api/calendar'
+    baseURL: `https://${IP}:7130/api/calendar`
 })
 
 export const GetCalendars = async () => {

@@ -1,10 +1,11 @@
+import { IP } from '../global/variables';
 import { GetUser } from '../session/session';
 import axios from 'axios'
 
 
 const { Token } = GetUser();
 const BuildingProviderHandler = axios.create({
-    baseURL: 'https://localhost:7130/api/building',
+    baseURL: `https://${IP}:7130/api/building`,
 })
 
 export const GetBuildings = async () => {

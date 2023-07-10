@@ -6,7 +6,6 @@ import {
 } from "../../helpers/group.helper";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { useSubjects } from "../../hooks/Subject.Hooks";
 import { useClassrooms } from "../../hooks/Classroom.Hooks";
 import { useGroup, useUpdateGroup } from "../../hooks/Group.Hooks";
 import { GetUser } from "../../session/session";
@@ -87,10 +86,6 @@ export default function EditGroups() {
       setSubjects(subjectsData);
       setClassrooms(classroomsData);
       isInitialMount.current = false;
-      group.sessions.forEach((s) => {
-        s.startTime = s.startTime + ":00";
-        s.endTime = s.endTime + ":00";
-      });
     }
     if (!isLoading && LoadCalendar) {
       setCurrentCalendar(calendars.find((c) => c.id == calendar));
@@ -122,7 +117,6 @@ export default function EditGroups() {
         { ...form },
         {
           onSuccess: (res) => {
-            console.log(res);
             if (res.data.isSuccess) setSuccessMessage(true);
             else {
               if (res.data.errorType == 2) {

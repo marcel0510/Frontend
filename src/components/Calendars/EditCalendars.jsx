@@ -74,7 +74,6 @@ export default function EditCalendars() {
           onSuccess: (res) => {
             if (res.data.isSuccess) {
               setSuccessMessage(true);
-              setIsEdit(false);
             } else
               setErrorMessage({
                 error: true,

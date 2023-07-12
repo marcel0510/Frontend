@@ -75,3 +75,16 @@ export const Algorithm = async (parameters) => {
     return response.data;
   }
 };
+
+export const Disponibility = async (parameters) =>{
+  if(parameters){
+    const URL = `/disponibility/?idSchedule=${parameters.calendar}` +
+    `&dayTest=${parameters.day}` +
+    `&piso=${parameters.floor}` +
+    `&buildCode=${parameters.building}` +
+    `&morning=${parameters.morning}`
+    console.log(URL);
+    const response = await AlgorithmProviderHandler.get(URL);
+    return response.data;
+  }
+}

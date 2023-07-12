@@ -52,3 +52,13 @@ export const getCurrentTime = () => {
   const padZero = (num) => {
     return num < 10 ? `0${num}` : num;
   };
+
+  export const DayMap = (day) => {
+    switch(day){
+        case 0: return "Lunes";
+        case 1: return "Martes";
+        case 2: return "Miercoles";
+        case 3: return "Jueves";
+        case 4: return "Viernes";
+    }
+  }

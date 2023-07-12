@@ -166,6 +166,8 @@ export default function ClassroomSchedule() {
                       </TableCell>
                     ) : (
                       <TableCell
+                      key={indexGroup}
+
                         sx={{
                           border: "1px solid rgba(224, 224, 224, 1)",
                           width: "14.4%",

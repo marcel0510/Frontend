@@ -3,11 +3,10 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 
-export default function GroupAlgorithm() {
+export default function ClassroomAlgorithm() {
   const navigate = useNavigate();
-  const [calendar] = useOutletContext();
+  const [, , , , , calendar] = useOutletContext();
   const [isForm, setIsForm] = useState(true);
-  const [isSchedule, setIsSchedule] = useState(false);
 
 
   useEffect(() => {
@@ -22,21 +21,16 @@ export default function GroupAlgorithm() {
     >
       <Paper sx={{ mt: 2, mb: 3, padding: "10px 2.5%", width: "75%", display:"flex", alignItems: "center" }}>
         <Typography variant="h4" align="center" sx={{ flexGrow: 1 }}>
-          {isForm ? "Insertar parámetros" : "Resultados..."}
+          {isForm ? "Insertar parámetros" : "Disponibilidad"}
         </Typography>
         {
-          !isForm && !isSchedule && <IconButton onClick={() => navigate("/Main/Grupos/Algoritmo/Parametros")}>
-          <ArrowBackIcon color="primary" />
-        </IconButton>
-        }
-        {
-          isSchedule && <IconButton onClick={() => navigate("/Main/Grupos/Algoritmo/Resultados")}>
+          !isForm && <IconButton onClick={() => navigate("/Main/Aulas/Algoritmo/Parametros")}>
           <ArrowBackIcon color="primary" />
         </IconButton>
         }
       </Paper>
       <Outlet
-        context={[calendar, setIsForm, setIsSchedule]}
+        context={[calendar, setIsForm]}
       />
     </Box>
   );

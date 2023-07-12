@@ -27,6 +27,8 @@ export const ErrorMap = (errorType) => {
       return "Las contraseñas no coinciden";
     case 4:
       return "No puede usar la misma contraseña";
+    case 5:
+      return "No un usuario con ese correo"
   }
 };
 

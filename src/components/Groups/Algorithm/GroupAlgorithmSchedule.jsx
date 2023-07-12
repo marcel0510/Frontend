@@ -12,12 +12,12 @@ import { useEffect, useState } from "react";
 import { useClassroom } from "../../../hooks/Classroom.Hooks";
 import { useAddGroup } from "../../../hooks/Group.Hooks";
 
-const color1 = "rgba(255, 0, 0, 0.2)";
-const color2 = "rgba(0, 150, 255, 0.2)";
+const color1 = "rgba(18, 255, 27, 0.5)";
+const color2 = "rgba(0, 150, 255, 0.4)";
 
 export default function () {
   const { id } = useParams();
-  const [ , setIsForm ] = useOutletContext();
+  const [ , , setIsSchedule ] = useOutletContext();
   const parameters = JSON.parse(localStorage.getItem("parameters"));
   const newGroup = {
     name: parameters.nameGr,
@@ -36,19 +36,23 @@ export default function () {
     sessions: parameters.sessions,
   };
   const navigate = useNavigate();
-  const { data: classroom, isLoading, isError } = useClassroom(id);
+  const { data: classroom, isLoading: isLoadClassroom, isError: isErrorClassroom } = useClassroom(id);
   const { mutate: add, isLoading: isLoadAdd, isError: isErrorAdd } = useAddGroup();
   const [render, setRender] = useState(0);
   const [successMessage, setSuccessMessage] = useState(false);
   const Header = ["Hora", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
   const Schedule = new Array(13).fill(0).map(() => new Array(6).fill("")); // 13 filas y 6 columnas (horas y días)
 
+  const isLoading = isLoadClassroom || isLoadAdd
+  const isError = isErrorClassroom || isErrorAdd
+
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoadClassroom) {
       classroom.groups.push(newGroup);
       setRender(render + 1);
     }
-    setIsForm(false);
+    setIsSchedule(true)
+    return () => setIsSchedule(false)
   }, [isLoading, classroom]);
 
   const handleSubmit = (e) => {
@@ -93,7 +97,7 @@ export default function () {
       });
     });
   };
-  if (!isLoading) MakeMatrix();
+  if (!isLoadClassroom) MakeMatrix();
 
   if (isLoading || isError)
     return (

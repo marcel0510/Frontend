@@ -1,5 +1,6 @@
 import "./App.css";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import Login from "./views/Login";
 import Main from "./views/Main";
 import Building from "./views/Building";
@@ -31,14 +32,15 @@ import GroupAlgorithmSchedule from "./components/Groups/Algorithm/GroupAlgorithm
 import User from "./views/User";
 import Users from "./components/Users/users";
 import AddUsers from "./views/Register";
-import { useEffect } from "react";
 import EditUsers from "./components/Users/EditUsers";
 import EditAccounts from "./components/Users/EditAccounts";
 import ResetPasswordForm from "./components/Users/ResetPasswordForm";
 import ResetPassword from "./views/ResetPassword";
 import Account from "./views/Account";
 import ChangePassword from "./components/Users/ChangePassword";
-
+import ClassroomAlgorithm from "./components/Classrooms/Algorithm/ClassroomAlgorithm"
+import ClassroomAlgorithmForm from "./components/Classrooms/Algorithm/ClassroomAlgorithmForm";
+import ClassroomAlgorithmResults from "./components/Classrooms/Algorithm/ClassroomAlgorithmResults";
 
 
 function App() {
@@ -57,6 +59,10 @@ function App() {
           <Route exact path="/Main/Aulas/Agregar/" Component={AddClassrooms} />
           <Route exact path="/Main/Aulas/Editar/:id" Component={EditClassrooms} />
           <Route path="/Main/Aulas/Ver/Filtro/:fil" Component={Classrooms} />
+          <Route exact path="/Main/Aulas/Algoritmo" Component={ClassroomAlgorithm}>
+            <Route  exact path="/Main/Aulas/Algoritmo/Parametros" Component={ClassroomAlgorithmForm} />
+            <Route  exact path="/Main/Aulas/Algoritmo/Resultados" Component={ClassroomAlgorithmResults} />
+          </Route>
           <Route exact path="/Main/Aulas/Horario/:id" Component={ClassroomSchedule} />
         </Route>
         <Route exact path="/Main/Materias" Component={Subject}>

@@ -190,8 +190,8 @@ const handleRemoveSessions = (
     updatedInitHours.splice(index, 1);
     updatedEndHours.splice(index, 1);
     setForm({ ...form, sessions: updatedSessions });
-    setInitHours([updatedInitHours]);
-    setEndHours([updatedEndHours]);
+    setInitHours([...updatedInitHours]);
+    setEndHours([...updatedEndHours]);
   }
 };
 const handleSuccessMessage = (setSuccessMessage, navigate) => {

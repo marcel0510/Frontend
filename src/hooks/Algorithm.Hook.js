@@ -1,6 +1,10 @@
 import { useQuery } from "react-query";
-import { Algorithm } from "../providers/Algorithm.Provider";
+import { Algorithm, Disponibility } from "../providers/Algorithm.Provider";
 
 export const useAlgorithm = (parameters) => {
-        return useQuery(["AlgorithmResults", parameters], () => Algorithm(parameters))
+        return useQuery(["AlgorithmResults", parameters], () => Algorithm(parameters));
+}
+
+export const useDisponibility = (parameters) => {
+        return useQuery(["DisponibilityResults", parameters], () => Disponibility(parameters));
 }

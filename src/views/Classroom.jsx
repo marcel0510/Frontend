@@ -9,10 +9,11 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useOutletContext } from "react-router-dom";
 
 export default function Classroom() {
   const navigate = useNavigate();
+  const [calendar] = useOutletContext();
   const [isEdit, setIsEdit] = useState(false);
   const [isSee, setIsSee] = useState(false);
   const [filter, setFilter] = useState({
@@ -80,7 +81,7 @@ export default function Classroom() {
           <p />
         )}
       </Paper>
-      <Outlet context={[isEdit, setIsEdit, setIsSee, filter, setFilter]} />
+      <Outlet context={[isEdit, setIsEdit, setIsSee, filter, setFilter, calendar]} />
     </>
   );
 }

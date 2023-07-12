@@ -226,7 +226,7 @@ export default function EditAccounts(){
             color="primary"
             sx={{ width: "40%" }}
           >
-            Editar
+            Guardar
           </Button>
         </Paper>
       </Box>

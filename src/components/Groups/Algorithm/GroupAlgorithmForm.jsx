@@ -95,6 +95,11 @@ export default function GroupAlgorithmForm() {
       setSubjects(subjectsData);
       setClassrooms(classroomsData.filter((c) => c.isLab));
       setForm({ ...form, calendar: calendar });
+      if (localStorage.getItem("parameters")) {
+        const params = JSON.parse(localStorage.getItem("parameters"));
+        setForm(params);
+      }
+
       isInitialMount.current = false;
     }
     filterData();
@@ -155,8 +160,8 @@ export default function GroupAlgorithmForm() {
       updatedInitHours.splice(index, 1);
       updatedEndHours.splice(index, 1);
       setForm({ ...form, sessions: updatedSessions });
-      setInitHours([updatedInitHours]);
-      setEndHours([updatedEndHours]);
+      setInitHours([...updatedInitHours]);
+      setEndHours([...updatedEndHours]);
       setFormErrors(withoutErrors);
     }
   };
@@ -332,7 +337,7 @@ export default function GroupAlgorithmForm() {
                     : "Ej. GR1"
                 }
                 error={formErrors.nameGr.error}
-                value={filters.nameGr}
+                value={form.nameGr}
               />
             </FormControl>
 
@@ -348,13 +353,15 @@ export default function GroupAlgorithmForm() {
                 name="subjectId"
                 error={formErrors.subjectId.error}
                 onChange={(e) => {
-                  const auxSubject = subjects.find(s => s.id == e.target.value)
+                  const auxSubject = subjects.find(
+                    (s) => s.id == e.target.value
+                  );
                   setForm({
                     ...form,
                     subjectId: parseInt(e.target.value),
                     subjectCode: auxSubject.code,
                     subjectName: auxSubject.name,
-                    subjectAlias: auxSubject.alias
+                    subjectAlias: auxSubject.alias,
                   });
                   setFormErrors(withoutErrors);
                 }}

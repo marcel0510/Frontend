@@ -1,17 +1,11 @@
-import { Backdrop, CircularProgress, Grid } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { Backdrop, CircularProgress, Grid, Typography } from "@mui/material";
 import ClassroomCard from "../../Classrooms/ClassroomCard";
 import { useAlgorithm } from "../../../hooks/Algorithm.Hook";
 
 export default function GroupAlgorithmResults() {
   const parameters = JSON.parse(localStorage.getItem("parameters"))
   const { data: results, isLoading, isError} = useAlgorithm(parameters);
-  const [successMessage, setSuccessMessage] = useState(false);
-  const [errorMessage, setErrorMessage] = useState({
-    error: false,
-    message: "",
-  });
+
 
   if (isLoading || isError)
     return (
@@ -31,18 +25,19 @@ export default function GroupAlgorithmResults() {
 
   return (
     <Grid container sx={{ width: "100%", gap: "1%" }}>
-      {results.map((classroom, index) => {
+      { results.status ?
+      results.aulas.map((classroom, index) => {
         return (
           <Grid item key={index} md={3.9} marginBottom={"1.3%"}>
             <ClassroomCard
               classroom={classroom}
-              setSuccessMessage={setSuccessMessage}
-              setErrorMessage={setErrorMessage}
               forInformation={false}
             />
           </Grid>
         );
-      })}
+      }) : 
+        <Typography variant="h4" color={"secondary"} ml={"5%"} >{results.message}.</Typography>
+    }
     </Grid>
   );
 }

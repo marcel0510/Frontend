@@ -74,12 +74,6 @@ export default function Login() {
         message: "No puede dejar este campo vacio",
       });
       return false;
-    } else if (!exp.test(email)) {
-      setErrorEmail({
-        error: true,
-        message: "Debe ingresar una dirección de correo válida",
-      });
-      return false;
     }
 
     return true;

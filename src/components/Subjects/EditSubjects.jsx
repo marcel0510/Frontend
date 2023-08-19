@@ -11,6 +11,9 @@ export default function () {
     code: { error: false },
     name: { error: false },
     alias: { error: false },
+    numCredits: { error: false },
+    numHours: { error: false },
+    numSemester: { error: false },
   };
   const [isEdit, setIsEdit] = useOutletContext(); //Informacion del padre8
   const navigate = useNavigate(); //Navegador de la aplicacion
@@ -32,9 +35,9 @@ export default function () {
     code: "",
     name: "",
     alias: "",
-    numHours: 1,
-    numCredits: 1,
-    numSemester: 1,
+    numHours: "",
+    numCredits: "",
+    numSemester: "",
     isLab: false,
     updatedBy: Id,
   });
@@ -48,19 +51,22 @@ export default function () {
     message: "",
   });
 
+  const isLoading = isLoadingSubject || isLoadingUpdate;
+  const isError = isErrorSubject || isErrorUpdate;
+
   useEffect(() => {
     if (!isLoadingSubject) {
       setForm({
         ...form,
         code: subject.code,
         name: subject.name,
-        alias: subject.alias === null ? "": subject.alias,
+        alias: subject.alias === null ? "" : subject.alias,
         numHours: subject.numHours,
         numCredits: subject.numCredits,
         numSemester: subject.numSemester,
         isLab: subject.isLab,
       });
-      if(subject.alias !== null){
+      if (subject.alias !== null) {
         setAlias(true);
       }
     }
@@ -71,7 +77,6 @@ export default function () {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm(form, setFormErrors, alias)) {
-      
       edit(
         { ...form },
         {
@@ -90,6 +95,28 @@ export default function () {
       );
     }
   };
+  if (isLoading || isError || form.code == "")
+    return (
+      <Backdrop
+        open={true}
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        {isErrorSubject || isErrorUpdate ? (
+          <Typography mb={"1.5%"} variant="h5" color="secondary">
+            Error de conexión con el servidor!
+          </Typography>
+        ) : (
+          <p></p>
+        )}
+        <CircularProgress size={100} />
+      </Backdrop>
+    );
   return (
     <>
       {
@@ -108,36 +135,9 @@ export default function () {
           setErrorMessage,
           alias,
           setAlias,
-          isEdit,
+          isEdit
         )
       }
-      {/* Pantalla de carga */}
-      {isLoadingSubject ||
-      isLoadingUpdate ||
-      isErrorSubject ||
-      isErrorUpdate ? (
-        <Backdrop
-          open={true}
-          sx={{
-            color: "#fff",
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          {isErrorSubject || isErrorUpdate ? (
-            <Typography mb={"1.5%"} variant="h5" color="secondary">
-              Error de conexión con el servidor!
-            </Typography>
-          ) : (
-            <p></p>
-          )}
-          <CircularProgress size={100} />
-        </Backdrop>
-      ) : (
-        <p />
-      )}
     </>
   );
 }

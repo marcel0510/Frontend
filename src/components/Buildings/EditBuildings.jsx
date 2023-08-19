@@ -1,15 +1,15 @@
+import { Backdrop, CircularProgress, Typography } from "@mui/material";
 import {
-  Backdrop,
-  CircularProgress,
-  Typography,
-} from "@mui/material";
-import { RenderComponent, validateForm } from "../../helpers/building.helper";
+  ErrorMap,
+  RenderComponent,
+  validateForm,
+} from "../../helpers/building.helper";
 import { useBuilding, useUpdateBuilding } from "../../hooks/Building.Hooks";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { GetUser } from "../../session/session";
 export default function EditBuilding() {
-  const { Id } = GetUser
+  const { Id } = GetUser;
   const withoutErrors = {
     code: { error: false },
     name: { error: false },
@@ -37,8 +37,8 @@ export default function EditBuilding() {
     name: "",
     floors: [
       {
-        code: ""
-      }
+        code: "",
+      },
     ],
     updatedBy: Id,
   });
@@ -51,6 +51,9 @@ export default function EditBuilding() {
     error: false,
     message: "",
   });
+  const isLoading = isLoadingBuilding || isLoadingUpdate;
+  const isError = isErrorBuilding || isErrorUpdate;
+
   //Llenado automatico del formulario
   useEffect(() => {
     if (!isLoadingBuilding) {
@@ -58,8 +61,7 @@ export default function EditBuilding() {
         ...form,
         code: building.code,
         name: building.name,
-        floors: building.floors
-
+        floors: building.floors,
       });
       setIsEdit(true);
     }
@@ -75,8 +77,7 @@ export default function EditBuilding() {
           onSuccess: (res) => {
             if (res.data.isSuccess) {
               setSuccessMessage(true);
-            }
-            else
+            } else
               setErrorMessage({
                 error: true,
                 message: ErrorMap(res.data.errorType),
@@ -90,6 +91,28 @@ export default function EditBuilding() {
       );
     }
   };
+  if (isLoading || isError || form.code == "")
+    return (
+      <Backdrop
+        open={true}
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        {isErrorBuilding || isErrorUpdate ? (
+          <Typography mb={"1.5%"} variant="h5" color="secondary">
+            Error de conexión con el servidor!
+          </Typography>
+        ) : (
+          <p></p>
+        )}
+        <CircularProgress size={100} />
+      </Backdrop>
+    );
   return (
     <>
       {
@@ -100,8 +123,8 @@ export default function EditBuilding() {
           form,
           setForm,
           formErrors,
-          withoutErrors,
           setFormErrors,
+          withoutErrors,
           successMessage,
           setSuccessMessage,
           errorMessage,
@@ -109,33 +132,6 @@ export default function EditBuilding() {
           isEdit
         )
       }
-      {/* Pantalla de carga */}
-      {isLoadingBuilding ||
-      isLoadingUpdate ||
-      isErrorBuilding ||
-      isErrorUpdate ? (
-        <Backdrop
-          open={true}
-          sx={{
-            color: "#fff",
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          {isErrorBuilding || isErrorUpdate ? (
-            <Typography mb={"1.5%"} variant="h5" color="secondary">
-              Error de conexión con el servidor!
-            </Typography>
-          ) : (
-            <p></p>
-          )}
-          <CircularProgress size={100} />
-        </Backdrop>
-      ) : (
-        <p />
-      )}
     </>
   );
 }

@@ -239,10 +239,10 @@ export default function ResetPasswordForm() {
         autoHideDuration={1500}
         onClose={() => handleSuccessMessage()}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        sx={{ mr: "5.5%" }}
+        sx={{ mr: "5.5%", mt: 2 }}
       >
         <Alert severity="success" sx={{ width: "100%" }}>
-          <Typography>La contraseña ha sido cambiada!</Typography>
+          <Typography>La contraseña se cambió!</Typography>
         </Alert>
       </Snackbar>
       {/* Mensaje de error */}

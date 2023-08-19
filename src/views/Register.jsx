@@ -28,12 +28,6 @@ const Img = styled("img")({
   width: "13%",
 });
 
-// const roles = [
-//   "C. Eléctrica",
-//   "C. Control",
-//   "C. Telecomunicaciones",
-//   "C.Tcnologías de la Información",
-// ];
 
 export default function AddUsers() {
   const withoutErrors = {
@@ -93,30 +87,6 @@ export default function AddUsers() {
     setSuccessMessage(false);
     navigate("/Ingresar");
   }
-
-
-  if (isLoading || isError)
-    return (
-      <Backdrop
-        open={true}
-        sx={{
-          color: "#fff",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
-      >
-        {isError ? (
-          <Typography mb={"1.5%"} variant="h5" color="secondary">
-            Error de conexión con el servidor!
-          </Typography>
-        ) : (
-          <p></p>
-        )}
-        <CircularProgress size={100} />
-      </Backdrop>
-    );
 
   return (
     <>
@@ -214,33 +184,6 @@ export default function AddUsers() {
               value={form.repPassword}
             />
           </FormControl>
-          {/* <FormControl size="small" fullWidth>
-            <CustomInputLabel id="role" error={formErrors.role.error}>
-              Rol
-            </CustomInputLabel>
-            <CustomSelect
-              labelId="role"
-              value={form.role}
-              label="Rol"
-              name="role"
-              onChange={(e) => handleForm(e)}
-              error={formErrors.role.error}
-            >
-              <MenuItem value={-1}></MenuItem>
-              {roles.map((role, index) => {
-                return (
-                  <MenuItem key={index} value={index + 1}>
-                    {role}
-                  </MenuItem>
-                );
-              })}
-            </CustomSelect>
-            {formErrors.role.error && (
-              <ErrorFormHelperText>
-                {formErrors.role.message}
-              </ErrorFormHelperText>
-            )}
-          </FormControl> */}
           <Button
             type="submit"
             variant="contained"
@@ -277,6 +220,29 @@ export default function AddUsers() {
           <Typography>{errorMessage.message}</Typography>
         </Alert>
       </Snackbar>
+      {isLoading || isError ? (
+        <Backdrop
+          open={true}
+          sx={{
+            color: "#fff",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          {isError ? (
+            <Typography mb={"1.5%"} variant="h5" color="secondary">
+              Error de conexión con el servidor!
+            </Typography>
+          ) : (
+            <p></p>
+          )}
+          <CircularProgress size={100} />
+        </Backdrop>
+      ) : (
+        <p />
+      )}
     </>
   );
 }

@@ -15,6 +15,9 @@ export default function AddSubject() {
     code: { error: false },
     name: { error: false },
     alias: { error: false },
+    numCredits: { error: false },
+    numHours: { error: false },
+    numSemester: { error: false },
   };
   const [isEdit] = useOutletContext(); //Informacion del padre
   const navigate = useNavigate(); //Navegador de la aplicacion
@@ -25,9 +28,9 @@ export default function AddSubject() {
     code: "",
     name: "",
     alias: "",
-    numHours: 1,
-    numCredits: 1,
-    numSemester: 1,
+    numHours: "",
+    numCredits: "",
+    numSemester: "",
     isLab: false,
     createdBy: Id,
   });

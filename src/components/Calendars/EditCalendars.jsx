@@ -49,6 +49,10 @@ export default function EditCalendars() {
     error: false,
     message: "",
   });
+
+  const isLoading = isLoadingCalendar || isLoadingUpdate;
+  const isError = isErrorCalendar || isErrorUpdate;
+
   //Llenado automatico del formulario
   useEffect(() => {
     if (!isLoadingCalendar) {
@@ -88,6 +92,28 @@ export default function EditCalendars() {
       );
     }
   };
+  if (isLoading || isError || form.period == "")
+    return (
+      <Backdrop
+        open={true}
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        {isErrorCalendar || isErrorUpdate ? (
+          <Typography mb={"1.5%"} variant="h5" color="secondary">
+            Error de conexión con el servidor!
+          </Typography>
+        ) : (
+          <p></p>
+        )}
+        <CircularProgress size={100} />
+      </Backdrop>
+    );
   return (
     <>
       {
@@ -112,33 +138,6 @@ export default function EditCalendars() {
           isEdit
         )
       }
-      {/* Pantalla de carga */}
-      {isLoadingCalendar ||
-      isLoadingUpdate ||
-      isErrorCalendar ||
-      isErrorUpdate ? (
-        <Backdrop
-          open={true}
-          sx={{
-            color: "#fff",
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          {isErrorCalendar || isErrorUpdate ? (
-            <Typography mb={"1.5%"} variant="h5" color="secondary">
-              Error de conexión con el servidor!
-            </Typography>
-          ) : (
-            <p></p>
-          )}
-          <CircularProgress size={100} />
-        </Backdrop>
-      ) : (
-        <p />
-      )}
     </>
   );
 }

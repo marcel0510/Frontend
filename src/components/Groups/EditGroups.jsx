@@ -7,6 +7,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useClassrooms } from "../../hooks/Classroom.Hooks";
+import { useSubjects } from "../../hooks/Subject.Hooks";
 import { useGroup, useUpdateGroup } from "../../hooks/Group.Hooks";
 import { GetUser } from "../../session/session";
 import dayjs from "dayjs";
@@ -193,7 +194,28 @@ export default function EditGroups() {
     setInitHours(iHours);
     setEndHours(eHours);
   };
-
+  if(isLoading || isError || isLoadUpdate || form.name == "")
+    return(
+      <Backdrop
+      open={true}
+      sx={{
+        color: "#fff",
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
+      {isError || errorUpdate ? (
+        <Typography mb={"1.5%"} variant="h5" color="secondary">
+          Error de conexión con el servidor!
+        </Typography>
+      ) : (
+        <p></p>
+      )}
+      <CircularProgress size={100} />
+    </Backdrop>
+    );
   return (
     <>
       {
@@ -224,30 +246,7 @@ export default function EditGroups() {
           isEdit
         )
       }
-      {/* Pantalla de carga */}
-      {isLoading || isError || isLoadUpdate ? (
-        <Backdrop
-          open={true}
-          sx={{
-            color: "#fff",
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          {isError || errorUpdate ? (
-            <Typography mb={"1.5%"} variant="h5" color="secondary">
-              Error de conexión con el servidor!
-            </Typography>
-          ) : (
-            <p></p>
-          )}
-          <CircularProgress size={100} />
-        </Backdrop>
-      ) : (
-        <p />
-      )}
+     
     </>
   );
-}
+} 

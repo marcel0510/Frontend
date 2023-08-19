@@ -13,7 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { TimeField } from "@mui/x-date-pickers";
+import { TimePicker } from "@mui/x-date-pickers";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -81,8 +81,11 @@ export const ErrorMap = (errorType, props) => {
       return `Ya existe un ${props.gr} para la materia ${props.subject} en el aula seleccionada`;
     case 2:
       return `Existe un cruce con el grupo ${props.name} de la materia ${props.subject}`;
+    case 3:
+      return "No se puede agregar un grupo el jueves de 11:00 - 13:00";
   }
 };
+
 const handleForm = (e, form, setForm, setFormErrors, withoutErrors) => {
   if (e.target.name === "name")
     setForm({ ...form, name: e.target.value.toUpperCase() });
@@ -300,7 +303,7 @@ export const RenderComponent = (
                   })
                 }
               />
-              <MenuItem value={0}></MenuItem>
+              <MenuItem value={""}></MenuItem>
               {subjects.map((subject, index) => {
                 return (
                   <MenuItem key={index} value={subject.id}>
@@ -349,7 +352,7 @@ export const RenderComponent = (
                   })
                 }
               />
-              <MenuItem value={0}></MenuItem>
+              <MenuItem value={""}></MenuItem>
               {classrooms.map((classroom, index) => {
                 return (
                   <MenuItem key={index} value={classroom.id}>
@@ -474,7 +477,7 @@ export const RenderComponent = (
                         )
                       }
                     >
-                      <MenuItem value={-1}></MenuItem>
+                      <MenuItem value={""}></MenuItem>
                       {days.map((day, index) => {
                         return (
                           <MenuItem key={index} value={index}>
@@ -486,9 +489,10 @@ export const RenderComponent = (
                   </FormControl>
 
                   {/* Hora de inicio de la sesion */}
-                  <TimeField
+                  <TimePicker
                     label="Hora de inicio"
                     sx={{ flex: 1 }}
+                    slotProps={{ textField: {size : "small"} }}
                     value={initHours[index]}
                     size="small"
                     onChange={(e) =>
@@ -506,9 +510,10 @@ export const RenderComponent = (
                   />
 
                   {/* Hora de fin de la sesion */}
-                  <TimeField
+                  <TimePicker
                     label="Hora de Fin"
                     sx={{ flex: 1 }}
+                    slotProps={{ textField: {size : "small"} }}
                     value={endHours[index]}
                     size="small"
                     onChange={(e) =>

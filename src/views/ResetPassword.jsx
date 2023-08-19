@@ -109,29 +109,6 @@ export default function ResetPassword() {
     navigate("/Main");
   }
 
-  if (isLoading || isError)
-    return (
-      <Backdrop
-        open={true}
-        sx={{
-          color: "#fff",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
-      >
-        {isError ? (
-          <Typography mb={"1.5%"} variant="h5" color="secondary">
-            Error de conexión con el servidor!
-          </Typography>
-        ) : (
-          <p></p>
-        )}
-        <CircularProgress size={100} />
-      </Backdrop>
-    );
-
   return (
     <Box
       sx={{
@@ -222,6 +199,29 @@ export default function ResetPassword() {
           <Typography>{errorMessage.message}</Typography>
         </Alert>
       </Snackbar>
+      {isLoading || isError ? (
+        <Backdrop
+          open={true}
+          sx={{
+            color: "#fff",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          {isError ? (
+            <Typography mb={"1.5%"} variant="h5" color="secondary">
+              Error de conexión con el servidor!
+            </Typography>
+          ) : (
+            <p></p>
+          )}
+          <CircularProgress size={100} />
+        </Backdrop>
+      ) : (
+        <p />
+      )}
     </Box>
   );
 }

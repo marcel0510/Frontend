@@ -27,7 +27,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { useSubjects } from "../../../hooks/Subject.Hooks";
 import { useBuildings } from "../../../hooks/Building.Hooks";
 import { useEffect, useRef, useState } from "react";
-import { TimeField } from "@mui/x-date-pickers";
+import { TimeField, TimePicker } from "@mui/x-date-pickers";
 import { GetTime } from "../../../helpers/date.helper";
 import dayjs from "dayjs";
 import { useClassrooms } from "../../../hooks/Classroom.Hooks";
@@ -63,7 +63,7 @@ export default function GroupAlgorithmForm() {
   const [classrooms, setClassrooms] = useState([]);
   const [form, setForm] = useState({
     nameGr: "",
-    subjectId: 0,
+    subjectId: "",
     subjectCode: "",
     subjectName: "",
     subjectAlias: "",
@@ -71,7 +71,7 @@ export default function GroupAlgorithmForm() {
     nameLab: "",
     sessions: [
       {
-        day: -1,
+        day: "",
         startTime: "07:00",
         endTime: "09:00",
       },
@@ -381,7 +381,7 @@ export default function GroupAlgorithmForm() {
                     })
                   }
                 />
-                <MenuItem value={0}></MenuItem>
+                <MenuItem value={""}></MenuItem>
                 {subjects.map((subject, index) => {
                   return (
                     <MenuItem key={index} value={subject.id}>
@@ -535,18 +535,20 @@ export default function GroupAlgorithmForm() {
                     </FormControl>
 
                     {/* Hora de inicio */}
-                    <TimeField
+                    <TimePicker
                       label="Hora de inicio"
                       sx={{ flex: 3 }}
+                      slotProps={{ textField: { size: "small" } }}
                       value={initHours[index]}
                       size="small"
                       onChange={(e) => handleSessionsChangeInit(index, e)}
                     />
 
                     {/* Hora de fin */}
-                    <TimeField
+                    <TimePicker
                       label="Hora de Fin"
                       sx={{ flex: 3 }}
+                      slotProps={{ textField: { size: "small" } }}
                       value={endHours[index]}
                       size="small"
                       onChange={(e) => handleSessionsChangeEnd(index, e)}

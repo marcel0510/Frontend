@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { CustomGrid } from "../Styles/Styled";
+import { CustomGrid, ErrorFormHelperText } from "../Styles/Styled";
 import { alpha, alphaNumeric } from "./regularExpressions.helper";
 
 export const validateForm = (form, setFormErrors) => {
@@ -64,7 +64,6 @@ const handleForm = (e, form, setForm, setFormError, withoutErrors) => {
   if (e.target.name === "code" || e.target.name === "floors")
     setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
   else setForm({ ...form, [e.target.name]: e.target.value });
-
   setFormError(withoutErrors);
 };
 const handleAddFloors = (form, setForm, setFormErrors, withoutErrors) => {
@@ -102,6 +101,7 @@ const handleFloorsChange = (
   setForm({ ...form, floors: updatedFloors });
   setFormErrors(withoutErrors);
 };
+
 const handleSuccessMessage = (setSuccessMessage, navigate) => {
   setSuccessMessage(false);
   navigate("/Main/Edificios/Ver");
@@ -118,7 +118,7 @@ export const RenderComponent = (
   setSuccessMessage,
   errorMessage,
   setErrorMessage,
-  isEdit,
+  isEdit
 ) => {
   return (
     // Contenedor
@@ -159,7 +159,9 @@ export const RenderComponent = (
             name="code"
             variant="outlined"
             inputProps={{ maxLength: 3, style: { textTransform: "uppercase" } }}
-            onKeyDown={e => { if(!alphaNumeric.test(e.key)) e.preventDefault() }}
+            onKeyDown={(e) => {
+              if (!alphaNumeric.test(e.key)) e.preventDefault();
+            }}
             onChange={(e) =>
               handleForm(e, form, setForm, setFormErrors, withoutErrors)
             }
@@ -179,7 +181,9 @@ export const RenderComponent = (
             label="Nombre del Edificio"
             variant="outlined"
             inputProps={{ maxLength: 40 }}
-            onKeyDown={e => { if(!alpha.test(e.key)) e.preventDefault() }}
+            onKeyDown={(e) => {
+              if (!alpha.test(e.key)) e.preventDefault();
+            }}
             onChange={(e) =>
               handleForm(e, form, setForm, setFormErrors, withoutErrors)
             }
@@ -231,11 +235,13 @@ export const RenderComponent = (
                 md={5.9}
               >
                 <TextField
-                  label={"Piso " + (index + 1)}
+                  label={"Piso"}
                   variant="outlined"
                   size="small"
                   inputProps={{ maxLength: 3 }}
-                  onKeyDown={e => {if(!alphaNumeric.test(e.key)) e.preventDefault()}}
+                  onKeyDown={(e) => {
+                    if (!alphaNumeric.test(e.key)) e.preventDefault();
+                  }}
                   onChange={(e) =>
                     handleFloorsChange(
                       index,
@@ -269,9 +275,13 @@ export const RenderComponent = (
             );
           })}
         </CustomGrid>
-        {formErrors.floors.error && (
-          <FormHelperText sx={{ color: "#d62f36" }}>
+        {formErrors.floors.error ? (
+          <ErrorFormHelperText error={formErrors.floors.error}>
             {formErrors.floors.message}
+          </ErrorFormHelperText>
+        ) : (
+          <FormHelperText>
+            Agregue los códigos de los pisos: Ej: PB, P1, ...
           </FormHelperText>
         )}
 
@@ -289,9 +299,7 @@ export const RenderComponent = (
       <Snackbar
         open={successMessage}
         autoHideDuration={1500}
-        onClose={() =>
-          handleSuccessMessage(setSuccessMessage, navigate)
-        }
+        onClose={() => handleSuccessMessage(setSuccessMessage, navigate)}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         sx={{ mt: "5%", mr: "5.5%" }}
       >

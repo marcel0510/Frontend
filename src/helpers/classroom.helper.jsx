@@ -16,7 +16,7 @@ import {
   CustomSelect,
   ErrorFormHelperText,
 } from "../Styles/Styled";
-import { alpha } from "../helpers/regularExpressions.helper";
+import { alpha, alphaNumeric } from "../helpers/regularExpressions.helper";
 
 
 export const validateForm = (form, setFormErrors) => {
@@ -142,7 +142,7 @@ export const RenderComponent = (
                 handleForm(e, form, setForm, setFormErrors, withoutErrors)
               }
             >
-              <MenuItem value={0}></MenuItem>
+              <MenuItem value={""}></MenuItem>
               {buildings.map((building, index) => {
                 return (
                   <MenuItem key={index} value={building.id}>
@@ -173,7 +173,7 @@ export const RenderComponent = (
                 handleForm(e, form, setForm, setFormErrors, withoutErrors)
               }
             >
-              {form.buildingId === 0 ? (
+              {form.buildingId === "" ? (
                 <MenuItem value={""}></MenuItem>
               ) : (
                 buildings[

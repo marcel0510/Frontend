@@ -98,7 +98,7 @@ export default function Groups() {
         sx={{ mt: "5%", mr: "3%" }}
       >
         <Alert severity="success" sx={{ width: "100%" }}>
-          <Typography>{"El edificio se eliminó correctamente!"}</Typography>
+          <Typography>{"El grupo se eliminó correctamente!"}</Typography>
         </Alert>
       </Snackbar>
       <Snackbar

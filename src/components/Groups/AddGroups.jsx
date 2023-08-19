@@ -46,12 +46,12 @@ export default function AddGroups() {
   const [endHours, setEndHours] = useState([dayjs("0000/00/00T09:00")]);
   const [form, setForm] = useState({
     name: "",
-    subjectId: 0,
-    classroomId: 0,
+    subjectId: "",
+    classroomId: "",
     calendarId: 0,
     sessions: [
       {
-        day: -1,
+        day: "",
         startTime: "07:00",
         endTime: "09:00",
       },
@@ -113,7 +113,7 @@ export default function AddGroups() {
                   error: true,
                   message: ErrorMap(res.data.errorType, { ...currentGroup }),
                 });
-              } else {
+              } else if(res.data.errorType == 1) {
                 const gr = form.name;
                 const subject = subjects.find((s) => s.id == form.subjectId)[
                   "name"
@@ -124,6 +124,11 @@ export default function AddGroups() {
                     gr: gr,
                     subject: subject,
                   }),
+                });
+              }else{
+                setErrorMessage({
+                  error: true,
+                  message: ErrorMap(res.data.errorType),
                 });
               }
             }

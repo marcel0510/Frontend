@@ -31,6 +31,9 @@ export const GetToday = (addMonth = 0) => {
     let month = fecha.getMonth() + 1 + addMonth;
     const year = fecha.getFullYear();
 
+    if(month > 12)
+        month = month - 12;
+
     if(day < 10)
         day = "0"+day;
     if(month < 10)

@@ -57,6 +57,7 @@ export default function EditClassrooms() {
   const isError = isErrorClassroom || isErrorBuilding;
 
   useEffect(() => {
+
     if (!isLoadingClassroom) {
       setForm({
         ...form,
@@ -93,7 +94,7 @@ export default function EditClassrooms() {
       );
     }
   };
-  if (isLoading || isError || isLoadingUpdate || isErrorUpdate)
+  if (isLoading || isError || isLoadingUpdate || isErrorUpdate || form.buildingId == 0)
     return (
       <Backdrop
         open={true}
@@ -116,6 +117,7 @@ export default function EditClassrooms() {
       </Backdrop>
     );
 
+    // return <>Hola</>
   return (
     <>
       {

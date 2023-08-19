@@ -14,7 +14,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 export default function Subject() {
   const navigate = useNavigate();
   const [isEdit, setIsEdit] = useState(false);
-  const [isSee, setIsSee] = useState(true);
+  const [isSee, setIsSee] = useState(false);
   const [filter, setFilter] = useState({
     code: "",
     name: "",

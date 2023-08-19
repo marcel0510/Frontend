@@ -119,7 +119,7 @@ export default function EditUsers() {
     else navigate("/Main/Usuarios/Ver")
   };
 
-  if (isLoading || isError)
+  if (isLoading || isError || form.role == -1)
     return (
       <Backdrop
         open={true}

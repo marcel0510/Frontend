@@ -5,14 +5,16 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
+  MenuItem,
   Paper,
   Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
 import { alpha, alphaNumeric } from "./regularExpressions.helper";
+import { CustomInputLabel, CustomSelect, ErrorFormHelperText } from "../Styles/Styled";
 export const validateForm = (form, setFormErrors, alias) => {
-  const errors = { code: {}, name: {}, alias: {} };
+  const errors = { code: {}, name: {}, alias: {}, numHours: {} };
   var validate = true;
   if (form.code === "") {
     errors["code"]["error"] = true;
@@ -22,6 +24,11 @@ export const validateForm = (form, setFormErrors, alias) => {
   if (form.name === "") {
     errors["name"]["error"] = true;
     errors["name"]["message"] = "No puede dejar este campo vacío";
+    validate = false;
+  }
+  if(form.numHours === ""){
+    errors["numHours"]["error"] = true;
+    errors["numHours"]["message"] = "Debe seleccionar un numero de horas";
     validate = false;
   }
   if (alias && form.alias === "") {
@@ -50,11 +57,10 @@ const handleForm = (e, form, setForm, setFormErrors, withtoutErrors) => {
     setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
   } else {
     if (e.target.name === "numCredits") {
-      if (parseInt(e.target.value) >= 1 && parseInt(e.target.value) <= 3)
+      if (parseInt(e.target.value) >= 1 && parseInt(e.target.value) <= 5)
         setForm({ ...form, [e.target.name]: parseInt(e.target.value) });
     }
     if (e.target.name === "numHours") {
-      if (parseInt(e.target.value) >= 1 && parseInt(e.target.value) <= 5)
         setForm({ ...form, [e.target.name]: parseInt(e.target.value) });
     }
     if (e.target.name === "numSemester") {
@@ -176,52 +182,97 @@ export const RenderComponent = (
         {/* Segunda fila */}
         <Box sx={{ width: "100%", display: "flex", gap: 2, mt: 2.5 }}>
           {/* Creditos */}
-          <FormControl sx={{ flex: 1 }}>
-            <TextField
-              size="small"
-              label="Número de créditos"
-              name="numCredits"
-              variant="outlined"
-              inputProps={{
-                type: "number",
-              }}
-              onChange={(e) =>
-                handleForm(e, form, setForm, setFormErrors, withoutErrors)
-              }
+          <FormControl size="small" sx={{ flex: 0.9 }}>
+            <CustomInputLabel id="numHoras" error={formErrors.numCredits.error}>
+            Número de créditos
+            </CustomInputLabel>
+            <CustomSelect
+              labelId="numHoras"
               value={form.numCredits}
-            />
-          </FormControl>
-
-          {/* Campo de horas */}
-          <FormControl sx={{ flex: 1 }}>
-            <TextField
-              name="numHours"
-              size="small"
-              label="Número de horas"
-              variant="outlined"
-              inputProps={{ type: "number" }}
+              label="Num. Creditos"
+              name="numCredits"
+              error={formErrors.numCredits.error}
               onChange={(e) =>
                 handleForm(e, form, setForm, setFormErrors, withoutErrors)
               }
+            >
+              <MenuItem value={""}></MenuItem>
+              <MenuItem value={0}>0</MenuItem>
+              <MenuItem value={1}>1</MenuItem>
+              <MenuItem value={2}>2</MenuItem>
+              <MenuItem value={3}>3</MenuItem>
+              <MenuItem value={4}>4</MenuItem>
+              <MenuItem value={5}>5</MenuItem>
+              
+            </CustomSelect>
+            {formErrors.numCredits.error && (
+              <ErrorFormHelperText error={formErrors.numCredits.error}>
+                {formErrors.numCredits.message}
+              </ErrorFormHelperText>
+            )}
+          </FormControl>
+
+          {/* Horas */}
+          <FormControl size="small" sx={{ flex: 0.6 }}>
+            <CustomInputLabel id="numHoras" error={formErrors.numHours.error}>
+              Horas
+            </CustomInputLabel>
+            <CustomSelect
+              labelId="numHoras"
               value={form.numHours}
-            />
-          </FormControl>
-
-          {/* Campo de Semestre */}
-          <FormControl sx={{ flex: 1 }}>
-            <TextField
-              name="numSemester"
-              size="small"
-              label="Número de semestre"
-              variant="outlined"
-              inputProps={{ type: "number" }}
+              label="Num. Horas"
+              name="numHours"
+              error={formErrors.numHours.error}
               onChange={(e) =>
                 handleForm(e, form, setForm, setFormErrors, withoutErrors)
               }
-              value={form.numSemester}
-            />
+            >
+              <MenuItem value={""}></MenuItem>
+              <MenuItem value={48}>48</MenuItem>
+              <MenuItem value={96}>96</MenuItem>
+              <MenuItem value={144}>144</MenuItem>
+              <MenuItem value={240}>240</MenuItem>
+              
+            </CustomSelect>
+            {formErrors.numHours.error && (
+              <ErrorFormHelperText error={formErrors.numHours.error}>
+                {formErrors.numHours.message}
+              </ErrorFormHelperText>
+            )}
           </FormControl>
-
+          {/* Num semestre */}
+          <FormControl size="small" sx={{ flex: 0.9 }}>
+            <CustomInputLabel id="numHoras" error={formErrors.numSemester.error}>
+            Número de créditos
+            </CustomInputLabel>
+            <CustomSelect
+              labelId="numHoras"
+              value={form.numSemester}
+              label="Num. Creditos"
+              name="numSemester"
+              error={formErrors.numSemester.error}
+              onChange={(e) =>
+                handleForm(e, form, setForm, setFormErrors, withoutErrors)
+              }
+            >
+              <MenuItem value={""}></MenuItem>
+              <MenuItem value={1}>1</MenuItem>
+              <MenuItem value={2}>2</MenuItem>
+              <MenuItem value={3}>3</MenuItem>
+              <MenuItem value={4}>4</MenuItem>
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={6}>6</MenuItem>
+              <MenuItem value={7}>7</MenuItem>
+              <MenuItem value={8}>8</MenuItem>
+              <MenuItem value={9}>9</MenuItem>
+              
+            </CustomSelect>
+            {formErrors.numSemester.error && (
+              <ErrorFormHelperText error={formErrors.numSemester.error}>
+                {formErrors.numSemester.message}
+              </ErrorFormHelperText>
+            )}
+          </FormControl>
           <Box sx={{ flex: 0.6 }} />
         </Box>
         {/* Tercera Fila */}
@@ -267,7 +318,7 @@ export const RenderComponent = (
                 handleForm(e, form, setForm, setFormErrors, withoutErrors)
               }
               error={formErrors.alias.error}
-              helperText={formErrors.alias.message}
+              helperText={ formErrors.alias.error ? formErrors.alias.message : "Nombre corto. Ej: LAN"}
               value={form.alias}
             />
           )}

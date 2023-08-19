@@ -31,7 +31,7 @@ export default function AddClassrooms() {
     name: "",
     capacity: 10,
     floor: "",
-    buildingId: 0,
+    buildingId: "",
     createdBy: Id,
   });
   const [formErrors, setFormErrors] = useState(withoutErrors);

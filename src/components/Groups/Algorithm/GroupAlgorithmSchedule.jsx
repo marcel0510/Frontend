@@ -60,9 +60,45 @@ export default function () {
     add(
       {...newAddGroup},
       {
-        onSuccess: () => {
-          setSuccessMessage(true);
-        }
+        onSuccess: (res) => {
+          if (res.data.isSuccess) {
+            setSuccessMessage(true);
+          }
+          else {
+            if (res.data.errorType == 2) {
+              const currectGroups = classrooms.find(
+                (c) => c.id === form.classroomId
+              )["groups"];
+              const currentGroup = currectGroups.find(
+                (g) => g.id === res.data.overlappingGrs[0]
+              );
+              setErrorMessage({
+                error: true,
+                message: ErrorMap(res.data.errorType, { ...currentGroup }),
+              });
+            } else if(res.data.errorType == 1) {
+              const gr = form.name;
+              const subject = subjects.find((s) => s.id == form.subjectId)[
+                "name"
+              ];
+              setErrorMessage({
+                error: true,
+                message: ErrorMap(res.data.errorType, {
+                  gr: gr,
+                  subject: subject,
+                }),
+              });
+            }else{
+              setErrorMessage({
+                error: true,
+                message: ErrorMap(res.data.errorType),
+              });
+            }
+          }
+        },
+        onError: (error) => {
+          setErrorMessage({ error: true, message: error.message });
+        },
       }
     )
 

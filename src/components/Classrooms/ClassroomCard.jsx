@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import SchoolIcon from "@mui/icons-material/School";
 import { useNavigate } from "react-router-dom";
-import { useDeleteSubject } from "../../hooks/Subject.Hooks";
+import { useDeleteClassroom } from "../../hooks/Classroom.Hooks";
 import { useState } from "react";
 import { ErrorMap } from "../../helpers/subject.helper";
 import { GetUser } from "../../session/session";
@@ -25,7 +25,7 @@ export default function ClassroomCard({
 }) {
   const { Id } = GetUser();
   const navigate = useNavigate();
-  const { mutate: drop, isLoading, isError } = useDeleteSubject();
+  const { mutate: drop, isLoading, isError } = useDeleteClassroom();
   const [modal, setModal] = useState({
     isOpen: false,
     id: 0,
@@ -104,7 +104,13 @@ export default function ClassroomCard({
               >
                 Editar
               </Button>
-              <Button variant="outlined" color="secondary">
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() =>
+                  setModal({ ...modal, isOpen: true, id: classroom.id })
+                }
+              >
                 Eliminar
               </Button>
             </>
@@ -129,10 +135,10 @@ export default function ClassroomCard({
           </Typography>
           <Divider />
           <Typography mt={1} mb={2}>
-            ¿Esta seguro de que desea eliminar esta materia?
+            ¿Esta seguro de que desea eliminar esta aula?
             <Typography color={"secondary"}>
               {" "}
-              Todos los grupos relaciondas con esta materia también se
+              Todos los grupos relaciondas con esta aula también se
               eliminarán
             </Typography>
           </Typography>

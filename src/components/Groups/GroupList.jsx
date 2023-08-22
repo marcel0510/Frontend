@@ -21,14 +21,14 @@ export default function GroupList(){
         onClick={() => navigate("/Main/Grupos/Agregar")}
       >
         <LibraryAddIcon fontSize="small" sx={{ marginRight: "5%" }} />
-        <Typography variant="body2">Agregar grupo manual</Typography>
+        <Typography variant="body2">Agregar grupo</Typography>
       </ListItemButton>
       <ListItemButton
         sx={{ padding: 0, ml: 4 }}
         onClick={() => navigate("/Main/Grupos/Algoritmo/Parametros")}
       >
         <QueuePlayNextIcon fontSize="small" sx={{ marginRight: "5%" }} />
-        <Typography variant="body2">Agregar grupo automático</Typography>
+        <Typography variant="body2">Usar algoritmo</Typography>
       </ListItemButton>
     </Grid>
   );

@@ -76,7 +76,7 @@ export default function ClassroomAlgorithmResults() {
                   "/" +
                   classroom.code}
               </Typography>
-              {classroom.disponibility.split(",").filter(d => d !== "").map((disp, index) => {
+              {classroom.disponibility.map((disp, index) => {
                 return(
                   <Paper
                     key={index}

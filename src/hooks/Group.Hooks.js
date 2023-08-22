@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { GetGroups, GetGroup, AddGroup, UpdateGroup, DeleteGroup} from '../providers/Group.Provider'
 
-export const useGroups = () => {
-    return useQuery(['GetGroups'], GetGroups)
+export const useGroups = (id) => {
+    return useQuery(['GetGroups', id], () => GetGroups(id))
 }
 
 export const useGroup = (id) => {

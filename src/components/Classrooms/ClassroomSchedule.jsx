@@ -157,7 +157,7 @@ export default function ClassroomSchedule() {
                           backgroundColor: group.color
                         }}
                       >
-                        <Typography variant="body2" align="center">
+                        <Typography variant="body2" align="center" sx={{ fontWeight: 450 }}>
                           {group.gr + " - " + group.code}
                         </Typography>
                         <Typography variant="body2" align="center">

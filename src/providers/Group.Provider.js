@@ -8,13 +8,13 @@ const GroupProviderHandler = axios.create({
     baseURL: `https://${IP}:7130/api/Group`,
 })
 
-export const GetGroups = async () => {
-    const response = await GroupProviderHandler.get('/');
+export const GetGroups = async (id) => {
+    const response = await GroupProviderHandler.get(`/${id}`);
     return response.data;
 }
 
 export const GetGroup = async (id) => {
-    const response = await GroupProviderHandler.get(`/${id}`);
+    const response = await GroupProviderHandler.get(`/get/${id}`);
     return response.data;
 }
 

@@ -14,7 +14,7 @@ export default function Classrooms() {
   const [ , , setIsSee, filter, setFilter] = useOutletContext();
   const { fil } = useParams();
   const isInitialMount = useRef(true);
-  const { data, isLoading, isError } = useClassrooms();
+  const { data, isLoading, isError, isFetching } = useClassrooms();
   const [classrooms, setClassrooms] = useState([]);
   const [successMessage, setSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState({
@@ -53,7 +53,7 @@ export default function Classrooms() {
     else if (!isLoading) setClassrooms(data.reverse());
   };
 
-  if (isLoading || isError)
+  if (isLoading || isError || isFetching)
     return (
       <Backdrop
         open={true}
@@ -78,7 +78,7 @@ export default function Classrooms() {
   return (
     <>
       <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
-        {classrooms.map((classroom, index) => {
+        {classrooms.slice(0,36).map((classroom, index) => {
           return (
             <Grid item key={index} md={3.9} marginBottom={"1.3%"}>
               <ClassroomCard

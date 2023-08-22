@@ -1,6 +1,7 @@
 import {
   Alert,
   Backdrop,
+  Box,
   CircularProgress,
   Grid,
   Snackbar,
@@ -10,12 +11,14 @@ import { useGroups } from "../../hooks/Group.Hooks";
 import GroupCard from "./GroupCard";
 import { useEffect, useRef, useState } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
+
 export default function Groups() {
-  const [calendar, , , , , setIsSee, filter, setFilter] = useOutletContext();
+  const [calendar, , , , , setIsSee, filter, setFilter, doFilter] = useOutletContext();
   const { fil } = useParams();
   const isInitialMount = useRef(true);
-  const { data, isLoading, isError } = useGroups();
+  const { data, isLoading, isError, isFetching } = useGroups(calendar);
   const [groups, setGroups] = useState([]);
+  const [loadFilter, setLoadFilter] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState({
     error: false,
@@ -26,12 +29,12 @@ export default function Groups() {
       isInitialMount.current = false;
       setFilter({ ...filter, code: fil });
     }
-    filterData();
+    filterData(filter);
     setIsSee(true);
     return () => setIsSee(false);
   }, [filter, isLoading, calendar, data]);
 
-  const filterData = () => {
+  const filterData = (filter) => {
     if (filter.name !== "" && filter.code === "")
       setGroups(
         data
@@ -51,9 +54,10 @@ export default function Groups() {
           .reverse()
       );
     else if (!isLoading)
-      setGroups(data.filter((g) => g.calendar.id == calendar).reverse());
+      setGroups(data);
   };
-  if (isLoading || isError)
+
+  if (isLoading || isError || isFetching)
     return (
       <Backdrop
         open={true}
@@ -72,24 +76,30 @@ export default function Groups() {
         ) : (
           <p></p>
         )}
-        <CircularProgress size={100} />
+        <CircularProgress size={100} thickness={4} />
       </Backdrop>
     );
   return (
     <>
-      <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
-        {groups.reverse().map((group, index) => {
-          return (
-            <Grid item key={index} md={3.7} marginBottom={"1.3%"}>
-              <GroupCard
-                group={group}
-                setSuccessMessage={setSuccessMessage}
-                setErrorMessage={setErrorMessage}
-              />
-            </Grid>
-          );
-        })}
-      </Grid>
+      {loadFilter ? (
+        <Box sx={{ width: "100%", display: "flex", justifyContent: "center", mt: 25 }}>
+          <CircularProgress size={100} />
+        </Box>
+      ) : (
+        <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
+          {groups.slice(0, 35).reverse().map((group, index) => {
+            return (
+              <Grid item key={index} md={3.7} marginBottom={"1.3%"}>
+                <GroupCard
+                  group={group}
+                  setSuccessMessage={setSuccessMessage}
+                  setErrorMessage={setErrorMessage}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
+      )}
       <Snackbar
         open={successMessage}
         autoHideDuration={1500}

@@ -2,6 +2,7 @@ import TableViewIcon from "@mui/icons-material/TableView";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Box,
+  Button,
   Divider,
   IconButton,
   Paper,
@@ -19,11 +20,13 @@ export default function Group() {
     code: "",
     name: "",
   });
+  const [doFilter, setDoFilter] = useState(false)
   const editButtonHandle = () => {
     setIsEdit(false);
     setIsSee(true);
     navigate("/Main/Grupos/Ver");
   };
+
   return (
     <>
       <Paper
@@ -99,7 +102,8 @@ export default function Group() {
           setIsEdit,
           setIsSee,
           filter,
-          setFilter
+          setFilter,
+          doFilter
         ]}
       />
     </>

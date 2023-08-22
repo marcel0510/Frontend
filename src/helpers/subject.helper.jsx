@@ -182,9 +182,9 @@ export const RenderComponent = (
         {/* Segunda fila */}
         <Box sx={{ width: "100%", display: "flex", gap: 2, mt: 2.5 }}>
           {/* Creditos */}
-          <FormControl size="small" sx={{ flex: 0.9 }}>
+          <FormControl size="small" sx={{ flex: 1.2 }}>
             <CustomInputLabel id="numHoras" error={formErrors.numCredits.error}>
-            Número de créditos
+            Núm. de créditos
             </CustomInputLabel>
             <CustomSelect
               labelId="numHoras"
@@ -241,9 +241,9 @@ export const RenderComponent = (
             )}
           </FormControl>
           {/* Num semestre */}
-          <FormControl size="small" sx={{ flex: 0.9 }}>
+          <FormControl size="small" sx={{ flex: 1.2 }}>
             <CustomInputLabel id="numHoras" error={formErrors.numSemester.error}>
-            Número de créditos
+            Núm. de Semestre
             </CustomInputLabel>
             <CustomSelect
               labelId="numHoras"

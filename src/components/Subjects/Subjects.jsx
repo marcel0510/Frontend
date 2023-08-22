@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 export default function Subjects() {
   const [ , , setIsSee, filter] = useOutletContext();
-  const { data, isLoading, isError } = useSubjects();
+  const { data, isLoading, isError, isFetching } = useSubjects();
   const [subjects, setSubjects] = useState([]);
   const [successMessage, setSuccessMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState({
@@ -47,7 +47,7 @@ export default function Subjects() {
     else if (!isLoading) setSubjects(data.reverse());
   };
 
-  if (isLoading || isError)
+  if (isLoading || isError || isFetching)
     return (
       <Backdrop
         open={true}
@@ -73,7 +73,7 @@ export default function Subjects() {
   return (
     <>
       <Grid container sx={{ marginTop: "1.5%", width: "100%", gap: "1%" }}>
-        {subjects.map((subject, index) => {
+        {subjects.slice(0, 36).map((subject, index) => {
           return (
             <Grid item key={index} md={3.9} marginBottom={"1.3%"}>
               <SubjectCard

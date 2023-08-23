@@ -11,6 +11,7 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useClassroom } from "../../../hooks/Classroom.Hooks";
 import { useAddGroup } from "../../../hooks/Group.Hooks";
+import { ErrorMap } from "../../../helpers/group.helper";
 
 const color1 = "rgba(18, 255, 27, 0.5)";
 const color2 = "rgba(0, 150, 255, 0.4)";
@@ -40,6 +41,10 @@ export default function () {
   const { mutate: add, isLoading: isLoadAdd, isError: isErrorAdd } = useAddGroup();
   const [render, setRender] = useState(0);
   const [successMessage, setSuccessMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState({
+    error: false,
+    message: "",
+  });
   const Header = ["Hora", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
   const Schedule = new Array(13).fill(0).map(() => new Array(6).fill("")); // 13 filas y 6 columnas (horas y días)
 
@@ -294,6 +299,19 @@ export default function () {
           </Typography>
         </Alert>
       </Snackbar>
+      {/* Mensaje de error */}
+      <Snackbar
+        open={errorMessage.error}
+        autoHideDuration={4000}
+        onClose={() => setErrorMessage({ ...errorMessage, error: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        sx={{ mt: "5%", mr: "1%" }}
+      >
+        <Alert severity="error" sx={{ width: "100%" }}>
+          <Typography>{errorMessage.message}</Typography>
+        </Alert>
+      </Snackbar>
+
     </>
   );
 }

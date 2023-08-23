@@ -31,6 +31,7 @@ import { TimeField, TimePicker } from "@mui/x-date-pickers";
 import { GetTime } from "../../../helpers/date.helper";
 import dayjs from "dayjs";
 import { useClassrooms } from "../../../hooks/Classroom.Hooks";
+import { ValidateForm } from "../../../helpers/group.helper";
 
 export default function GroupAlgorithmForm() {
   const navigate = useNavigate();
@@ -198,6 +199,7 @@ export default function GroupAlgorithmForm() {
     setEndHours([...updatedEndHours]);
     setFormErrors(withoutErrors);
   };
+
   const validateForm = () => {
     const errors = {
       nameGr: {},
@@ -209,12 +211,38 @@ export default function GroupAlgorithmForm() {
     var validate = true;
     var validateSession1 = true;
     var validateSession2 = true;
+    var validateSession3 = true;
+    var validateSession4 = true;
+    var validateSession5 = true;
+    var validateSession6 = true;
+    var validateSession7 = true;
+
     form.sessions.forEach((s) => {
-      if (s.day == -1 || s.startTime == "" || s.endTime == "") {
+      const stime = parseInt(s.startTime.split(":")[0], 10);
+      const etime = parseInt(s.endTime.split(":")[0], 10);
+      if (s.day === "" || s.startTime == "" || s.endTime == "") {
         validateSession1 = false;
       }
       if (s.startTime === s.endTime) {
         validateSession2 = false;
+      }
+      if (stime > etime) {
+        validateSession3 = false;
+      }
+      if (stime > 20 || etime > 20 || stime < 7 || etime < 7) {
+        validateSession4 = false;
+      }
+      if (etime - stime > 3) {
+        validateSession5 = false;
+      }
+      if (
+        (stime == 11 || stime == 12 || etime == 12 || etime == 13) &&
+        s.day == 3
+      ) {
+        validateSession6 = false;
+      }
+      if (stime == 13 || etime == 14) {
+        validateSession7 = false;
       }
     });
     if (form.nameGr === "") {
@@ -241,6 +269,37 @@ export default function GroupAlgorithmForm() {
         "La hora de inicio no puede ser igual a la hora de fin";
       validate = false;
     }
+    if (!validateSession3) {
+      errors["sessions"]["error"] = true;
+      errors["sessions"]["message"] =
+        "La hora de inicio no puede ser despues de la hora de fin";
+      validate = false;
+    }
+    if (!validateSession4) {
+      errors["sessions"]["error"] = true;
+      errors["sessions"]["message"] =
+        "No puede poner una hora antes de las 07:00 o despues de a 20:00";
+      validate = false;
+    }
+    if (!validateSession5) {
+      errors["sessions"]["error"] = true;
+      errors["sessions"]["message"] =
+        "Solo se puede agregar sesiones de hasta 3 horas";
+      validate = false;
+    }
+    if (!validateSession6) {
+      errors["sessions"]["error"] = true;
+      errors["sessions"]["message"] =
+        "No se puede agregar un grupo el jueves de 11:00 a 13:00";
+      validate = false;
+    }
+    if (!validateSession7) {
+      errors["sessions"]["error"] = true;
+      errors["sessions"]["message"] =
+        "No se puede agregar un grupo durante el almuerzo";
+      validate = false;
+    }
+
     if (validate) return true;
     else {
       setFormErrors(errors);

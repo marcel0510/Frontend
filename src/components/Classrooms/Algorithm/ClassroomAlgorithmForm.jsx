@@ -64,7 +64,7 @@ export default function ClassroomAlgorithmForm() {
     };
     var validate = true;
 
-    if (form.day === -1) {
+    if (form.day === "") {
       errors["day"]["error"] = true;
       errors["day"]["message"] = "Debe seleccionar un día";
       validate = false;
@@ -81,7 +81,7 @@ export default function ClassroomAlgorithmForm() {
       errors["floor"]["message"] = "Debe seleccionar un piso";
       validate = false;
     }
-    if (form.morning == -1) {
+    if (form.morning == "") {
       errors["morning"]["error"] = true;
       errors["morning"]["message"] = "Debe seleccionar un periodo";
       validate = false;

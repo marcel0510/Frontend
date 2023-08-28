@@ -164,6 +164,8 @@ export default function AddGroups() {
       setClassrooms(
         classroomsData.filter((c) => {
           const code = c.building.code + "/" + c.floor + "/" + c.code;
+          if(c.isLab)
+            return code.includes(filters.classroomCode) || c.name.includes(filters.classroomCode);
           return code.includes(filters.classroomCode);
         })
       );

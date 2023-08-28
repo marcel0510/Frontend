@@ -37,7 +37,10 @@ export default function Login() {
     message: "",
   });
   const [successMessage, setSuccessMessage] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState({
+    error: false,
+    message: ""
+  });
 
   useEffect(() => {
     if (localStorage.getItem("user")) {
@@ -57,9 +60,14 @@ export default function Login() {
             delete data.isSuccess;
             data.currentTime = Date.now();
             localStorage.setItem("user", JSON.stringify(data));
+            console.log(data);
             setSuccessMessage(true);
           } else {
-            setErrorMessage(true);
+            if(data.errorType == 1)
+              setErrorMessage({ ...errorMessage, error: true, message: "La contraseña que has ingresado no es correcta" });
+            else
+              setErrorMessage({ ...errorMessage, error: true, message: "La cuenta asociada a este correo electrónico no se encuentra registrada" });
+
           }
         },
       });
@@ -133,13 +141,13 @@ export default function Login() {
       <Img src={logo} />
 
       <Snackbar
-        open={errorMessage}
+        open={errorMessage.error}
         autoHideDuration={1500}
         onClose={handleErrorMessage}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert severity="error" sx={{ width: "100%" }}>
-          <Typography>El correo o la contraseña no son correctos!</Typography>
+          <Typography>{errorMessage.message}</Typography>
         </Alert>
       </Snackbar>
 
@@ -183,7 +191,7 @@ export default function Login() {
           />
         </FormControl>
 
-        <Link to={"/Registrar"} >Registrate aquí</Link>
+        <Link to={"/Registrar"} >Regístrate aquí</Link>
         <Button
           type="submit"
           variant="contained"

@@ -16,7 +16,7 @@ export const Algorithm = async (parameters) => {
           `&endTimeTest=${parameters.sessions[0].endTime}` +
           `&dayTest=${parameters.sessions[0].day}` +
           `&capacity=${
-            parameters.capacity !== 0 ? parameters.capacity : null
+            parameters.capacity !== 0 ? parameters.capacity : null //session 1
           }` +
           `&piso=${parameters.floor !== "" ? parameters.floor : null}` +
           `&buildCode=${
@@ -33,7 +33,7 @@ export const Algorithm = async (parameters) => {
           `&endTimeTest=${parameters.sessions[0].endTime}` +
           `&dayTest=${parameters.sessions[0].day}` +
           `&capacity=${
-            parameters.capacity !== 0 ? parameters.capacity : null
+            parameters.capacity !== 0 ? parameters.capacity : null //session 2
           }` +
           `&piso=${parameters.floor !== "" ? parameters.floor : null}` +
           `&buildCode=${
@@ -53,7 +53,7 @@ export const Algorithm = async (parameters) => {
           `&endTimeTest=${parameters.sessions[0].endTime}` +
           `&dayTest=${parameters.sessions[0].day}` +
           `&capacity=${
-            parameters.capacity !== 0 ? parameters.capacity : null
+            parameters.capacity !== 0 ? parameters.capacity : 0 //session3
           }` +
           `&piso=${parameters.floor !== "" ? parameters.floor : null}` +
           `&buildCode=${

@@ -81,7 +81,7 @@ export default function ClassroomAlgorithmForm() {
       errors["floor"]["message"] = "Debe seleccionar un piso";
       validate = false;
     }
-    if (form.morning == "") {
+    if (form.morning === "") {
       errors["morning"]["error"] = true;
       errors["morning"]["message"] = "Debe seleccionar un periodo";
       validate = false;

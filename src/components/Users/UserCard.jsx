@@ -14,7 +14,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from "react-router-dom";
 import { GetUser } from "../../session/session";
 import { useDeleteUser } from "../../hooks/User.Hooks";
-import { RoleMap } from "../../helpers/user.helpers";
+import { ErrorMap, RoleMap } from "../../helpers/user.helpers";
 import { useState } from "react";
 export default function UserCard({ user, setSuccessMessage, setErrorMessage }) {
   const { Id } = GetUser();
@@ -39,7 +39,7 @@ export default function UserCard({ user, setSuccessMessage, setErrorMessage }) {
             setErrorMessage({
               error: true,
               message: ErrorMap(res.data.errorType),
-            });
+            })
         },
         onError: (error) => {
           setErrorMessage({

@@ -15,7 +15,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAddUser } from "../hooks/User.Hooks";
 import { alpha, email } from "../helpers/regularExpressions.helper";
-import { ValidateForm } from "../helpers/user.helpers";
+import { ErrorMap, ValidateForm } from "../helpers/user.helpers";
 // import {
 //   CustomInputLabel,
 //   CustomSelect,

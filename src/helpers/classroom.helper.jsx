@@ -22,7 +22,7 @@ import { alpha, alphaNumeric } from "../helpers/regularExpressions.helper";
 export const validateForm = (form, setFormErrors) => {
   const errors = { code: {}, name: {}, floor: {}, buildingId: {} };
   var validate = true;
-  if (form.buildingId === 0) {
+  if (form.buildingId === "") {
     errors["buildingId"]["error"] = true;
     errors["buildingId"]["message"] = "Debe seleccionar un edificio";
     validate = false;
@@ -62,7 +62,7 @@ export const ErrorMap = (errorType) => {
 
 const handleForm = (e, form, setForm, setFormErrors, withoutErrors) => {
   if (e.target.name === "capacity") {
-    if (parseInt(e.target.value) >= 10 && parseInt(e.target.value) <= 50)
+    if (parseInt(e.target.value) >= 10 && parseInt(e.target.value) <= 200)
       setForm({ ...form, capacity: parseInt(e.target.value) });
   }
   if (e.target.name == "buildingId")

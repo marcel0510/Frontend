@@ -108,16 +108,12 @@ export default function GroupCard({
           }}
         >
           <Typography variant="h6" mb={1}>
-            Eliminar edificio
+            Eliminar grupo
           </Typography>
           <Divider />
           <Typography mt={1} mb={2}>
-            ¿Esta seguro de que desea eliminar este edificio?
-            <Typography color={"secondary"}>
-              {" "}
-              Todas las aulas relaciondas con este edificio también se
-              eliminarán
-            </Typography>
+            ¿Esta seguro de que desea eliminar este grupo?
+
           </Typography>
           <Button
             color="secondary"

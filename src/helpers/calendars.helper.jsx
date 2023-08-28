@@ -36,6 +36,12 @@ export const validateForm = (form, setFormErrors) => {
       "La fecha de inicio y fin del periodo no deben coincidir";
     validate = false;
   }
+  if (form.periodInit === form.periodEnd) {
+    errors["periodEnd"]["error"] = true;
+    errors["periodEnd"]["message"] =
+      "La fecha de inicio y fin del periodo no deben coincidir";
+    validate = false;
+  }
   if (validate) return true;
   else {
     setFormErrors(errors);

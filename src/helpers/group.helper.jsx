@@ -35,6 +35,7 @@ export const ValidateForm = (form, setFormErrors) => {
   var validateSession5 = true;
   var validateSession6 = true;
   var validateSession7 = true;
+  var validateSession8 = true;
 
   form.sessions.forEach((s) => {
     const stime = parseInt(s.startTime.split(':')[0], 10)
@@ -60,6 +61,9 @@ export const ValidateForm = (form, setFormErrors) => {
     if(stime == 13 || etime == 14){
       validateSession7 = false;
     }
+    if(s.startTime.split(':')[1] !== "00" || s.endTime.split(':')[1] !== "00"){
+      validateSession8 = false;
+    }
   });
   if (form.name === "") {
     errors["name"]["error"] = true;
@@ -67,13 +71,13 @@ export const ValidateForm = (form, setFormErrors) => {
     validate = false;
   }
 
-  if (form.subjectId === 0) {
+  if (form.subjectId == "") {
     errors["subjectId"]["error"] = true;
     errors["subjectId"]["message"] = "Debe seleccionar una materia";
     validate = false;
   }
 
-  if (form.classroomId === 0) {
+  if (form.classroomId == "") {
     errors["classroomId"]["error"] = true;
     errors["classroomId"]["message"] = "Debe seleccionar un aula";
     validate = false;
@@ -119,6 +123,12 @@ export const ValidateForm = (form, setFormErrors) => {
     errors["sessions"]["error"] = true;
     errors["sessions"]["message"] =
       "No se puede agregar un grupo durante el almuerzo";
+    validate = false;
+  }
+  if (!validateSession8) {
+    errors["sessions"]["error"] = true;
+    errors["sessions"]["message"] =
+      "Se deben configurar horas completas. Ej. 07:00 - 09:00";
     validate = false;
   }
   if (validate) return true;

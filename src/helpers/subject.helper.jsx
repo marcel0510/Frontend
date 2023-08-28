@@ -14,7 +14,7 @@ import {
 import { alpha, alphaNumeric } from "./regularExpressions.helper";
 import { CustomInputLabel, CustomSelect, ErrorFormHelperText } from "../Styles/Styled";
 export const validateForm = (form, setFormErrors, alias) => {
-  const errors = { code: {}, name: {}, alias: {}, numHours: {} };
+  const errors = { code: {}, name: {}, alias: {}, numHours: {}, numCredits: {}, numSemester: {} };
   var validate = true;
   if (form.code === "") {
     errors["code"]["error"] = true;
@@ -29,6 +29,16 @@ export const validateForm = (form, setFormErrors, alias) => {
   if(form.numHours === ""){
     errors["numHours"]["error"] = true;
     errors["numHours"]["message"] = "Debe seleccionar un numero de horas";
+    validate = false;
+  }
+  if(form.numCredits === ""){
+    errors["numCredits"]["error"] = true;
+    errors["numCredits"]["message"] = "Debe seleccionar un numero de creditos";
+    validate = false;
+  }
+  if(form.numHours === ""){
+    errors["numSemester"]["error"] = true;
+    errors["numSemester"]["message"] = "Debe seleccionar un numero de semestre";
     validate = false;
   }
   if (alias && form.alias === "") {

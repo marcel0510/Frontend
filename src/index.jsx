@@ -52,7 +52,6 @@ root.render(
         <CssBaseline />
         <App />
         </LocalizationProvider>
-        <ReactQueryDevtools />
         </ThemeProvider>
       </BrowserRouter>
     </QueryClientProvider>

@@ -4,7 +4,7 @@ import { IP } from '../global/variables';
 
 const { Token } = GetUser();
 const calendarProviderHandler = axios.create({
-    baseURL: `https://${IP}:7130/api/calendar`
+    baseURL: `${IP}:7130/api/calendar`
 })
 
 export const GetCalendars = async () => {

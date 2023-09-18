@@ -7,6 +7,11 @@ const AlgorithmProviderHandler = axios.create({
 export const Algorithm = async (parameters) => {
   if (parameters) {
     let URL = "";
+    if(!parameters.isParameters) {
+      parameters.capacity = 0;
+      parameters.floor = "";
+      parameters.building = "";
+    } 
     switch (parameters.sessions.length) {
       case 1:
         URL =
@@ -16,7 +21,7 @@ export const Algorithm = async (parameters) => {
           `&endTimeTest=${parameters.sessions[0].endTime}` +
           `&dayTest=${parameters.sessions[0].day}` +
           `&capacity=${
-            parameters.capacity !== 0 ? parameters.capacity : null //session 1
+            parameters.capacity !== 0 ? parameters.capacity : 0 //session 1
           }` +
           `&piso=${parameters.floor !== "" ? parameters.floor : null}` +
           `&buildCode=${
@@ -33,7 +38,7 @@ export const Algorithm = async (parameters) => {
           `&endTimeTest=${parameters.sessions[0].endTime}` +
           `&dayTest=${parameters.sessions[0].day}` +
           `&capacity=${
-            parameters.capacity !== 0 ? parameters.capacity : null //session 2
+            parameters.capacity !== 0 ? parameters.capacity : 0 //session 2
           }` +
           `&piso=${parameters.floor !== "" ? parameters.floor : null}` +
           `&buildCode=${

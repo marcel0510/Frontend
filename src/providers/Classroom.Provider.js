@@ -6,7 +6,7 @@ import { IP } from '../global/variables';
 const { Token } = GetUser();
 
 const classroomProviderHandler = axios.create({
-    baseURL: `https://${IP}:7130/api/classroom`
+    baseURL: `${IP}:7130/api/classroom`
 })
 
 export const GetClassrooms = async () => {

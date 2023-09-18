@@ -4,7 +4,7 @@ import { IP } from '../global/variables';
 
 const { Token } = GetUser();
 const SubjectProviderHandler = axios.create({
-    baseURL: `https://${IP}:7130/api/subject`,
+    baseURL: `${IP}:7130/api/subject`,
 })
 
 export const GetSubjects = async () => {

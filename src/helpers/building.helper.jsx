@@ -18,10 +18,16 @@ import { alpha, alphaNumeric } from "./regularExpressions.helper";
 
 export const validateForm = (form, setFormErrors) => {
   const errors = { code: {}, name: {}, floors: {} };
+  const auxList = [];
   var validate = true;
   var validateFloors = true;
+  var validateFloors1 = true;
   form.floors.forEach((f) => {
     if (f.code === "") validateFloors = false;
+    auxList.forEach(auxF => {
+      if(auxF.code == f.code) validateFloors1 = false;
+    })
+    auxList.push(f);
   });
 
   if (form.code === "") {
@@ -40,6 +46,12 @@ export const validateForm = (form, setFormErrors) => {
     errors["floors"]["error"] = true;
     errors["floors"]["message"] =
       "Debe poner el codigo en cada uno de los pisos";
+    validate = false;
+  }
+
+  if (!validateFloors1) {
+    errors["floors"]["error"] = true;
+    errors["floors"]["message"] = "Los códigos no deben repetirse";
     validate = false;
   }
 

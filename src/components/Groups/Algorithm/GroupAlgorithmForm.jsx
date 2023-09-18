@@ -69,6 +69,7 @@ export default function GroupAlgorithmForm() {
     subjectName: "",
     subjectAlias: "",
     isLab: false,
+    isParameters: false,
     nameLab: "",
     sessions: [
       {
@@ -251,7 +252,7 @@ export default function GroupAlgorithmForm() {
       validate = false;
     }
 
-    if (form.subjectId === 0) {
+    if (form.subjectId === "") {
       errors["subjectId"]["error"] = true;
       errors["subjectId"]["message"] = "Debe seleccionar una materia";
       validate = false;
@@ -638,8 +639,8 @@ export default function GroupAlgorithmForm() {
           <FormControlLabel
             control={
               <Checkbox
-                checked={optional}
-                onChange={() => setOptional(!optional)}
+                checked={form.isParameters}
+                onChange={() => setForm({...form, isParameters: !form.isParameters})}
               />
             }
             label="Agregar parámetros opcionales"
@@ -648,7 +649,7 @@ export default function GroupAlgorithmForm() {
         </Box>
 
         {/* Parametros opcionales */}
-        {optional && (
+        {form.isParameters && (
           <Box
             component={"fieldset"}
             sx={{

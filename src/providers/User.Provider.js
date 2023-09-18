@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { IP } from '../global/variables';
 const UserProviderHandler = axios.create({
-    baseURL: `https://${IP}:7130/api/user`
+    baseURL: `${IP}:7130/api/user`
 })
 
 export const GetUsers = async () => {
